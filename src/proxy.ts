@@ -11,9 +11,9 @@ export async function proxy(request: NextRequest) {
   const { response, user } = await updateSession(request);
   const { pathname } = request.nextUrl;
 
+  const publicAuthRoutes = ["/dashboard/login", "/dashboard/forgot-password", "/dashboard/reset-password", "/dashboard/auth/"];
   const isProtected =
-    (pathname.startsWith("/dashboard") && !pathname.startsWith("/dashboard/login") &&
-      !pathname.startsWith("/dashboard/reset-password")) ||
+    (pathname.startsWith("/dashboard") && !publicAuthRoutes.some((r) => pathname.startsWith(r))) ||
     pathname.startsWith("/staff");
 
   if (isProtected && !user) {

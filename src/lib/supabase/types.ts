@@ -751,6 +751,13 @@ export type Database = {
             referencedRelation: "users";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "organisation_members_profile_fk";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
         ];
       };
       organisations: {

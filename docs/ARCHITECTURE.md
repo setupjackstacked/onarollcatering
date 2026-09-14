@@ -5,7 +5,7 @@ One Next.js 16 (App Router) application, one repository, three surfaces:
 | Surface | Route | Status |
 |---|---|---|
 | Public marketing site | `/` | Phase 1 — built |
-| Management dashboard (native CRM/ops) | `/dashboard` | Phase 2 schema done; Phase 3+ UI — auth gate + stub only |
+| Management dashboard (native CRM/ops) | `/dashboard` | Phase 3 — auth, shell, overview, search, notifications, settings (read) |
 | Staff portal | `/staff` | Phase 12 — auth gate + stub only |
 
 ## Stack
@@ -22,8 +22,8 @@ src/
     layout.tsx              root: self-hosted fonts, metadata
     globals.css             Tailwind v4 @theme brand tokens + utilities
     (marketing)/            public site (layout = header/footer)
-    (auth)/dashboard/login  sign-in (stub until Phase 3)
-    dashboard/              protected; Phase 3 shell
+    (auth)/dashboard/       login, forgot-password, reset-password, auth/callback (PKCE)
+    dashboard/              protected shell: layout (requireOrgContext), overview, notifications, settings, no-access
     staff/                  protected; Phase 12
     api/enquiry-upload/     multipart upload route handler
     sitemap.ts, robots.ts, not-found.tsx, error.tsx
@@ -35,12 +35,18 @@ src/
                             QuoteCTA, Footer, LogoStrip, PageHero, Faqs, Breadcrumbs, QuoteForm, ContactForm
     motion/                 Reveal, CountUp, Parallax
     ui/                     Button/LinkButton, Field/Input/Textarea/Select/CheckboxTile
+    dashboard/              DashboardShell, Sidebar, MobileNav, CommandPalette, AuthForm(s), primitives
+                            (PageHeader, Metric, StatusBadge, EmptyState, Panel), OverviewView
   features/
     enquiries/actions.ts    server actions: submitEnquiry, submitContactMessage
+    auth/actions.ts         signIn, signOut, requestPasswordReset, updatePassword
+    dashboard/              navigation config, overview loader, ⌘K search action, notification actions
   lib/
     env/                    zod-validated env (public vs server-only)
     supabase/               client / server / admin (service role) / proxy helpers, DB types
-    auth/                   session helpers (getCurrentUser, requireUser), permission map
+    auth/                   session helpers, requireOrgContext() (user + org + role + RLS client), permission map
+    domain/                 status vocabularies, address schema
+    money/, dates/          integer-pence money helpers; DD/MM/YYYY formatting
     validation/             zod schemas shared by client + server
     email/                  Resend wrapper + branded templates
     storage/                enquiry upload validation (magic bytes) + private bucket write
@@ -120,7 +126,17 @@ throwaway cluster, applies `supabase/tests/00_supabase_shim.sql` (emulates `auth
 `supabase/tests/*.test.sql`. Tests set `request.jwt.claim.sub` + `role = authenticated` to act as specific
 users and assert cross-tenant isolation and role behaviour. Add a test file whenever a migration adds RLS.
 
+## Dashboard request flow
+
+`proxy.ts` (edge) refreshes the Supabase cookie and bounces anonymous requests to `/dashboard/login`.
+`app/dashboard/layout.tsx` then calls `requireOrgContext()`, which resolves the user, their first accepted
+membership (organisation + role) and an RLS-scoped Supabase client; users with no membership land on
+`/dashboard/no-access`. Pages and server actions receive `ctx.can(permission)` for UI gating, while the
+database enforces the same matrix through RLS. Navigation items for unbuilt modules are rendered disabled
+with their phase number rather than hidden or faked.
+
 ## Phase roadmap
 
-See the master spec §103. Done: Phase 0, 1, 2. Next: **Phase 3** (login, password reset, protected
-routes, sidebar + mobile dashboard nav, overview, global search shell, permissions framework).
+See the master spec §103. Done: Phase 0–3. Next: **Phase 4** — native CRM: enquiries inbox →
+lead conversion, leads pipeline, clients + contacts + sites, projects + tasks + documents, activity
+timeline, notes, assignment, filters, team invitations/roles in Settings.

@@ -83,6 +83,10 @@ body {
   font-weight: 500;
 }
 
+@utility num-lining {
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
 @utility text-balance {
   text-wrap: balance;
 }

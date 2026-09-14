@@ -1,18 +1,11 @@
-import { getCurrentUser, getMemberships } from "@/lib/auth/session";
+import { requireOrgContext } from "@/lib/auth/context";
+import { loadOverview } from "@/features/dashboard/overview";
+import { OverviewView } from "@/components/dashboard/overview-view";
 
-export const metadata = { title: "Overview", robots: { index: false } };
+export const metadata = { title: "Overview" };
 
-/** Phase 3 replaces this with the real overview. */
-export default async function DashboardPage() {
-  const user = await getCurrentUser();
-  const memberships = await getMemberships();
-  return (
-    <main className="container-x py-16">
-      <p className="eyebrow text-copper-dark">Dashboard</p>
-      <h1 className="font-display display-md mt-3">Coming in Phase 3</h1>
-      <p className="mt-4 text-muted-light">
-        Signed in as {user?.email}. {memberships.length ? `Organisation: ${memberships[0]!.organisationName} (${memberships[0]!.role}).` : "No organisation membership yet."}
-      </p>
-    </main>
-  );
+export default async function DashboardOverviewPage() {
+  const ctx = await requireOrgContext();
+  const data = await loadOverview(ctx);
+  return <OverviewView data={data} orgName={ctx.organisation.name} canSales={ctx.can("sales.read")} />;
 }
