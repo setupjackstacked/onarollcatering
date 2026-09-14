@@ -22,12 +22,13 @@ export default async function ExpensePage({ params }: { params: Promise<{ id: st
   const activity = await listActivity(ctx, "expenses", id);
   const project = e.projects as unknown as { id: string; name: string; project_number: string } | null;
   const receipt = e.documents as unknown as { id: string; name: string } | null;
+  const supplier = e.suppliers as unknown as { id: string; name: string } | null;
   const canApprove = ctx.can("finance.write");
   const canEdit = canApprove || (ctx.role === "project_manager" && e.status === "pending");
   return (
     <>
       <EntityHeader back={{ href: "/dashboard/expenses", label: "Expenses" }} eyebrow={`${categoryLabel(e.category)} · ${formatDateUK(e.expense_date)}`} title={e.description} badge={<ExpenseBadge status={e.status} />}
-        meta={<>{project ? <Link href={`/dashboard/projects/${project.id}/costs`} className="underline">{project.project_number} · {project.name}</Link> : <span>Overhead</span>}{e.supplier_name ? <span>{e.supplier_name}</span> : null}{e.reference ? <span>Ref {e.reference}</span> : null}</>}
+        meta={<>{project ? <Link href={`/dashboard/projects/${project.id}/costs`} className="underline">{project.project_number} · {project.name}</Link> : <span>Overhead</span>}{supplier ? <Link href={`/dashboard/suppliers/${supplier.id}`} className="underline">{supplier.name}</Link> : e.supplier_name ? <span>{e.supplier_name}</span> : null}{e.reference ? <span>Ref {e.reference}</span> : null}</>}
         actions={<>
           {canEdit ? <ActionLink href={`/dashboard/expenses/${id}/edit`} variant="obsidian">Edit</ActionLink> : null}
           {canApprove ? <ConfirmAction action={archiveExpense.bind(null, id)} label="Remove" title="Remove this cost?" description="It will no longer count towards project costs." confirmLabel="Remove" /> : null}
@@ -48,7 +49,7 @@ export default async function ExpensePage({ params }: { params: Promise<{ id: st
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <Panel title="Details">
-            <DescriptionList cols={2} items={[{ label: "Category", value: categoryLabel(e.category) }, { label: "Date", value: formatDateUK(e.expense_date) }, { label: "Supplier", value: e.supplier_name }, { label: "Reference", value: e.reference }, { label: "Approved", value: e.approved_at ? formatDateUK(e.approved_at, true) : null }, { label: "Notes", value: e.notes }]} />
+            <DescriptionList cols={2} items={[{ label: "Category", value: categoryLabel(e.category) }, { label: "Date", value: formatDateUK(e.expense_date) }, { label: "Supplier", value: supplier?.name ?? e.supplier_name }, { label: "Reference", value: e.reference }, { label: "Approved", value: e.approved_at ? formatDateUK(e.approved_at, true) : null }, { label: "Notes", value: e.notes }]} />
           </Panel>
           <Panel title="Receipt">
             {receipt ? <p className="text-sm"><a href={`/api/documents/${receipt.id}`} className="underline">{receipt.name}</a></p> : <p className="mb-3 text-sm text-muted-light">No receipt attached.</p>}

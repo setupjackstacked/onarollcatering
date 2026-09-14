@@ -31,7 +31,7 @@ export default async function ExpensesPage({ searchParams }: { searchParams: Pro
       <DataTable rows={rows} rowKey={(r) => r.id} rowHref={(r) => `/dashboard/expenses/${r.id}`}
         columns={[
           { key: "d", header: "Date", render: (r) => formatDateUK(r.expense_date) },
-          { key: "desc", header: "Description", render: (r) => <span>{r.description}{r.supplier_name ? <span className="block text-xs text-muted-light">{r.supplier_name}</span> : null}</span> },
+          { key: "desc", header: "Description", render: (r) => { const sup = (r.suppliers as unknown as { name: string } | null)?.name ?? r.supplier_name; return <span>{r.description}{sup ? <span className="block text-xs text-muted-light">{sup}</span> : null}</span>; } },
           { key: "p", header: "Project", render: (r) => (r.projects as unknown as { name: string } | null)?.name ?? <span className="text-muted-light">Overhead</span> },
           { key: "c", header: "Category", render: (r) => categoryLabel(r.category) },
           { key: "s", header: "Status", render: (r) => <ExpenseBadge status={r.status} /> },

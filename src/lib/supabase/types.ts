@@ -109,6 +109,13 @@ export type Database = {
             referencedRelation: "organisations";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "catalogue_items_equipment_fk";
+            columns: ["equipment_id"];
+            isOneToOne: false;
+            referencedRelation: "equipment";
+            referencedColumns: ["id"];
+          },
         ];
       };
       client_contacts: {
@@ -638,6 +645,105 @@ export type Database = {
           },
         ];
       };
+      equipment: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          name: string;
+          category: string;
+          supplier_id: string | null;
+          supplier_sku: string | null;
+          description: string | null;
+          specification: string | null;
+          cost_price: string;
+          sell_price: string;
+          vat_rate_key: string;
+          image_document_id: string | null;
+          datasheet_document_id: string | null;
+          active: boolean;
+          notes: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          name: string;
+          category?: string;
+          supplier_id?: string | null;
+          supplier_sku?: string | null;
+          description?: string | null;
+          specification?: string | null;
+          cost_price?: string;
+          sell_price?: string;
+          vat_rate_key?: string;
+          image_document_id?: string | null;
+          datasheet_document_id?: string | null;
+          active?: boolean;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          name?: string;
+          category?: string;
+          supplier_id?: string | null;
+          supplier_sku?: string | null;
+          description?: string | null;
+          specification?: string | null;
+          cost_price?: string;
+          sell_price?: string;
+          vat_rate_key?: string;
+          image_document_id?: string | null;
+          datasheet_document_id?: string | null;
+          active?: boolean;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "equipment_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "equipment_supplier_id_fkey";
+            columns: ["supplier_id"];
+            isOneToOne: false;
+            referencedRelation: "suppliers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "equipment_image_document_id_fkey";
+            columns: ["image_document_id"];
+            isOneToOne: false;
+            referencedRelation: "documents";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "equipment_datasheet_document_id_fkey";
+            columns: ["datasheet_document_id"];
+            isOneToOne: false;
+            referencedRelation: "documents";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "equipment_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       expenses: {
         Row: {
           id: string;
@@ -745,6 +851,13 @@ export type Database = {
             columns: ["created_by"];
             isOneToOne: false;
             referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "expenses_supplier_fk";
+            columns: ["supplier_id"];
+            isOneToOne: false;
+            referencedRelation: "suppliers";
             referencedColumns: ["id"];
           },
         ];
@@ -2430,6 +2543,141 @@ export type Database = {
           },
         ];
       };
+      supplier_contacts: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          supplier_id: string;
+          first_name: string;
+          last_name: string;
+          job_title: string | null;
+          email: string | null;
+          phone: string | null;
+          is_primary: boolean;
+          notes: string | null;
+          archived_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          supplier_id: string;
+          first_name: string;
+          last_name?: string;
+          job_title?: string | null;
+          email?: string | null;
+          phone?: string | null;
+          is_primary?: boolean;
+          notes?: string | null;
+          archived_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          supplier_id?: string;
+          first_name?: string;
+          last_name?: string;
+          job_title?: string | null;
+          email?: string | null;
+          phone?: string | null;
+          is_primary?: boolean;
+          notes?: string | null;
+          archived_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "supplier_contacts_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "supplier_contacts_supplier_id_fkey";
+            columns: ["supplier_id"];
+            isOneToOne: false;
+            referencedRelation: "suppliers";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      suppliers: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          name: string;
+          category: Database["public"]["Enums"]["supplier_category"];
+          email: string | null;
+          phone: string | null;
+          website: string | null;
+          address: Json;
+          vat_number: string | null;
+          payment_terms_days: number;
+          account_number: string | null;
+          notes: string | null;
+          archived_at: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          name: string;
+          category?: Database["public"]["Enums"]["supplier_category"];
+          email?: string | null;
+          phone?: string | null;
+          website?: string | null;
+          address?: Json;
+          vat_number?: string | null;
+          payment_terms_days?: number;
+          account_number?: string | null;
+          notes?: string | null;
+          archived_at?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          name?: string;
+          category?: Database["public"]["Enums"]["supplier_category"];
+          email?: string | null;
+          phone?: string | null;
+          website?: string | null;
+          address?: Json;
+          vat_number?: string | null;
+          payment_terms_days?: number;
+          account_number?: string | null;
+          notes?: string | null;
+          archived_at?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "suppliers_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "suppliers_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       tasks: {
         Row: {
           id: string;
@@ -2810,7 +3058,10 @@ export type Database = {
       recalculate_payroll_entry: { Args: { p_entry_id: string }; Returns: undefined };
       build_payroll_period: { Args: { p_period_id: string; p_overtime_multiplier?: unknown }; Returns: number };
       finalise_payroll_period: { Args: { p_period_id: string }; Returns: undefined };
+      supplier_spend: { Args: { p_supplier_id: string }; Returns: unknown };
       reopen_payroll_period: { Args: { p_period_id: string }; Returns: undefined };
+      publish_equipment_to_catalogue: { Args: { p_equipment_id: string }; Returns: string };
+      seed_org_supplier_defaults: { Args: { org: string }; Returns: undefined };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";
@@ -2875,6 +3126,18 @@ export type Database = {
       verification_status: "unverified" | "verified" | "rejected" | "expired";
       pay_period_status: "draft" | "review" | "finalised" | "exported";
       pay_adjustment_kind: "bonus" | "expense_reimbursement" | "deduction" | "holiday_pay" | "other";
+      supplier_category:
+        | "food"
+        | "equipment"
+        | "fabrication"
+        | "extraction"
+        | "refrigeration"
+        | "electrical"
+        | "plumbing"
+        | "transport"
+        | "agency_staff"
+        | "cleaning"
+        | "other";
     };
     CompositeTypes: Record<string, never>;
   };
@@ -2907,5 +3170,6 @@ export type LeaveStatus = Database["public"]["Enums"]["leave_status"];
 export type VerificationStatus = Database["public"]["Enums"]["verification_status"];
 export type PayPeriodStatus = Database["public"]["Enums"]["pay_period_status"];
 export type PayAdjustmentKind = Database["public"]["Enums"]["pay_adjustment_kind"];
+export type SupplierCategory = Database["public"]["Enums"]["supplier_category"];
 export type TablesInsert<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Insert"];
 export type TablesUpdate<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Update"];

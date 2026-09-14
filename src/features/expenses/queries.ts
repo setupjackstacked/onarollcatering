@@ -5,7 +5,7 @@ import type { OrgContext } from "@/lib/auth/context";
 import { pageParams, str } from "@/lib/pagination";
 import type { ExpenseStatus, CostCategory } from "@/lib/supabase/types";
 
-const LIST = "id, expense_date, description, category, net, vat, gross, status, reference, supplier_name, project_id, projects(name, project_number)";
+const LIST = "id, expense_date, description, category, net, vat, gross, status, reference, supplier_name, supplier_id, suppliers(id, name), project_id, projects(name, project_number)";
 
 export async function listExpenses(ctx: OrgContext, sp: Record<string, string | string[] | undefined>, filter?: { projectId?: string; supplierId?: string }) {
   const { from, to, page, size } = pageParams(sp);
@@ -21,7 +21,7 @@ export async function listExpenses(ctx: OrgContext, sp: Record<string, string | 
 }
 
 export const getExpense = cache(async (ctx: OrgContext, id: string) => {
-  const { data } = await ctx.supabase.from("expenses").select("*, projects(id, name, project_number), documents:receipt_document_id(id, name, mime_type, size_bytes)").eq("id", id).maybeSingle();
+  const { data } = await ctx.supabase.from("expenses").select("*, projects(id, name, project_number), suppliers(id, name), documents:receipt_document_id(id, name, mime_type, size_bytes)").eq("id", id).maybeSingle();
   return data;
 });
 

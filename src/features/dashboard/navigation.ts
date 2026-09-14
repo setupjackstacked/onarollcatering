@@ -53,8 +53,8 @@ export const DASHBOARD_NAV: NavSection[] = [
   {
     label: "Operations",
     items: [
-      { label: "Suppliers", href: "/dashboard/suppliers", icon: "suppliers", permission: "projects.read", phase: 10 },
-      { label: "Equipment", href: "/dashboard/equipment", icon: "equipment", permission: "projects.read", phase: 10 },
+      { label: "Suppliers", href: "/dashboard/suppliers", icon: "suppliers", permission: "projects.read" },
+      { label: "Equipment", href: "/dashboard/equipment", icon: "equipment", permission: "projects.read" },
     ],
   },
   {
