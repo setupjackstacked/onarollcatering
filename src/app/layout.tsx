@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { site } from "@/content/site";
+import { stock } from "@/content/images";
 import "./globals.css";
 
 /** Self-hosted fonts (no third-party requests). Files in src/fonts. */
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
     type: "website",
     siteName: site.name,
     locale: "en_GB",
-    images: [{ url: "/images/placeholders/og.jpg", width: 1200, height: 630, alt: site.name }],
+    images: [{ url: stock.og, width: 1200, height: 630, alt: site.name }],
   },
   twitter: { card: "summary_large_image" },
   icons: { icon: "/brand/icon.png" },

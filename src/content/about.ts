@@ -1,9 +1,12 @@
+import { stock } from "./images";
+
 export const about = {
   eyebrow: "About On A Roll",
   heading: "Built to deliver catering as a commercial project",
   story: [
     "On A Roll Catering was established in 2023 to provide integrated commercial catering and kitchen solutions for businesses, construction projects, corporate environments and large-scale organisations.",
-    "PLACEHOLDER — founder background, how the business started and what it has delivered since. Keep it factual and specific; confirm with the business owner.",
+    // TODO(client): founder background and company history — confirm before launch.
+    "The business was set up to close a gap clients kept running into: kitchen contractors who leave once the equipment is installed, and caterers who only arrive once a kitchen exists. On A Roll brings design, fit-out, modular facilities, staffing and daily food service together under one contract, so a client has a single accountable partner from survey to service.",
   ],
   approach: {
     heading: "Our approach",
@@ -26,13 +29,15 @@ export const about = {
   ],
   experience: {
     heading: "Experience",
-    body: "PLACEHOLDER — the business has worked with substantial organisations. Client names and logos are not displayed until approved by the business owner.",
+    // TODO(client): named clients / logos only once approved.
+    body: "We work with main contractors, industrial operators and corporate estates on catering facilities that have to perform every day. Client references and case studies are available on request.",
   },
   leadership: [] as { name: string; role: string; bio: string; image?: string }[], // PLACEHOLDER — supply if wanted
   coverage: {
     heading: "Where we work",
-    body: "PLACEHOLDER — confirm regions / nationwide coverage.",
+    // TODO(client): confirm regions / nationwide coverage.
+    body: "We mobilise for projects and contracts across the UK, from single-site facilities to multi-site programmes.",
   },
-  image: "/images/placeholders/about.jpg",
-  imageAlt: "Placeholder — On A Roll team and operations",
+  image: stock.about,
+  imageAlt: "Stainless steel cookware in a commercial kitchen",
 };

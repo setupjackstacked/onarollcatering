@@ -1,3 +1,5 @@
+import { stock } from "./images";
+
 export type ServiceSection = {
   heading: string;
   body: string;
@@ -34,7 +36,7 @@ export const services: Service[] = [
       "Contract, workforce and construction-site catering delivered as a managed operation — infrastructure, people and food service under one contract.",
     intro:
       "We run catering as an operation, not an event. That means the kitchen, the supply chain, the team and the daily service are planned and delivered together, so a site or workplace gets a dependable service from the first day of mobilisation to the last day of the contract.",
-    image: "/images/placeholders/commercial-catering.jpg",
+    image: stock.commercialCatering,
     imageAlt: "Commercial catering operation in service",
     keywords: [
       "contract catering",
@@ -100,7 +102,7 @@ export const services: Service[] = [
       "Workflow-led design of commercial kitchens — from brief and site survey through layout, equipment specification, utilities and commissioning.",
     intro:
       "A commercial kitchen is a production facility. We design it around the menu it has to deliver, the throughput it must sustain, the people who will work in it and the building it sits in — then carry the design through procurement, installation and handover.",
-    image: "/images/placeholders/kitchen-design.jpg",
+    image: stock.kitchenDesign,
     imageAlt: "Commercial kitchen layout and equipment",
     keywords: ["commercial kitchen design", "kitchen layout", "equipment specification", "kitchen consultancy"],
     covers: [
@@ -150,7 +152,7 @@ export const services: Service[] = [
       "Portacabin, container and modular kitchens and canteens — fully equipped, rapidly deployed, and specified for temporary or long-term use.",
     intro:
       "When a site has no kitchen, or the existing one can't cope, a modular facility is the fastest route to a compliant, productive catering operation. We specify, equip, deliver and commission modular kitchens and dining facilities as a turnkey package — and can staff and run them too.",
-    image: "/images/placeholders/modular-kitchens.jpg",
+    image: stock.modularKitchens,
     imageAlt: "Modular kitchen unit on a construction site",
     keywords: [
       "modular kitchen",
@@ -209,7 +211,7 @@ export const services: Service[] = [
       "New installations, refurbishments and equipment replacement — fabrication, services coordination, refrigeration, extraction and commissioning delivered as one package.",
     intro:
       "Fit-out is where design becomes a working kitchen. We manage fabrication, installation, mechanical and electrical coordination, refrigeration and extraction through to commissioning, so the client deals with one accountable contractor rather than a chain of trades.",
-    image: "/images/placeholders/kitchen-fit-out.jpg",
+    image: stock.kitchenFitOut,
     imageAlt: "Commercial kitchen installation in progress",
     keywords: ["kitchen fit-out", "kitchen installation", "kitchen refurbishment", "catering equipment installation"],
     covers: [
@@ -251,7 +253,7 @@ export const services: Service[] = [
       "Employed, managed catering teams — head chefs to kitchen porters — supplied as part of a delivered catering contract.",
     intro:
       "Our people are how a catering contract gets delivered every day. We employ, manage, rota and support the teams that run our client facilities, handling compliance, training and cover centrally so the service holds up regardless of who is on shift.",
-    image: "/images/placeholders/catering-staffing.jpg",
+    image: stock.cateringStaffing,
     imageAlt: "Catering team working in a commercial kitchen",
     keywords: ["catering staff", "contract catering team", "site chefs", "kitchen staff"],
     covers: [
@@ -292,7 +294,7 @@ export const services: Service[] = [
       "Unusual sites, tight programmes and combined scopes — catering and kitchen projects that don't fit a standard package.",
     intro:
       "Some requirements don't sit neatly under one heading: a remote compound that needs kitchen, dining, staffing and supply from nothing; a live facility that needs replacing without a break in service; a multi-site rollout on a fixed programme. We scope these as projects and deliver them end to end.",
-    image: "/images/placeholders/bespoke-projects.jpg",
+    image: stock.bespokeProjects,
     imageAlt: "Bespoke catering facility project",
     keywords: ["bespoke catering project", "catering project delivery", "kitchen project management"],
     covers: [

@@ -1,3 +1,5 @@
+import { stock } from "./images";
+
 export const hero = {
   eyebrow: "Commercial catering & kitchen solutions",
   headline: "Complete Commercial Catering Solutions",
@@ -8,9 +10,9 @@ export const hero = {
   media: {
     /** Swap for a real image or video path. Component supports both. */
     type: "image" as "image" | "video",
-    src: "/images/placeholders/hero.jpg",
-    poster: "/images/placeholders/hero.jpg",
-    alt: "Placeholder — commercial catering facility",
+    src: stock.hero,
+    poster: stock.hero,
+    alt: "Commercial kitchen — stainless steel preparation area",
     placeholder: true,
   },
 };
@@ -29,8 +31,8 @@ export const capability = {
     { label: "Staff", detail: "Employed, managed catering teams" },
     { label: "Operate", detail: "Daily food service, supply chain and compliance" },
   ],
-  image: "/images/placeholders/capability.jpg",
-  imageAlt: "Placeholder — catering facility from empty site to operation",
+  image: stock.capability,
+  imageAlt: "Chef working at the pass in a commercial kitchen",
 };
 
 export const process = {

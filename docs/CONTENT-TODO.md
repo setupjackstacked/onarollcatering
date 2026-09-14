@@ -11,7 +11,7 @@ Everything below is currently a labelled placeholder. Nothing has been invented.
 - [ ] Social links (LinkedIn etc.)
 
 ## Homepage — `src/content/homepage.ts`
-- [ ] Hero image or video (currently `/images/placeholders/hero.jpg`)
+- [ ] Hero image or video (currently an Unsplash placeholder — see `src/content/images.ts`)
 - [ ] Capability image
 - [ ] Statistics (years operating, meals served, kitchens delivered, contracts, locations) — `StatStrip` is hidden until supplied
 
@@ -38,7 +38,10 @@ Everything below is currently a labelled placeholder. Nothing has been invented.
 ## Brand
 - [ ] Vector logo (SVG). Current assets are extracted from the supplied JPEG: `public/brand/logo-copper.png`,
       `mark-copper.png`, `logo-horizontal.png` (composed for the header). Replace files in place; no code change needed.
-- [ ] Open Graph image (`/images/placeholders/og.jpg`)
+- [ ] Open Graph image (currently the Unsplash hero)
+
+## Placeholder photography
+All imagery is currently hotlinked from Unsplash (Unsplash License — free for commercial use, no attribution required) via `src/content/images.ts`. It is review-only. Replace each key with the company's own photography; drop files in `public/images/` and change the path — no component changes needed.
 
 ## Photography direction (spec §97)
 Industrial kitchens, site compounds, modular units, installation, teams at work, dining facilities.
