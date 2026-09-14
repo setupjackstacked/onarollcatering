@@ -331,6 +331,10 @@ export type Database = {
           archived_at: string | null;
           created_at: string;
           updated_at: string;
+          verification: Database["public"]["Enums"]["verification_status"];
+          verified_by: string | null;
+          verified_at: string | null;
+          notes: string | null;
         };
         Insert: {
           id?: string;
@@ -350,6 +354,10 @@ export type Database = {
           archived_at?: string | null;
           created_at?: string;
           updated_at?: string;
+          verification?: Database["public"]["Enums"]["verification_status"];
+          verified_by?: string | null;
+          verified_at?: string | null;
+          notes?: string | null;
         };
         Update: {
           id?: string;
@@ -369,6 +377,10 @@ export type Database = {
           archived_at?: string | null;
           created_at?: string;
           updated_at?: string;
+          verification?: Database["public"]["Enums"]["verification_status"];
+          verified_by?: string | null;
+          verified_at?: string | null;
+          notes?: string | null;
         };
         Relationships: [
           {
@@ -388,6 +400,148 @@ export type Database = {
           {
             foreignKeyName: "documents_uploaded_by_fkey";
             columns: ["uploaded_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "documents_verified_by_fkey";
+            columns: ["verified_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      employee_roles: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          key: string;
+          label: string;
+          sort_order: number;
+          active: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          key: string;
+          label: string;
+          sort_order?: number;
+          active?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          key?: string;
+          label?: string;
+          sort_order?: number;
+          active?: boolean;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "employee_roles_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      employees: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          employee_number: string;
+          user_id: string | null;
+          first_name: string;
+          last_name: string;
+          email: string | null;
+          phone: string | null;
+          address: Json;
+          emergency_contact: Json;
+          role_key: string;
+          employment_type: Database["public"]["Enums"]["employment_type"];
+          start_date: string | null;
+          end_date: string | null;
+          hourly_rate: string | null;
+          salary: string | null;
+          status: Database["public"]["Enums"]["employee_status"];
+          notes: string | null;
+          archived_at: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          employee_number: string;
+          user_id?: string | null;
+          first_name: string;
+          last_name: string;
+          email?: string | null;
+          phone?: string | null;
+          address?: Json;
+          emergency_contact?: Json;
+          role_key?: string;
+          employment_type?: Database["public"]["Enums"]["employment_type"];
+          start_date?: string | null;
+          end_date?: string | null;
+          hourly_rate?: string | null;
+          salary?: string | null;
+          status?: Database["public"]["Enums"]["employee_status"];
+          notes?: string | null;
+          archived_at?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          employee_number?: string;
+          user_id?: string | null;
+          first_name?: string;
+          last_name?: string;
+          email?: string | null;
+          phone?: string | null;
+          address?: Json;
+          emergency_contact?: Json;
+          role_key?: string;
+          employment_type?: Database["public"]["Enums"]["employment_type"];
+          start_date?: string | null;
+          end_date?: string | null;
+          hourly_rate?: string | null;
+          salary?: string | null;
+          status?: Database["public"]["Enums"]["employee_status"];
+          notes?: string | null;
+          archived_at?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "employees_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "employees_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "employees_created_by_fkey";
+            columns: ["created_by"];
             isOneToOne: false;
             referencedRelation: "users";
             referencedColumns: ["id"];
@@ -1002,6 +1156,79 @@ export type Database = {
             columns: ["converted_project_id"];
             isOneToOne: false;
             referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      leave_requests: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          employee_id: string;
+          leave_type: Database["public"]["Enums"]["leave_type"];
+          start_date: string;
+          end_date: string;
+          days: string;
+          reason: string | null;
+          status: Database["public"]["Enums"]["leave_status"];
+          decided_by: string | null;
+          decided_at: string | null;
+          decision_note: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          employee_id: string;
+          leave_type?: Database["public"]["Enums"]["leave_type"];
+          start_date: string;
+          end_date: string;
+          days?: string;
+          reason?: string | null;
+          status?: Database["public"]["Enums"]["leave_status"];
+          decided_by?: string | null;
+          decided_at?: string | null;
+          decision_note?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          employee_id?: string;
+          leave_type?: Database["public"]["Enums"]["leave_type"];
+          start_date?: string;
+          end_date?: string;
+          days?: string;
+          reason?: string | null;
+          status?: Database["public"]["Enums"]["leave_status"];
+          decided_by?: string | null;
+          decided_at?: string | null;
+          decision_note?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "leave_requests_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "leave_requests_employee_id_fkey";
+            columns: ["employee_id"];
+            isOneToOne: false;
+            referencedRelation: "employees";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "leave_requests_decided_by_fkey";
+            columns: ["decided_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];
@@ -1817,6 +2044,99 @@ export type Database = {
           },
         ];
       };
+      shifts: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          employee_id: string;
+          project_id: string | null;
+          site_id: string | null;
+          shift_date: string;
+          start_time: string;
+          end_time: string;
+          break_minutes: number;
+          role_key: string | null;
+          status: Database["public"]["Enums"]["shift_status"];
+          notes: string | null;
+          hours: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          employee_id: string;
+          project_id?: string | null;
+          site_id?: string | null;
+          shift_date: string;
+          start_time: string;
+          end_time: string;
+          break_minutes?: number;
+          role_key?: string | null;
+          status?: Database["public"]["Enums"]["shift_status"];
+          notes?: string | null;
+          hours?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          employee_id?: string;
+          project_id?: string | null;
+          site_id?: string | null;
+          shift_date?: string;
+          start_time?: string;
+          end_time?: string;
+          break_minutes?: number;
+          role_key?: string | null;
+          status?: Database["public"]["Enums"]["shift_status"];
+          notes?: string | null;
+          hours?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "shifts_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "shifts_employee_id_fkey";
+            columns: ["employee_id"];
+            isOneToOne: false;
+            referencedRelation: "employees";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "shifts_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "shifts_site_id_fkey";
+            columns: ["site_id"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "shifts_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       sites: {
         Row: {
           id: string;
@@ -1967,6 +2287,134 @@ export type Database = {
           },
         ];
       };
+      timesheets: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          employee_id: string;
+          shift_id: string | null;
+          project_id: string | null;
+          site_id: string | null;
+          work_date: string;
+          start_time: string;
+          end_time: string;
+          break_minutes: number;
+          hours: string | null;
+          overtime_hours: string;
+          hourly_rate: string | null;
+          notes: string | null;
+          status: Database["public"]["Enums"]["timesheet_status"];
+          submitted_at: string | null;
+          approved_by: string | null;
+          approved_at: string | null;
+          rejection_note: string | null;
+          payroll_entry_id: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          employee_id: string;
+          shift_id?: string | null;
+          project_id?: string | null;
+          site_id?: string | null;
+          work_date: string;
+          start_time: string;
+          end_time: string;
+          break_minutes?: number;
+          hours?: string | null;
+          overtime_hours?: string;
+          hourly_rate?: string | null;
+          notes?: string | null;
+          status?: Database["public"]["Enums"]["timesheet_status"];
+          submitted_at?: string | null;
+          approved_by?: string | null;
+          approved_at?: string | null;
+          rejection_note?: string | null;
+          payroll_entry_id?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          employee_id?: string;
+          shift_id?: string | null;
+          project_id?: string | null;
+          site_id?: string | null;
+          work_date?: string;
+          start_time?: string;
+          end_time?: string;
+          break_minutes?: number;
+          hours?: string | null;
+          overtime_hours?: string;
+          hourly_rate?: string | null;
+          notes?: string | null;
+          status?: Database["public"]["Enums"]["timesheet_status"];
+          submitted_at?: string | null;
+          approved_by?: string | null;
+          approved_at?: string | null;
+          rejection_note?: string | null;
+          payroll_entry_id?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "timesheets_approved_by_fkey";
+            columns: ["approved_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "timesheets_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "timesheets_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "timesheets_employee_id_fkey";
+            columns: ["employee_id"];
+            isOneToOne: false;
+            referencedRelation: "employees";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "timesheets_shift_id_fkey";
+            columns: ["shift_id"];
+            isOneToOne: false;
+            referencedRelation: "shifts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "timesheets_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "timesheets_site_id_fkey";
+            columns: ["site_id"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       vat_rates: {
         Row: {
           id: string;
@@ -2016,6 +2464,24 @@ export type Database = {
       };
     };
     Views: {
+      employee_directory: {
+        Row: {
+          id: string | null;
+          organisation_id: string | null;
+          employee_number: string | null;
+          user_id: string | null;
+          first_name: string | null;
+          last_name: string | null;
+          full_name: string | null;
+          role_key: string | null;
+          employment_type: Database["public"]["Enums"]["employment_type"] | null;
+          status: Database["public"]["Enums"]["employee_status"] | null;
+          archived_at: string | null;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       organisation_member_profiles: {
         Row: {
           organisation_id: string | null;
@@ -2039,6 +2505,8 @@ export type Database = {
           estimated_cost: string | null;
           committed_cost: string | null;
           actual_cost: string | null;
+          labour_cost: string | null;
+          labour_hours: string | null;
           estimated_gross_profit: string | null;
           estimated_margin_pct: string | null;
           forecast_gross_profit: string | null;
@@ -2080,6 +2548,7 @@ export type Database = {
       };
       recalculate_quote: { Args: { p_quote_id: string }; Returns: undefined };
       create_quote_revision: { Args: { p_quote_id: string }; Returns: string };
+      my_employee_id: { Args: Record<string, never>; Returns: string };
       quote_mark_viewed: { Args: { p_token: string }; Returns: undefined };
       quote_customer_decision: {
         Args: { p_token: string; p_decision: string; p_name: string; p_note?: unknown };
@@ -2104,6 +2573,13 @@ export type Database = {
       invoice_mark_viewed: { Args: { p_token: string }; Returns: undefined };
       project_cost_breakdown: { Args: { p_project_id: string }; Returns: unknown };
       map_quote_category: { Args: { p: string }; Returns: Database["public"]["Enums"]["cost_category"] };
+      shift_conflicts: {
+        Args: { p_employee_id: string; p_date: unknown; p_start: unknown; p_end: unknown; p_exclude_shift?: unknown };
+        Returns: unknown;
+      };
+      timesheet_from_shift: { Args: { p_shift_id: string }; Returns: string };
+      seed_org_workforce_defaults: { Args: { org: string }; Returns: undefined };
+      can_view_directory: { Args: { org: string }; Returns: boolean };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";
@@ -2159,6 +2635,13 @@ export type Database = {
         | "utilities"
         | "other";
       expense_status: "pending" | "committed" | "actual" | "paid" | "rejected";
+      employment_type: "full_time" | "part_time" | "casual" | "contractor" | "agency";
+      employee_status: "active" | "inactive" | "on_leave" | "former";
+      shift_status: "draft" | "published" | "completed" | "cancelled";
+      timesheet_status: "draft" | "submitted" | "approved" | "rejected" | "paid";
+      leave_type: "holiday" | "sick" | "unpaid" | "other";
+      leave_status: "requested" | "approved" | "rejected" | "cancelled";
+      verification_status: "unverified" | "verified" | "rejected" | "expired";
     };
     CompositeTypes: Record<string, never>;
   };
@@ -2182,5 +2665,12 @@ export type InvoiceKind = Database["public"]["Enums"]["invoice_kind"];
 export type PaymentMethod = Database["public"]["Enums"]["payment_method"];
 export type CostCategory = Database["public"]["Enums"]["cost_category"];
 export type ExpenseStatus = Database["public"]["Enums"]["expense_status"];
+export type EmploymentType = Database["public"]["Enums"]["employment_type"];
+export type EmployeeStatus = Database["public"]["Enums"]["employee_status"];
+export type ShiftStatus = Database["public"]["Enums"]["shift_status"];
+export type TimesheetStatus = Database["public"]["Enums"]["timesheet_status"];
+export type LeaveType = Database["public"]["Enums"]["leave_type"];
+export type LeaveStatus = Database["public"]["Enums"]["leave_status"];
+export type VerificationStatus = Database["public"]["Enums"]["verification_status"];
 export type TablesInsert<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Insert"];
 export type TablesUpdate<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Update"];

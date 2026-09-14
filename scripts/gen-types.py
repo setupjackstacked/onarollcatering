@@ -99,7 +99,8 @@ def emit_func(f):
         typ = typ.split(" DEFAULT")[0].split("DEFAULT")[0].strip()
         opt = "DEFAULT" in part.upper()
         args.append(f'{name}{"?" if opt else ""}: {ts_sql_type(typ)}')
-    return f'      {f["name"]}: {{ Args: {{ {"; ".join(args)} }}; Returns: {ts_sql_type(f["ret"])} }}'
+    arg_type = f'{{ {"; ".join(args)} }}' if args else "Record<string, never>"
+    return f'      {f["name"]}: {{ Args: {arg_type}; Returns: {ts_sql_type(f["ret"])} }}'
 
 out = []
 out.append("export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]")

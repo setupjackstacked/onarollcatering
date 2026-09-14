@@ -35,10 +35,10 @@ export const DASHBOARD_NAV: NavSection[] = [
   {
     label: "Workforce",
     items: [
-      { label: "Employees", href: "/dashboard/employees", icon: "employees", permission: "workforce.read", phase: 8 },
-      { label: "Rota", href: "/dashboard/rota", icon: "rota", permission: "workforce.read", phase: 8 },
-      { label: "Timesheets", href: "/dashboard/timesheets", icon: "timesheets", permission: "workforce.read", phase: 8 },
-      { label: "Leave", href: "/dashboard/leave", icon: "leave", permission: "workforce.read", phase: 8 },
+      { label: "Employees", href: "/dashboard/employees", icon: "employees", permission: "workforce.read" },
+      { label: "Rota", href: "/dashboard/rota", icon: "rota", permission: "workforce.read" },
+      { label: "Timesheets", href: "/dashboard/timesheets", icon: "timesheets", permission: "workforce.read" },
+      { label: "Leave", href: "/dashboard/leave", icon: "leave", permission: "workforce.read" },
     ],
   },
   {
@@ -70,5 +70,5 @@ export const MOBILE_NAV: { label: string; href: string; icon: NavItem["icon"]; p
   { label: "Home", href: "/dashboard", icon: "home" },
   { label: "Projects", href: "/dashboard/projects", icon: "projects", permission: "projects.read" },
   { label: "Sales", href: "/dashboard/leads", icon: "leads", permission: "sales.read" },
-  { label: "Staff", href: "/dashboard/employees", icon: "employees", permission: "workforce.read", phase: 8 },
+  { label: "Staff", href: "/dashboard/employees", icon: "employees", permission: "workforce.read" },
 ];

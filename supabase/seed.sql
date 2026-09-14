@@ -12,14 +12,16 @@ insert into auth.users (id, email, raw_user_meta_data) values
   ('00000000-0000-4000-8000-0000000000a1', 'dev-owner@example.com',   '{"full_name":"SAMPLE Owner"}'),
   ('00000000-0000-4000-8000-0000000000a2', 'dev-finance@example.com', '{"full_name":"SAMPLE Finance"}'),
   ('00000000-0000-4000-8000-0000000000a3', 'dev-pm@example.com',      '{"full_name":"SAMPLE Project Manager"}'),
-  ('00000000-0000-4000-8000-0000000000a4', 'dev-readonly@example.com','{"full_name":"SAMPLE Read Only"}')
+  ('00000000-0000-4000-8000-0000000000a4', 'dev-readonly@example.com','{"full_name":"SAMPLE Read Only"}'),
+  ('00000000-0000-4000-8000-0000000000a5', 'dev-staff@example.com',   '{"full_name":"SAMPLE Staff"}')
 on conflict (id) do nothing;
 
 insert into public.organisation_members (organisation_id, user_id, role, accepted_at) values
   ('00000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-0000000000a1', 'owner',           now()),
   ('00000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-0000000000a2', 'finance',         now()),
   ('00000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-0000000000a3', 'project_manager', now()),
-  ('00000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-0000000000a4', 'read_only',       now())
+  ('00000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-0000000000a4', 'read_only',       now()),
+  ('00000000-0000-4000-8000-000000000001', '00000000-0000-4000-8000-0000000000a5', 'staff',           now())
 on conflict (organisation_id, user_id) do nothing;
 
 -- Sample client, contact, site
@@ -54,4 +56,11 @@ values ('00000000-0000-4000-8000-000000000101', '00000000-0000-4000-8000-0000000
         'SAMPLE North Compound catering', 'planning', '00000000-0000-4000-8000-0000000000c1',
         '00000000-0000-4000-8000-0000000000e1', '00000000-0000-4000-8000-0000000000f1', '00000000-0000-4000-8000-0000000000a3',
         current_date + 30, current_date + 400, 185000.00, 142000.00, '{commercial-catering,modular-kitchens}')
+on conflict (id) do nothing;
+
+-- Sample employee linked to the staff login (Phase 8)
+insert into public.employees (id, organisation_id, employee_number, user_id, first_name, last_name, email, role_key,
+                              employment_type, start_date, hourly_rate, status)
+values ('00000000-0000-4000-8000-000000000201', '00000000-0000-4000-8000-000000000001', '', '00000000-0000-4000-8000-0000000000a5',
+        'SAMPLE', 'Staff', 'dev-staff@example.com', 'chef', 'full_time', current_date - 200, 18.50, 'active')
 on conflict (id) do nothing;

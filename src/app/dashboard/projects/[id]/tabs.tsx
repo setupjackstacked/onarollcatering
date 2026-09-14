@@ -10,8 +10,8 @@ export function ProjectTabs({ base, counts }: { base: string; counts: { tasks: n
     <Tabs base={base} current={current} tabs={[
       { key: "overview", label: "Overview" },
       { key: "tasks", label: "Tasks", count: counts.tasks },
-      { key: "staff", label: "Staff", disabled: "P8" },
-      { key: "timesheets", label: "Timesheets", disabled: "P8" },
+      { key: "staff", label: "Staff" },
+      { key: "timesheets", label: "Timesheets" },
       { key: "costs", label: "Costs" },
       { key: "quotes", label: "Quotes" },
       { key: "invoices", label: "Invoices" },
