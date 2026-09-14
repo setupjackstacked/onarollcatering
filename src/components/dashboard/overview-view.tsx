@@ -1,7 +1,7 @@
 import type { OverviewData } from "@/features/dashboard/overview";
 import { PageHeader, Metric, Panel, EmptyState, StatusBadge } from "@/components/dashboard/primitives";
 import { formatGBP } from "@/lib/money";
-import { formatDistanceToNowStrict } from "date-fns";
+import { RelativeTime } from "./relative-time";
 
 const ACTION_LABEL: Record<string, string> = {
   "leads.created": "Lead created",
@@ -77,7 +77,7 @@ export function OverviewView({ data, orgName, canSales }: { data: OverviewData; 
               <li key={a.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-3 first:pt-0 last:pb-0 text-sm">
                 <span className="font-medium">{ACTION_LABEL[a.action] ?? a.action}</span>
                 {typeof a.metadata.to === "string" ? <StatusBadge label={String(a.metadata.to).replace(/_/g, " ")} tone="blue" /> : null}
-                <span className="ml-auto text-xs text-muted-light">{formatDistanceToNowStrict(new Date(a.created_at), { addSuffix: true })}</span>
+                <RelativeTime value={a.created_at} className="ml-auto text-xs text-muted-light" />
               </li>
             ))}
           </ol>

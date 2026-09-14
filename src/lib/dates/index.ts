@@ -14,3 +14,8 @@ export function isoDate(value: string | Date | null | undefined) {
   const d = typeof value === "string" ? parseISO(value) : value;
   return isValid(d) ? d.toISOString() : undefined;
 }
+
+/** ISO date (YYYY-MM-DD) for today ± days. Lives outside components to keep them pure. */
+export function isoDateOffset(days = 0, from: Date = new Date()) {
+  return new Date(from.getTime() + days * 864e5).toISOString().slice(0, 10);
+}

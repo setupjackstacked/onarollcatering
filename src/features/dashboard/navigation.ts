@@ -17,19 +17,19 @@ export const DASHBOARD_NAV: NavSection[] = [
   {
     label: "Sales",
     items: [
-      { label: "Enquiries", href: "/dashboard/enquiries", icon: "enquiries", permission: "sales.read", phase: 4 },
-      { label: "Leads", href: "/dashboard/leads", icon: "leads", permission: "sales.read", phase: 4 },
-      { label: "Clients", href: "/dashboard/clients", icon: "clients", permission: "sales.read", phase: 4 },
+      { label: "Enquiries", href: "/dashboard/enquiries", icon: "enquiries", permission: "sales.read" },
+      { label: "Leads", href: "/dashboard/leads", icon: "leads", permission: "sales.read" },
+      { label: "Clients", href: "/dashboard/clients", icon: "clients", permission: "sales.read" },
       { label: "Quotes", href: "/dashboard/quotes", icon: "quotes", permission: "sales.read", phase: 5 },
     ],
   },
   {
     label: "Projects",
     items: [
-      { label: "Projects", href: "/dashboard/projects", icon: "projects", permission: "projects.read", phase: 4 },
-      { label: "Sites", href: "/dashboard/sites", icon: "sites", permission: "projects.read", phase: 4 },
-      { label: "Tasks", href: "/dashboard/tasks", icon: "tasks", permission: "projects.read", phase: 4 },
-      { label: "Documents", href: "/dashboard/documents", icon: "documents", permission: "projects.read", phase: 4 },
+      { label: "Projects", href: "/dashboard/projects", icon: "projects", permission: "projects.read" },
+      { label: "Sites", href: "/dashboard/sites", icon: "sites", permission: "projects.read" },
+      { label: "Tasks", href: "/dashboard/tasks", icon: "tasks", permission: "projects.read" },
+      { label: "Documents", href: "/dashboard/documents", icon: "documents", permission: "projects.read" },
     ],
   },
   {
@@ -68,7 +68,7 @@ export const DASHBOARD_NAV: NavSection[] = [
 /** Mobile bottom bar (spec §76). */
 export const MOBILE_NAV: { label: string; href: string; icon: NavItem["icon"]; permission?: Permission; phase?: number }[] = [
   { label: "Home", href: "/dashboard", icon: "home" },
-  { label: "Projects", href: "/dashboard/projects", icon: "projects", permission: "projects.read", phase: 4 },
-  { label: "Sales", href: "/dashboard/leads", icon: "leads", permission: "sales.read", phase: 4 },
+  { label: "Projects", href: "/dashboard/projects", icon: "projects", permission: "projects.read" },
+  { label: "Sales", href: "/dashboard/leads", icon: "leads", permission: "sales.read" },
   { label: "Staff", href: "/dashboard/employees", icon: "employees", permission: "workforce.read", phase: 8 },
 ];

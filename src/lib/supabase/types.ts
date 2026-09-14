@@ -606,6 +606,57 @@ export type Database = {
           },
         ];
       };
+      notes: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          entity_type: string;
+          entity_id: string;
+          body: string;
+          pinned: boolean;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          entity_type: string;
+          entity_id: string;
+          body: string;
+          pinned?: boolean;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          entity_type?: string;
+          entity_id?: string;
+          body?: string;
+          pinned?: boolean;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notes_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "notes_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       notifications: {
         Row: {
           id: string;
@@ -1051,8 +1102,98 @@ export type Database = {
           },
         ];
       };
+      tasks: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          project_id: string | null;
+          title: string;
+          description: string | null;
+          assignee_user_id: string | null;
+          due_date: string | null;
+          priority: Database["public"]["Enums"]["task_priority"];
+          status: Database["public"]["Enums"]["task_status"];
+          completed_at: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          project_id?: string | null;
+          title: string;
+          description?: string | null;
+          assignee_user_id?: string | null;
+          due_date?: string | null;
+          priority?: Database["public"]["Enums"]["task_priority"];
+          status?: Database["public"]["Enums"]["task_status"];
+          completed_at?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          project_id?: string | null;
+          title?: string;
+          description?: string | null;
+          assignee_user_id?: string | null;
+          due_date?: string | null;
+          priority?: Database["public"]["Enums"]["task_priority"];
+          status?: Database["public"]["Enums"]["task_status"];
+          completed_at?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tasks_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tasks_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tasks_assignee_user_id_fkey";
+            columns: ["assignee_user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "tasks_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
+      organisation_member_profiles: {
+        Row: {
+          organisation_id: string | null;
+          user_id: string | null;
+          role: Database["public"]["Enums"]["organisation_role"] | null;
+          accepted_at: string | null;
+          full_name: string | null;
+          email: string | null;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       project_financials: {
         Row: {
           project_id: string | null;
@@ -1076,6 +1217,7 @@ export type Database = {
       org_role: { Args: { org_id: string }; Returns: Database["public"]["Enums"]["organisation_role"] };
       seed_org_defaults: { Args: { org: string }; Returns: undefined };
       next_document_number: { Args: { p_org: string; p_kind: string; p_prefix: string }; Returns: string };
+      convert_enquiry_to_lead: { Args: { p_enquiry_id: string; p_assignee?: unknown }; Returns: string };
       log_activity: {
         Args: { org: string; entity_type: string; entity_id: string; action: string; metadata?: Json };
         Returns: string;
@@ -1083,6 +1225,17 @@ export type Database = {
       can_write_project: { Args: { project_id: string }; Returns: boolean };
       role_in: { Args: { org: string; roles: string[] }; Returns: boolean };
       can_read_project: { Args: { project_id: string }; Returns: boolean };
+      convert_lead_to_project: {
+        Args: {
+          p_lead_id: string;
+          p_name?: unknown;
+          p_site_id?: unknown;
+          p_project_manager?: unknown;
+          p_contract_value?: unknown;
+          p_start_date?: unknown;
+        };
+        Returns: string;
+      };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";
@@ -1120,6 +1273,8 @@ export type Database = {
         | "project_deadline"
         | "enquiry_received"
         | "system";
+      task_status: "todo" | "in_progress" | "blocked" | "complete";
+      task_priority: "low" | "medium" | "high" | "urgent";
     };
     CompositeTypes: Record<string, never>;
   };

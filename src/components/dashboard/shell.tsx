@@ -101,7 +101,7 @@ export function DashboardShell({ orgName, userEmail, roleLabel, permissions, unr
       </div>
 
       <MobileNav permissions={permissions} />
-      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} available={false} />
+      <CommandPalette open={paletteOpen} onOpenChange={setPaletteOpen} available />
     </div>
   );
 }

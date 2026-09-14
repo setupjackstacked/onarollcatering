@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatDistanceToNowStrict } from "date-fns";
+import { RelativeTime } from "@/components/dashboard/relative-time";
 import { requireOrgContext } from "@/lib/auth/context";
 import { markAllNotificationsRead, markNotificationRead } from "@/features/dashboard/notifications";
 import { PageHeader, EmptyState } from "@/components/dashboard/primitives";
@@ -39,7 +39,7 @@ export default async function NotificationsPage() {
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium">{n.href ? <Link href={n.href} className="hover:underline">{n.title}</Link> : n.title}</p>
                 {n.body ? <p className="text-sm text-muted-light">{n.body}</p> : null}
-                <p className="mt-1 text-xs text-muted-light">{formatDistanceToNowStrict(new Date(n.created_at), { addSuffix: true })}</p>
+                <p className="mt-1 text-xs text-muted-light"><RelativeTime value={n.created_at} /></p>
               </div>
               {!n.read_at ? (
                 <form action={markNotificationRead.bind(null, n.id)}>
