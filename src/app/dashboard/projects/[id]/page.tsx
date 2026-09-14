@@ -28,7 +28,7 @@ export default async function ProjectOverviewPage({ params }: { params: Promise<
         <Metric label="Contract value" value={formatGBP(value, { showPence: false })} />
         <Metric label="Estimated cost" value={formatGBP(cost, { showPence: false })} />
         <Metric label="Est. gross profit" value={formatGBP(value - cost, { showPence: false })} />
-        <Metric label="Est. margin" value={margin === null ? "—" : `${margin}%`} hint="Actual costs from Phase 7" />
+        <Metric label="Est. margin" value={margin === null ? "—" : `${margin}%`} hint="Estimate — see Costs tab for actuals" />
       </div>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">

@@ -12,7 +12,7 @@ export function ProjectTabs({ base, counts }: { base: string; counts: { tasks: n
       { key: "tasks", label: "Tasks", count: counts.tasks },
       { key: "staff", label: "Staff", disabled: "P8" },
       { key: "timesheets", label: "Timesheets", disabled: "P8" },
-      { key: "costs", label: "Costs", disabled: "P7" },
+      { key: "costs", label: "Costs" },
       { key: "quotes", label: "Quotes" },
       { key: "invoices", label: "Invoices" },
       { key: "documents", label: "Documents", count: counts.documents },

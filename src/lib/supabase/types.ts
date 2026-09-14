@@ -484,6 +484,117 @@ export type Database = {
           },
         ];
       };
+      expenses: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          project_id: string | null;
+          supplier_id: string | null;
+          supplier_name: string | null;
+          category: Database["public"]["Enums"]["cost_category"];
+          expense_date: string;
+          description: string;
+          net: string;
+          vat: string;
+          gross: string | null;
+          reference: string | null;
+          receipt_document_id: string | null;
+          status: Database["public"]["Enums"]["expense_status"];
+          employee_id: string | null;
+          notes: string | null;
+          approved_by: string | null;
+          approved_at: string | null;
+          created_by: string | null;
+          archived_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          project_id?: string | null;
+          supplier_id?: string | null;
+          supplier_name?: string | null;
+          category?: Database["public"]["Enums"]["cost_category"];
+          expense_date?: string;
+          description: string;
+          net?: string;
+          vat?: string;
+          gross?: string | null;
+          reference?: string | null;
+          receipt_document_id?: string | null;
+          status?: Database["public"]["Enums"]["expense_status"];
+          employee_id?: string | null;
+          notes?: string | null;
+          approved_by?: string | null;
+          approved_at?: string | null;
+          created_by?: string | null;
+          archived_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          project_id?: string | null;
+          supplier_id?: string | null;
+          supplier_name?: string | null;
+          category?: Database["public"]["Enums"]["cost_category"];
+          expense_date?: string;
+          description?: string;
+          net?: string;
+          vat?: string;
+          gross?: string | null;
+          reference?: string | null;
+          receipt_document_id?: string | null;
+          status?: Database["public"]["Enums"]["expense_status"];
+          employee_id?: string | null;
+          notes?: string | null;
+          approved_by?: string | null;
+          approved_at?: string | null;
+          created_by?: string | null;
+          archived_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "expenses_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "expenses_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "expenses_receipt_document_id_fkey";
+            columns: ["receipt_document_id"];
+            isOneToOne: false;
+            referencedRelation: "documents";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "expenses_approved_by_fkey";
+            columns: ["approved_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "expenses_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       invoice_items: {
         Row: {
           id: string;
@@ -1223,6 +1334,54 @@ export type Database = {
           },
         ];
       };
+      project_cost_estimates: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          project_id: string;
+          category: Database["public"]["Enums"]["cost_category"];
+          amount: string;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          project_id: string;
+          category: Database["public"]["Enums"]["cost_category"];
+          amount?: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          project_id?: string;
+          category?: Database["public"]["Enums"]["cost_category"];
+          amount?: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "project_cost_estimates_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "project_cost_estimates_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       projects: {
         Row: {
           id: string;
@@ -1875,9 +2034,15 @@ export type Database = {
           project_id: string | null;
           organisation_id: string | null;
           contract_value: string | null;
+          invoiced_net: string | null;
+          received: string | null;
           estimated_cost: string | null;
+          committed_cost: string | null;
+          actual_cost: string | null;
           estimated_gross_profit: string | null;
           estimated_margin_pct: string | null;
+          forecast_gross_profit: string | null;
+          forecast_margin_pct: string | null;
         };
         Insert: never;
         Update: never;
@@ -1901,6 +2066,7 @@ export type Database = {
       can_write_project: { Args: { project_id: string }; Returns: boolean };
       role_in: { Args: { org: string; roles: string[] }; Returns: boolean };
       can_read_project: { Args: { project_id: string }; Returns: boolean };
+      seed_estimates_from_quote: { Args: { p_project_id: string; p_quote_id: string }; Returns: undefined };
       convert_lead_to_project: {
         Args: {
           p_lead_id: string;
@@ -1915,15 +2081,15 @@ export type Database = {
       recalculate_quote: { Args: { p_quote_id: string }; Returns: undefined };
       create_quote_revision: { Args: { p_quote_id: string }; Returns: string };
       quote_mark_viewed: { Args: { p_token: string }; Returns: undefined };
-      convert_quote_to_project: {
-        Args: { p_quote_id: string; p_project_manager?: unknown; p_site_id?: unknown };
-        Returns: string;
-      };
       quote_customer_decision: {
         Args: { p_token: string; p_decision: string; p_name: string; p_note?: unknown };
         Returns: boolean;
       };
       seed_org_finance_defaults: { Args: { org: string }; Returns: undefined };
+      convert_quote_to_project: {
+        Args: { p_quote_id: string; p_project_manager?: unknown; p_site_id?: unknown };
+        Returns: string;
+      };
       replace_quote_items: { Args: { p_quote_id: string; p_items: Json }; Returns: undefined };
       recalculate_invoice: { Args: { p_invoice_id: string }; Returns: undefined };
       refresh_overdue_invoices: { Args: { p_org: string }; Returns: number };
@@ -1936,6 +2102,8 @@ export type Database = {
         Returns: string;
       };
       invoice_mark_viewed: { Args: { p_token: string }; Returns: undefined };
+      project_cost_breakdown: { Args: { p_project_id: string }; Returns: unknown };
+      map_quote_category: { Args: { p: string }; Returns: Database["public"]["Enums"]["cost_category"] };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";
@@ -1979,6 +2147,18 @@ export type Database = {
       invoice_status: "draft" | "issued" | "part_paid" | "paid" | "overdue" | "cancelled" | "credit";
       invoice_kind: "standard" | "deposit" | "milestone" | "final" | "credit_note";
       payment_method: "bank_transfer" | "card" | "cash" | "cheque" | "other";
+      cost_category:
+        | "labour"
+        | "food"
+        | "equipment"
+        | "materials"
+        | "transport"
+        | "accommodation"
+        | "subcontractors"
+        | "hire"
+        | "utilities"
+        | "other";
+      expense_status: "pending" | "committed" | "actual" | "paid" | "rejected";
     };
     CompositeTypes: Record<string, never>;
   };
@@ -1987,17 +2167,20 @@ export type Database = {
 export type Tables<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Row"];
 export type Views<T extends keyof Database["public"]["Views"]> = Database["public"]["Views"][T]["Row"];
 
-// ---- convenience aliases ----------------------------------------------------
+// ---- convenience aliases (one per enum, generated) ---------------------------
 export type OrganisationRole = Database["public"]["Enums"]["organisation_role"];
 export type EnquiryStatus = Database["public"]["Enums"]["enquiry_status"];
 export type LeadStatus = Database["public"]["Enums"]["lead_status"];
 export type ProjectStatus = Database["public"]["Enums"]["project_status"];
 export type DocumentEntity = Database["public"]["Enums"]["document_entity"];
 export type NotificationType = Database["public"]["Enums"]["notification_type"];
+export type TaskStatus = Database["public"]["Enums"]["task_status"];
+export type TaskPriority = Database["public"]["Enums"]["task_priority"];
 export type QuoteStatus = Database["public"]["Enums"]["quote_status"];
 export type InvoiceStatus = Database["public"]["Enums"]["invoice_status"];
 export type InvoiceKind = Database["public"]["Enums"]["invoice_kind"];
 export type PaymentMethod = Database["public"]["Enums"]["payment_method"];
-export type TaskStatus = Database["public"]["Enums"]["task_status"];
+export type CostCategory = Database["public"]["Enums"]["cost_category"];
+export type ExpenseStatus = Database["public"]["Enums"]["expense_status"];
 export type TablesInsert<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Insert"];
 export type TablesUpdate<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Update"];

@@ -31,3 +31,11 @@ export function InvoiceBadge({ status }: { status: string }) {
   const s = INVOICE_TONES[status];
   return <StatusBadge label={s?.label ?? status} tone={s?.tone ?? "grey"} />;
 }
+
+const EXPENSE_TONES: Record<string, { label: string; tone: import("@/lib/domain/statuses").StatusTone }> = {
+  pending: { label: "Pending", tone: "amber" }, committed: { label: "Committed", tone: "blue" }, actual: { label: "Actual", tone: "green" }, paid: { label: "Paid", tone: "green" }, rejected: { label: "Rejected", tone: "grey" },
+};
+export function ExpenseBadge({ status }: { status: string }) {
+  const s = EXPENSE_TONES[status];
+  return <StatusBadge label={s?.label ?? status} tone={s?.tone ?? "grey"} />;
+}

@@ -26,22 +26,19 @@ OUT="$ROOT/src/lib/supabase/types.ts"
   echo " */"
   python3 "$ROOT/scripts/gen-types.py" --debug 2>&1
 } > "$OUT"
-cat >> "$OUT" <<'TS'
-
-// ---- convenience aliases ----------------------------------------------------
-export type OrganisationRole = Database["public"]["Enums"]["organisation_role"];
-export type EnquiryStatus = Database["public"]["Enums"]["enquiry_status"];
-export type LeadStatus = Database["public"]["Enums"]["lead_status"];
-export type ProjectStatus = Database["public"]["Enums"]["project_status"];
-export type DocumentEntity = Database["public"]["Enums"]["document_entity"];
-export type NotificationType = Database["public"]["Enums"]["notification_type"];
-export type QuoteStatus = Database["public"]["Enums"]["quote_status"];
-export type InvoiceStatus = Database["public"]["Enums"]["invoice_status"];
-export type InvoiceKind = Database["public"]["Enums"]["invoice_kind"];
-export type PaymentMethod = Database["public"]["Enums"]["payment_method"];
-export type TaskStatus = Database["public"]["Enums"]["task_status"];
-export type TablesInsert<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Insert"];
-export type TablesUpdate<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Update"];
-TS
+npx prettier --write "$OUT" >/dev/null
+python3 - "$OUT" <<'PY'
+import re, sys
+out = sys.argv[1]
+src = open(out).read()
+m = re.search(r"\n    Enums: \{\n(.*?)\n    \};", src, re.S)
+names = re.findall(r"^\s{6}(\w+):", m.group(1), re.M) if m else []
+pascal = lambda n: "".join(w.capitalize() for w in n.split("_"))
+lines = ["", "// ---- convenience aliases (one per enum, generated) ---------------------------"]
+lines += [f'export type {pascal(n)} = Database["public"]["Enums"]["{n}"];' for n in names]
+lines += ['export type TablesInsert<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Insert"];',
+          'export type TablesUpdate<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Update"];', ""]
+open(out, "a").write("\n".join(lines))
+PY
 npx prettier --write "$OUT" >/dev/null
 echo "✓ wrote $OUT"
