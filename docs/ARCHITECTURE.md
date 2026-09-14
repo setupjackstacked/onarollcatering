@@ -5,14 +5,16 @@ One Next.js 16 (App Router) application, one repository, three surfaces:
 | Surface | Route | Status |
 |---|---|---|
 | Public marketing site | `/` | Phase 1 — built |
-| Management dashboard (native CRM/ops) | `/dashboard` | Phase 3 — auth, shell, overview, search, notifications, settings (read) |
-| Staff portal | `/staff` | Phase 12 — auth gate + stub only |
+| Management dashboard (native CRM/ops) | `/dashboard` | Phases 3–11 — built |
+| Staff portal | `/staff` | Phase 12 — built (mobile-first) |
+| Customer document pages | `/q/[token]`, `/i/[token]` | Phases 5–6 — built (token-only, no login) |
 
 ## Stack
 
 Next.js 16 · React 19 · TypeScript (strict) · Tailwind v4 · Supabase (Postgres, Auth, Storage) · Resend · React Hook Form + Zod · Vitest · Vercel.
 
 No external CRM. No CMS. No animation library (CSS transitions + IntersectionObserver).
+Charts: Recharts (reports only). PDFs: `@react-pdf/renderer`. Email: Resend.
 
 ## Directory layout
 
@@ -59,6 +61,21 @@ supabase/
                               0001 tenancy, profiles, members, enquiries, RLS helpers, buckets
                               0002 core CRM: lookups, clients, contacts, sites, leads, projects, documents,
                                    activity_logs, notifications, numbering, audit triggers, RLS
+                              0003 member ⇄ profile FK
+                              0004 tasks, notes, enquiry→lead and lead→project conversion, member view
+                              0005 quotes: VAT rates, catalogue, quotes + items, revisions, customer
+                                   decision by token, immutability guard, quote→project conversion
+                              0006 invoices: invoices + items + payments, issue/cancel/credit note,
+                                   overdue sweep, quote→invoice (full, deposit, milestone, final)
+                              0007 costing: cost categories, per-project estimates, expenses with an
+                                   approval workflow, project_financials v2 (committed vs actual)
+                              0008 workforce: employees + roles, compliance document verification,
+                                   shifts with conflict detection, leave, timesheets, labour cost
+                              0009 payroll: pay periods, entry aggregation from approved timesheets,
+                                   adjustments, finalise/reopen
+                              0010 suppliers, supplier contacts, equipment catalogue → quote catalogue
+                              0011 reporting functions + idempotent alert generation
+                              0012 staff portal: self-service contact details (column-guarded)
   seed.sql                  dev-only seed (org, 4 role users, SAMPLE client/contact/site/lead/project)
   tests/                    00_supabase_shim.sql (auth/storage emulation) + *.test.sql RLS tests
   config.toml               local Supabase CLI config
@@ -85,14 +102,58 @@ docs/                       this file, CONTENT-TODO.md
   magic bytes and enforces size/type limits. In-memory rate limiting on both.
 * Money is `numeric(12,2)` in Postgres (arrives as a string via PostgREST) and integer pence in TS
   (`lib/money`). Derived values (gross profit, margin) are views (`project_financials`), never columns.
-* Per-org, per-year document numbering (`OAR-P-2026-0001`, later `OAR-Q-…`, `OAR-INV-…`) via
+* Per-org, per-year document numbering (`OAR-P-2026-0001`, `OAR-Q-…`, `OAR-INV-…`, `OAR-E-…`) via
   `next_document_number()` backed by a `number_sequences` counter table — numbers are never reused.
 * `activity_logs` is append-only; written by `log_activity()` (security definer, member-checked) and by
   audit triggers on lead/project status changes. Authenticated users have no insert policy on it.
 * Project managers can only see/update projects where `project_manager_id = auth.uid()`; documents attached
   to projects inherit that rule via `can_read_project()` / `can_write_project()`.
-* Lookups that may need to be configurable (lead sources, service types, document categories) are
-  org-scoped tables seeded for every organisation by trigger, not enums.
+* Lookups that may need to be configurable (lead sources, service types, document categories, VAT rates,
+  employee roles) are org-scoped tables seeded for every organisation by trigger, not enums.
+* Financial documents are immutable once issued. Quote lines freeze on send (change = a new revision that
+  supersedes the old one and keeps the same quote number); invoice lines freeze on issue (correct with a
+  credit note or a cancellation). Recalculation functions set a GUC to bypass their own guard and restore
+  the caller's value, so the guard can never be left switched off.
+* Cost price never leaves the organisation: it lives on `quote_items` and `catalogue_items`, is filtered
+  out of every customer-facing query, PDF and public page, and is gated on `finance.read` in the UI.
+* Customer quote and invoice pages are reached by a 48-character random token, never a sequential id.
+  They are served by the service-role client through `features/*/public.ts`, which strips internal fields
+  and exposes only two mutations: mark viewed, and record the customer's accept/decline decision.
+* Employee HR data (pay, address, notes) is owner/administrator only. Schedulers use the
+  `employee_directory` view, which exposes name, role and status and nothing else. Staff see their own
+  record and may change only their phone and emergency contact, enforced by a column-comparing trigger.
+* Approved timesheets snapshot the employee's hourly rate, so a later pay rise never rewrites history —
+  and they feed both project labour cost and payroll. Paid timesheets are frozen.
+
+## Modules
+
+| Module | Routes | Notes |
+|---|---|---|
+| Sales | `/dashboard/enquiries`, `/leads`, `/clients`, `/quotes` | Enquiry → lead → quote → project/invoice, all in-app |
+| Finance | `/dashboard/invoices`, `/payments`, `/expenses`, `/payroll` | Invoices, payments, costs, payroll inputs |
+| Projects | `/dashboard/projects`, `/sites`, `/tasks`, `/documents` | Per-project costs, staff, timesheets, quotes, invoices tabs |
+| Workforce | `/dashboard/employees`, `/rota`, `/timesheets`, `/leave` | Compliance expiry, conflict-aware rota, approvals |
+| Supply chain | `/dashboard/suppliers`, `/equipment` | Equipment publishes into the quotation line picker |
+| Insight | `/dashboard/reports`, `/notifications` | Nine reports; alerts raised nightly |
+| Staff portal | `/staff`, `/shifts`, `/timesheets`, `/leave`, `/documents`, `/profile` | Mobile-first, bottom tab bar |
+
+## Money and calculation rules
+
+Line totals, document totals, VAT and margin are computed in SQL (`recalculate_quote`, `recalculate_invoice`)
+and mirrored in TypeScript (`lib/money/calc.ts`) purely so the line-item editor can show live figures. The
+server recalculates on every write and is authoritative; `tests/calc.test.ts` and
+`supabase/tests/30_quotes_invoices.test.sql` assert both agree on the same fixture. Quote-level discount is
+applied per line before VAT, so blended VAT rates stay correct. Rounding is half-up to the penny at line
+level, never at document level.
+
+## Scheduled work
+
+`/api/cron/daily` (Vercel Cron, `vercel.json`, 06:00 UTC) runs `generate_alerts` and `expire_documents` for
+every organisation: expires lapsed quotes, refreshes overdue invoices, marks expired compliance documents
+and raises dashboard notifications (invoice overdue, quote expiring, document expiring at 90/60/30/14/7/0
+days, timesheet pending, staffing conflict, task overdue, unassigned project starting). It requires
+`CRON_SECRET` as a bearer token and refuses to run if that is unset. Notifications carry a `dedupe_key`, so
+re-running the job never produces duplicates. Owners can also trigger a sweep from Reports.
 
 ## Content model (Phase 1)
 
@@ -115,7 +176,7 @@ npx supabase db push # push migrations to a linked remote project
 
 See `.env.example`. Public: `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
 Server-only: `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `EMAIL_FROM`, `INTERNAL_NOTIFICATION_EMAIL`,
-`ENQUIRY_ORGANISATION_ID`. The site builds and runs without any of them; enquiry persistence/email degrade
+`ENQUIRY_ORGANISATION_ID`, `INVOICE_PAYMENT_DETAILS` (bank details printed on invoices), `CRON_SECRET`. The site builds and runs without any of them; enquiry persistence/email degrade
 to logged warnings and the form reports an honest error if nothing could be recorded.
 
 ## Database testing
@@ -137,6 +198,10 @@ with their phase number rather than hidden or faked.
 
 ## Phase roadmap
 
-See the master spec §103. Done: Phase 0–3. Next: **Phase 4** — native CRM: enquiries inbox →
-lead conversion, leads pipeline, clients + contacts + sites, projects + tasks + documents, activity
-timeline, notes, assignment, filters, team invitations/roles in Settings.
+See the master spec §103. **Phases 0–12 are built.** What remains is configuration and real content
+rather than code: supply `INVOICE_PAYMENT_DETAILS` and `CRON_SECRET` in Vercel, connect Resend so quote and
+invoice emails send, and work through `docs/CONTENT-TODO.md` for the public site.
+
+Deliberately not built, and why: no statutory payroll engine (the platform prepares inputs and exports CSV —
+spec §50); no accounting integration (the export is the seam); no customer login (quote and invoice pages
+are token-addressed instead); no supplier purchase-order workflow beyond marking a cost committed.

@@ -31,6 +31,17 @@ Everything below is currently a labelled placeholder. Nothing has been invented.
 - [ ] Leadership profiles (optional)
 - [ ] Coverage
 
+## Operational settings — set these in the dashboard or Vercel, not in code
+- [ ] `INVOICE_PAYMENT_DETAILS` (Vercel env): bank name, sort code, account number printed on every invoice
+      and on the customer invoice page. Until it is set, invoices say "Bank details to be supplied".
+- [ ] `CRON_SECRET` (Vercel env): any long random string. Without it the nightly alert job refuses to run.
+- [ ] `RESEND_API_KEY` + verified sending domain: until this is configured, quote and invoice emails fail
+      cleanly and you share the customer link manually instead.
+- [ ] VAT rates — Settings → Catalogue & VAT. Standard 20%, reduced 5%, zero and exempt are seeded; confirm.
+- [ ] Quote catalogue and equipment prices — Settings → Catalogue, and Equipment.
+- [ ] Employee roles — seeded with the nine roles from the spec; add your own if they differ.
+- [ ] Default payment terms per client (days) — set on each client record; invoices derive the due date.
+
 ## Legal
 - [ ] Privacy policy (`/privacy`)
 - [ ] Website terms (`/terms`)
