@@ -59,7 +59,7 @@ export const DASHBOARD_NAV: NavSection[] = [
   },
   {
     items: [
-      { label: "Reports", href: "/dashboard/reports", icon: "reports", permission: "reports.read", phase: 11 },
+      { label: "Reports", href: "/dashboard/reports", icon: "reports", permission: "reports.read" },
       { label: "Settings", href: "/dashboard/settings", icon: "settings" },
     ],
   },

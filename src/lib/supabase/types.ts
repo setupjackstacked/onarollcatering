@@ -3053,15 +3053,41 @@ export type Database = {
         Returns: unknown;
       };
       timesheet_from_shift: { Args: { p_shift_id: string }; Returns: string };
+      report_revenue_by_month: { Args: { p_org: string; p_months?: unknown }; Returns: unknown };
+      report_quotes_by_status: { Args: { p_org: string; p_days?: unknown }; Returns: unknown };
       seed_org_workforce_defaults: { Args: { org: string }; Returns: undefined };
       can_view_directory: { Args: { org: string }; Returns: boolean };
       recalculate_payroll_entry: { Args: { p_entry_id: string }; Returns: undefined };
       build_payroll_period: { Args: { p_period_id: string; p_overtime_multiplier?: unknown }; Returns: number };
+      generate_alerts_all: { Args: Record<string, never>; Returns: number };
+      report_cost_breakdown: { Args: { p_org: string; p_days?: unknown }; Returns: unknown };
+      notify_roles: {
+        Args: {
+          p_org: string;
+          p_roles: string[];
+          p_type: Database["public"]["Enums"]["notification_type"];
+          p_title: string;
+          p_body: string;
+          p_entity_type: string;
+          p_entity_id: string;
+          p_href: string;
+          p_dedupe: string;
+        };
+        Returns: number;
+      };
+      generate_alerts: { Args: { p_org: string }; Returns: number };
+      expire_documents: { Args: { p_org: string }; Returns: number };
       finalise_payroll_period: { Args: { p_period_id: string }; Returns: undefined };
       supplier_spend: { Args: { p_supplier_id: string }; Returns: unknown };
       reopen_payroll_period: { Args: { p_period_id: string }; Returns: undefined };
       publish_equipment_to_catalogue: { Args: { p_equipment_id: string }; Returns: string };
       seed_org_supplier_defaults: { Args: { org: string }; Returns: undefined };
+      report_quote_conversion: { Args: { p_org: string; p_months?: unknown }; Returns: unknown };
+      report_project_profitability: { Args: { p_org: string }; Returns: unknown };
+      report_outstanding_invoices: { Args: { p_org: string }; Returns: unknown };
+      report_revenue_by_client: { Args: { p_org: string; p_months?: unknown }; Returns: unknown };
+      report_labour_by_project: { Args: { p_org: string; p_days?: unknown }; Returns: unknown };
+      report_employee_hours: { Args: { p_org: string; p_days?: unknown }; Returns: unknown };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";
