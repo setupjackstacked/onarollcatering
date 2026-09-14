@@ -35,6 +35,11 @@ export type LeadStatus = Database["public"]["Enums"]["lead_status"];
 export type ProjectStatus = Database["public"]["Enums"]["project_status"];
 export type DocumentEntity = Database["public"]["Enums"]["document_entity"];
 export type NotificationType = Database["public"]["Enums"]["notification_type"];
+export type QuoteStatus = Database["public"]["Enums"]["quote_status"];
+export type InvoiceStatus = Database["public"]["Enums"]["invoice_status"];
+export type InvoiceKind = Database["public"]["Enums"]["invoice_kind"];
+export type PaymentMethod = Database["public"]["Enums"]["payment_method"];
+export type TaskStatus = Database["public"]["Enums"]["task_status"];
 export type TablesInsert<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Insert"];
 export type TablesUpdate<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Update"];
 TS

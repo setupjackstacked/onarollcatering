@@ -29,6 +29,8 @@ export function OverviewView({ data, orgName, canSales }: { data: OverviewData; 
         <Metric label="Open leads" value={data.kpis.openLeads} />
         {canSales ? <Metric label="New enquiries" value={data.kpis.newEnquiries} tone={data.kpis.newEnquiries ? "warning" : "default"} /> : null}
         <Metric label="Clients" value={data.kpis.clients} />
+        {data.finance ? <Metric label="Quotes awaiting decision" value={data.finance.openQuotes} hint={formatGBP(data.finance.openQuoteValue, { showPence: false })} href="/dashboard/quotes?status=sent" /> : null}
+        {data.finance ? <Metric label="Invoices outstanding" value={formatGBP(data.finance.outstanding, { showPence: false })} hint={data.finance.overdueCount ? `${formatGBP(data.finance.overdue, { showPence: false })} overdue (${data.finance.overdueCount})` : "Nothing overdue"} tone={data.finance.overdueCount ? "warning" : "default"} href="/dashboard/invoices?status=outstanding" /> : null}
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">

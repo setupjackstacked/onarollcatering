@@ -1,7 +1,7 @@
 import { requireOrgContext } from "@/lib/auth/context";
 import { removeMember } from "@/features/team/actions";
 import { PageHeader, Panel, StatusBadge } from "@/components/dashboard/primitives";
-import { DescriptionList } from "@/components/dashboard/entity";
+import { DescriptionList, ActionLink } from "@/components/dashboard/entity";
 import { ConfirmAction } from "@/components/dashboard/confirm";
 import { InviteForm, RoleForm } from "@/components/dashboard/forms/team-forms";
 
@@ -23,6 +23,7 @@ export default async function SettingsPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Panel title="Organisation">
           <DescriptionList cols={1} items={[{ label: "Name", value: ctx.organisation.name }, { label: "Your role", value: ROLE_LABEL[ctx.role] }, { label: "Signed in as", value: ctx.user.email }]} />
+          {ctx.can("finance.read") || ctx.role === "administrator" ? <div className="mt-4 border-t border-graphite/10 pt-4"><ActionLink href="/dashboard/settings/catalogue">Catalogue &amp; VAT rates</ActionLink></div> : null}
         </Panel>
         <div className="space-y-6 lg:col-span-2">
           {canManage ? (

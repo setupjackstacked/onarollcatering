@@ -68,7 +68,7 @@ export function DescriptionList({ items, cols = 2 }: { items: { label: string; v
   );
 }
 
-export function ActionLink({ href, children, variant = "outline" }: { href: string; children: React.ReactNode; variant?: "outline" | "copper" | "obsidian" }) {
+export function ActionLink({ href, children, variant = "outline", className }: { href: string; children: React.ReactNode; variant?: "outline" | "copper" | "obsidian"; className?: string }) {
   return (
     <Link
       href={href}
@@ -77,6 +77,7 @@ export function ActionLink({ href, children, variant = "outline" }: { href: stri
         variant === "outline" && "border border-graphite/25 hover:border-graphite",
         variant === "copper" && "bg-copper text-ivory hover:bg-copper-dark",
         variant === "obsidian" && "bg-obsidian text-ivory hover:bg-graphite",
+        className,
       )}
     >
       {children}

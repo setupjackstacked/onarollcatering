@@ -16,8 +16,8 @@ export function ClientTabs({ base, counts }: { base: string; counts: { contacts:
         { key: "sites", label: "Sites", count: counts.sites },
         { key: "leads", label: "Leads", count: counts.leads },
         { key: "projects", label: "Projects", count: counts.projects },
-        { key: "quotes", label: "Quotes", disabled: "P5" },
-        { key: "invoices", label: "Invoices", disabled: "P6" },
+        { key: "quotes", label: "Quotes" },
+        { key: "invoices", label: "Invoices" },
         { key: "documents", label: "Documents", count: counts.documents },
         { key: "activity", label: "Activity" },
       ]}

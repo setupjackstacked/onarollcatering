@@ -55,6 +55,62 @@ export type Database = {
           },
         ];
       };
+      catalogue_items: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          name: string;
+          category: string;
+          description: string | null;
+          unit: string;
+          cost_price: string;
+          sell_price: string;
+          vat_rate_key: string;
+          equipment_id: string | null;
+          active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          name: string;
+          category?: string;
+          description?: string | null;
+          unit?: string;
+          cost_price?: string;
+          sell_price?: string;
+          vat_rate_key?: string;
+          equipment_id?: string | null;
+          active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          name?: string;
+          category?: string;
+          description?: string | null;
+          unit?: string;
+          cost_price?: string;
+          sell_price?: string;
+          vat_rate_key?: string;
+          equipment_id?: string | null;
+          active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "catalogue_items_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       client_contacts: {
         Row: {
           id: string;
@@ -424,6 +480,239 @@ export type Database = {
             columns: ["lead_id"];
             isOneToOne: false;
             referencedRelation: "leads";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      invoice_items: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          invoice_id: string;
+          position: number;
+          description: string;
+          category: string;
+          quantity: string;
+          unit: string;
+          sell_price: string;
+          discount_pct: string;
+          vat_rate: string;
+          line_net: string;
+          line_vat: string;
+          line_total: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          invoice_id: string;
+          position?: number;
+          description: string;
+          category?: string;
+          quantity?: string;
+          unit?: string;
+          sell_price?: string;
+          discount_pct?: string;
+          vat_rate?: string;
+          line_net?: string;
+          line_vat?: string;
+          line_total?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          invoice_id?: string;
+          position?: number;
+          description?: string;
+          category?: string;
+          quantity?: string;
+          unit?: string;
+          sell_price?: string;
+          discount_pct?: string;
+          vat_rate?: string;
+          line_net?: string;
+          line_vat?: string;
+          line_total?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey";
+            columns: ["invoice_id"];
+            isOneToOne: false;
+            referencedRelation: "invoices";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      invoices: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          invoice_number: string;
+          kind: Database["public"]["Enums"]["invoice_kind"];
+          status: Database["public"]["Enums"]["invoice_status"];
+          client_id: string;
+          contact_id: string | null;
+          project_id: string | null;
+          quote_id: string | null;
+          credit_for_invoice_id: string | null;
+          title: string;
+          reference: string | null;
+          currency: string;
+          issue_date: string | null;
+          due_date: string | null;
+          discount_pct: string;
+          subtotal: string;
+          discount_amount: string;
+          vat_amount: string;
+          total: string;
+          amount_paid: string;
+          notes: string | null;
+          terms: string | null;
+          internal_notes: string | null;
+          public_token: string;
+          issued_at: string | null;
+          sent_at: string | null;
+          paid_at: string | null;
+          cancelled_at: string | null;
+          cancel_reason: string | null;
+          created_by: string | null;
+          archived_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          invoice_number: string;
+          kind?: Database["public"]["Enums"]["invoice_kind"];
+          status?: Database["public"]["Enums"]["invoice_status"];
+          client_id: string;
+          contact_id?: string | null;
+          project_id?: string | null;
+          quote_id?: string | null;
+          credit_for_invoice_id?: string | null;
+          title: string;
+          reference?: string | null;
+          currency?: string;
+          issue_date?: string | null;
+          due_date?: string | null;
+          discount_pct?: string;
+          subtotal?: string;
+          discount_amount?: string;
+          vat_amount?: string;
+          total?: string;
+          amount_paid?: string;
+          notes?: string | null;
+          terms?: string | null;
+          internal_notes?: string | null;
+          public_token?: string;
+          issued_at?: string | null;
+          sent_at?: string | null;
+          paid_at?: string | null;
+          cancelled_at?: string | null;
+          cancel_reason?: string | null;
+          created_by?: string | null;
+          archived_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          invoice_number?: string;
+          kind?: Database["public"]["Enums"]["invoice_kind"];
+          status?: Database["public"]["Enums"]["invoice_status"];
+          client_id?: string;
+          contact_id?: string | null;
+          project_id?: string | null;
+          quote_id?: string | null;
+          credit_for_invoice_id?: string | null;
+          title?: string;
+          reference?: string | null;
+          currency?: string;
+          issue_date?: string | null;
+          due_date?: string | null;
+          discount_pct?: string;
+          subtotal?: string;
+          discount_amount?: string;
+          vat_amount?: string;
+          total?: string;
+          amount_paid?: string;
+          notes?: string | null;
+          terms?: string | null;
+          internal_notes?: string | null;
+          public_token?: string;
+          issued_at?: string | null;
+          sent_at?: string | null;
+          paid_at?: string | null;
+          cancelled_at?: string | null;
+          cancel_reason?: string | null;
+          created_by?: string | null;
+          archived_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "invoices_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoices_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "clients";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoices_contact_id_fkey";
+            columns: ["contact_id"];
+            isOneToOne: false;
+            referencedRelation: "client_contacts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoices_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoices_quote_id_fkey";
+            columns: ["quote_id"];
+            isOneToOne: false;
+            referencedRelation: "quotes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoices_credit_for_invoice_id_fkey";
+            columns: ["credit_for_invoice_id"];
+            isOneToOne: false;
+            referencedRelation: "invoices";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoices_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];
@@ -838,6 +1127,67 @@ export type Database = {
         };
         Relationships: [];
       };
+      payments: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          invoice_id: string;
+          paid_on: string;
+          amount: string;
+          method: Database["public"]["Enums"]["payment_method"];
+          reference: string | null;
+          notes: string | null;
+          recorded_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          invoice_id: string;
+          paid_on?: string;
+          amount: string;
+          method?: Database["public"]["Enums"]["payment_method"];
+          reference?: string | null;
+          notes?: string | null;
+          recorded_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          invoice_id?: string;
+          paid_on?: string;
+          amount?: string;
+          method?: Database["public"]["Enums"]["payment_method"];
+          reference?: string | null;
+          notes?: string | null;
+          recorded_by?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "payments_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payments_invoice_id_fkey";
+            columns: ["invoice_id"];
+            isOneToOne: false;
+            referencedRelation: "invoices";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payments_recorded_by_fkey";
+            columns: ["recorded_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profiles: {
         Row: {
           id: string;
@@ -984,6 +1334,285 @@ export type Database = {
             columns: ["created_by"];
             isOneToOne: false;
             referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      quote_items: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          quote_id: string;
+          position: number;
+          catalogue_item_id: string | null;
+          description: string;
+          category: string;
+          quantity: string;
+          unit: string;
+          cost_price: string;
+          sell_price: string;
+          discount_pct: string;
+          vat_rate: string;
+          line_net: string;
+          line_vat: string;
+          line_total: string;
+          internal_notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          quote_id: string;
+          position?: number;
+          catalogue_item_id?: string | null;
+          description: string;
+          category?: string;
+          quantity?: string;
+          unit?: string;
+          cost_price?: string;
+          sell_price?: string;
+          discount_pct?: string;
+          vat_rate?: string;
+          line_net?: string;
+          line_vat?: string;
+          line_total?: string;
+          internal_notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          quote_id?: string;
+          position?: number;
+          catalogue_item_id?: string | null;
+          description?: string;
+          category?: string;
+          quantity?: string;
+          unit?: string;
+          cost_price?: string;
+          sell_price?: string;
+          discount_pct?: string;
+          vat_rate?: string;
+          line_net?: string;
+          line_vat?: string;
+          line_total?: string;
+          internal_notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "quote_items_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quote_items_quote_id_fkey";
+            columns: ["quote_id"];
+            isOneToOne: false;
+            referencedRelation: "quotes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quote_items_catalogue_item_id_fkey";
+            columns: ["catalogue_item_id"];
+            isOneToOne: false;
+            referencedRelation: "catalogue_items";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      quotes: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          quote_number: string;
+          revision: number;
+          root_quote_id: string | null;
+          supersedes_quote_id: string | null;
+          status: Database["public"]["Enums"]["quote_status"];
+          client_id: string;
+          contact_id: string | null;
+          project_id: string | null;
+          lead_id: string | null;
+          title: string;
+          currency: string;
+          issue_date: string;
+          expiry_date: string;
+          discount_pct: string;
+          subtotal: string;
+          discount_amount: string;
+          vat_amount: string;
+          total: string;
+          cost_total: string;
+          scope_notes: string | null;
+          terms: string | null;
+          internal_notes: string | null;
+          public_token: string;
+          sent_at: string | null;
+          viewed_at: string | null;
+          accepted_at: string | null;
+          rejected_at: string | null;
+          decision_name: string | null;
+          decision_note: string | null;
+          converted_project_id: string | null;
+          converted_invoice_id: string | null;
+          created_by: string | null;
+          archived_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          quote_number: string;
+          revision?: number;
+          root_quote_id?: string | null;
+          supersedes_quote_id?: string | null;
+          status?: Database["public"]["Enums"]["quote_status"];
+          client_id: string;
+          contact_id?: string | null;
+          project_id?: string | null;
+          lead_id?: string | null;
+          title: string;
+          currency?: string;
+          issue_date?: string;
+          expiry_date?: string;
+          discount_pct?: string;
+          subtotal?: string;
+          discount_amount?: string;
+          vat_amount?: string;
+          total?: string;
+          cost_total?: string;
+          scope_notes?: string | null;
+          terms?: string | null;
+          internal_notes?: string | null;
+          public_token?: string;
+          sent_at?: string | null;
+          viewed_at?: string | null;
+          accepted_at?: string | null;
+          rejected_at?: string | null;
+          decision_name?: string | null;
+          decision_note?: string | null;
+          converted_project_id?: string | null;
+          converted_invoice_id?: string | null;
+          created_by?: string | null;
+          archived_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          quote_number?: string;
+          revision?: number;
+          root_quote_id?: string | null;
+          supersedes_quote_id?: string | null;
+          status?: Database["public"]["Enums"]["quote_status"];
+          client_id?: string;
+          contact_id?: string | null;
+          project_id?: string | null;
+          lead_id?: string | null;
+          title?: string;
+          currency?: string;
+          issue_date?: string;
+          expiry_date?: string;
+          discount_pct?: string;
+          subtotal?: string;
+          discount_amount?: string;
+          vat_amount?: string;
+          total?: string;
+          cost_total?: string;
+          scope_notes?: string | null;
+          terms?: string | null;
+          internal_notes?: string | null;
+          public_token?: string;
+          sent_at?: string | null;
+          viewed_at?: string | null;
+          accepted_at?: string | null;
+          rejected_at?: string | null;
+          decision_name?: string | null;
+          decision_note?: string | null;
+          converted_project_id?: string | null;
+          converted_invoice_id?: string | null;
+          created_by?: string | null;
+          archived_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "quotes_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quotes_root_quote_id_fkey";
+            columns: ["root_quote_id"];
+            isOneToOne: false;
+            referencedRelation: "quotes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quotes_supersedes_quote_id_fkey";
+            columns: ["supersedes_quote_id"];
+            isOneToOne: false;
+            referencedRelation: "quotes";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quotes_client_id_fkey";
+            columns: ["client_id"];
+            isOneToOne: false;
+            referencedRelation: "clients";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quotes_contact_id_fkey";
+            columns: ["contact_id"];
+            isOneToOne: false;
+            referencedRelation: "client_contacts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quotes_project_id_fkey";
+            columns: ["project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quotes_lead_id_fkey";
+            columns: ["lead_id"];
+            isOneToOne: false;
+            referencedRelation: "leads";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quotes_converted_project_id_fkey";
+            columns: ["converted_project_id"];
+            isOneToOne: false;
+            referencedRelation: "projects";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quotes_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "quotes_converted_invoice_fk";
+            columns: ["converted_invoice_id"];
+            isOneToOne: false;
+            referencedRelation: "invoices";
             referencedColumns: ["id"];
           },
         ];
@@ -1179,6 +1808,53 @@ export type Database = {
           },
         ];
       };
+      vat_rates: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          key: string;
+          label: string;
+          rate: string;
+          is_default: boolean;
+          active: boolean;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          key: string;
+          label: string;
+          rate: string;
+          is_default?: boolean;
+          active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          key?: string;
+          label?: string;
+          rate?: string;
+          is_default?: boolean;
+          active?: boolean;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "vat_rates_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       organisation_member_profiles: {
@@ -1236,6 +1912,30 @@ export type Database = {
         };
         Returns: string;
       };
+      recalculate_quote: { Args: { p_quote_id: string }; Returns: undefined };
+      create_quote_revision: { Args: { p_quote_id: string }; Returns: string };
+      quote_mark_viewed: { Args: { p_token: string }; Returns: undefined };
+      convert_quote_to_project: {
+        Args: { p_quote_id: string; p_project_manager?: unknown; p_site_id?: unknown };
+        Returns: string;
+      };
+      quote_customer_decision: {
+        Args: { p_token: string; p_decision: string; p_name: string; p_note?: unknown };
+        Returns: boolean;
+      };
+      seed_org_finance_defaults: { Args: { org: string }; Returns: undefined };
+      replace_quote_items: { Args: { p_quote_id: string; p_items: Json }; Returns: undefined };
+      recalculate_invoice: { Args: { p_invoice_id: string }; Returns: undefined };
+      refresh_overdue_invoices: { Args: { p_org: string }; Returns: number };
+      cancel_invoice: { Args: { p_invoice_id: string; p_reason: string }; Returns: undefined };
+      issue_invoice: { Args: { p_invoice_id: string; p_issue_date?: unknown; p_due_date?: unknown }; Returns: string };
+      create_credit_note: { Args: { p_invoice_id: string }; Returns: string };
+      replace_invoice_items: { Args: { p_invoice_id: string; p_items: Json }; Returns: undefined };
+      create_invoice_from_quote: {
+        Args: { p_quote_id: string; p_kind?: Database["public"]["Enums"]["invoice_kind"]; p_percent?: unknown };
+        Returns: string;
+      };
+      invoice_mark_viewed: { Args: { p_token: string }; Returns: undefined };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";
@@ -1275,6 +1975,10 @@ export type Database = {
         | "system";
       task_status: "todo" | "in_progress" | "blocked" | "complete";
       task_priority: "low" | "medium" | "high" | "urgent";
+      quote_status: "draft" | "sent" | "viewed" | "accepted" | "rejected" | "expired" | "superseded";
+      invoice_status: "draft" | "issued" | "part_paid" | "paid" | "overdue" | "cancelled" | "credit";
+      invoice_kind: "standard" | "deposit" | "milestone" | "final" | "credit_note";
+      payment_method: "bank_transfer" | "card" | "cash" | "cheque" | "other";
     };
     CompositeTypes: Record<string, never>;
   };
@@ -1290,5 +1994,10 @@ export type LeadStatus = Database["public"]["Enums"]["lead_status"];
 export type ProjectStatus = Database["public"]["Enums"]["project_status"];
 export type DocumentEntity = Database["public"]["Enums"]["document_entity"];
 export type NotificationType = Database["public"]["Enums"]["notification_type"];
+export type QuoteStatus = Database["public"]["Enums"]["quote_status"];
+export type InvoiceStatus = Database["public"]["Enums"]["invoice_status"];
+export type InvoiceKind = Database["public"]["Enums"]["invoice_kind"];
+export type PaymentMethod = Database["public"]["Enums"]["payment_method"];
+export type TaskStatus = Database["public"]["Enums"]["task_status"];
 export type TablesInsert<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Insert"];
 export type TablesUpdate<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Update"];
