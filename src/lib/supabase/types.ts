@@ -1465,6 +1465,79 @@ export type Database = {
         };
         Relationships: [];
       };
+      pay_periods: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          name: string;
+          start_date: string;
+          end_date: string;
+          pay_date: string | null;
+          status: Database["public"]["Enums"]["pay_period_status"];
+          notes: string | null;
+          finalised_at: string | null;
+          finalised_by: string | null;
+          exported_at: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          name: string;
+          start_date: string;
+          end_date: string;
+          pay_date?: string | null;
+          status?: Database["public"]["Enums"]["pay_period_status"];
+          notes?: string | null;
+          finalised_at?: string | null;
+          finalised_by?: string | null;
+          exported_at?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          name?: string;
+          start_date?: string;
+          end_date?: string;
+          pay_date?: string | null;
+          status?: Database["public"]["Enums"]["pay_period_status"];
+          notes?: string | null;
+          finalised_at?: string | null;
+          finalised_by?: string | null;
+          exported_at?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "pay_periods_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "pay_periods_finalised_by_fkey";
+            columns: ["finalised_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "pay_periods_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       payments: {
         Row: {
           id: string;
@@ -1522,6 +1595,153 @@ export type Database = {
             columns: ["recorded_by"];
             isOneToOne: false;
             referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      payroll_adjustments: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          payroll_entry_id: string;
+          kind: Database["public"]["Enums"]["pay_adjustment_kind"];
+          label: string;
+          amount: string;
+          expense_id: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          payroll_entry_id: string;
+          kind?: Database["public"]["Enums"]["pay_adjustment_kind"];
+          label: string;
+          amount: string;
+          expense_id?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          payroll_entry_id?: string;
+          kind?: Database["public"]["Enums"]["pay_adjustment_kind"];
+          label?: string;
+          amount?: string;
+          expense_id?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "payroll_adjustments_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payroll_adjustments_payroll_entry_id_fkey";
+            columns: ["payroll_entry_id"];
+            isOneToOne: false;
+            referencedRelation: "payroll_entries";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payroll_adjustments_expense_id_fkey";
+            columns: ["expense_id"];
+            isOneToOne: false;
+            referencedRelation: "expenses";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payroll_adjustments_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      payroll_entries: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          pay_period_id: string;
+          employee_id: string;
+          standard_hours: string;
+          overtime_hours: string;
+          hourly_rate: string;
+          overtime_rate: string;
+          base_pay: string | null;
+          overtime_pay: string | null;
+          adjustments: string;
+          expenses: string;
+          gross_pay: string;
+          timesheet_count: number;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          pay_period_id: string;
+          employee_id: string;
+          standard_hours?: string;
+          overtime_hours?: string;
+          hourly_rate?: string;
+          overtime_rate?: string;
+          base_pay?: string | null;
+          overtime_pay?: string | null;
+          adjustments?: string;
+          expenses?: string;
+          gross_pay?: string;
+          timesheet_count?: number;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          pay_period_id?: string;
+          employee_id?: string;
+          standard_hours?: string;
+          overtime_hours?: string;
+          hourly_rate?: string;
+          overtime_rate?: string;
+          base_pay?: string | null;
+          overtime_pay?: string | null;
+          adjustments?: string;
+          expenses?: string;
+          gross_pay?: string;
+          timesheet_count?: number;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "payroll_entries_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payroll_entries_pay_period_id_fkey";
+            columns: ["pay_period_id"];
+            isOneToOne: false;
+            referencedRelation: "pay_periods";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payroll_entries_employee_id_fkey";
+            columns: ["employee_id"];
+            isOneToOne: false;
+            referencedRelation: "employees";
             referencedColumns: ["id"];
           },
         ];
@@ -2413,6 +2633,13 @@ export type Database = {
             referencedRelation: "sites";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "timesheets_payroll_entry_fk";
+            columns: ["payroll_entry_id"];
+            isOneToOne: false;
+            referencedRelation: "payroll_entries";
+            referencedColumns: ["id"];
+          },
         ];
       };
       vat_rates: {
@@ -2580,6 +2807,10 @@ export type Database = {
       timesheet_from_shift: { Args: { p_shift_id: string }; Returns: string };
       seed_org_workforce_defaults: { Args: { org: string }; Returns: undefined };
       can_view_directory: { Args: { org: string }; Returns: boolean };
+      recalculate_payroll_entry: { Args: { p_entry_id: string }; Returns: undefined };
+      build_payroll_period: { Args: { p_period_id: string; p_overtime_multiplier?: unknown }; Returns: number };
+      finalise_payroll_period: { Args: { p_period_id: string }; Returns: undefined };
+      reopen_payroll_period: { Args: { p_period_id: string }; Returns: undefined };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";
@@ -2642,6 +2873,8 @@ export type Database = {
       leave_type: "holiday" | "sick" | "unpaid" | "other";
       leave_status: "requested" | "approved" | "rejected" | "cancelled";
       verification_status: "unverified" | "verified" | "rejected" | "expired";
+      pay_period_status: "draft" | "review" | "finalised" | "exported";
+      pay_adjustment_kind: "bonus" | "expense_reimbursement" | "deduction" | "holiday_pay" | "other";
     };
     CompositeTypes: Record<string, never>;
   };
@@ -2672,5 +2905,7 @@ export type TimesheetStatus = Database["public"]["Enums"]["timesheet_status"];
 export type LeaveType = Database["public"]["Enums"]["leave_type"];
 export type LeaveStatus = Database["public"]["Enums"]["leave_status"];
 export type VerificationStatus = Database["public"]["Enums"]["verification_status"];
+export type PayPeriodStatus = Database["public"]["Enums"]["pay_period_status"];
+export type PayAdjustmentKind = Database["public"]["Enums"]["pay_adjustment_kind"];
 export type TablesInsert<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Insert"];
 export type TablesUpdate<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Update"];

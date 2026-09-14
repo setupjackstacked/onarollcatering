@@ -47,7 +47,7 @@ export const DASHBOARD_NAV: NavSection[] = [
       { label: "Invoices", href: "/dashboard/invoices", icon: "invoices", permission: "finance.read" },
       { label: "Payments", href: "/dashboard/payments", icon: "payments", permission: "finance.read" },
       { label: "Expenses", href: "/dashboard/expenses", icon: "expenses", permission: "finance.read" },
-      { label: "Payroll", href: "/dashboard/payroll", icon: "payroll", permission: "finance.read", phase: 9 },
+      { label: "Payroll", href: "/dashboard/payroll", icon: "payroll", permission: "finance.read" },
     ],
   },
   {
