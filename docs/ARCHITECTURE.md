@@ -5,7 +5,7 @@ One Next.js 16 (App Router) application, one repository, three surfaces:
 | Surface | Route | Status |
 |---|---|---|
 | Public marketing site | `/` | Phase 1 — built |
-| Management dashboard (native CRM/ops) | `/dashboard` | Phase 3+ — auth gate + stub only |
+| Management dashboard (native CRM/ops) | `/dashboard` | Phase 2 schema done; Phase 3+ UI — auth gate + stub only |
 | Staff portal | `/staff` | Phase 12 — auth gate + stub only |
 
 ## Stack
@@ -49,10 +49,17 @@ src/
     logger.ts, rate-limit.ts, utils/cn.ts
   fonts/                    self-hosted woff2 (Cormorant Garamond, Inter variable)
 supabase/
-  migrations/               deterministic SQL migrations (tenancy, profiles, members, enquiries, RLS, buckets)
-  seed.sql                  dev-only organisation seed
+  migrations/               deterministic SQL migrations
+                              0001 tenancy, profiles, members, enquiries, RLS helpers, buckets
+                              0002 core CRM: lookups, clients, contacts, sites, leads, projects, documents,
+                                   activity_logs, notifications, numbering, audit triggers, RLS
+  seed.sql                  dev-only seed (org, 4 role users, SAMPLE client/contact/site/lead/project)
+  tests/                    00_supabase_shim.sql (auth/storage emulation) + *.test.sql RLS tests
   config.toml               local Supabase CLI config
-tests/                      vitest unit tests (validation, permissions)
+scripts/
+  db-test.sh                throwaway Postgres 16 → shim → migrations → seed → RLS tests
+  db-types.sh + gen-types.py  regenerate src/lib/supabase/types.ts from the migrated schema
+tests/                      vitest unit tests (validation, permissions, money)
 docs/                       this file, CONTENT-TODO.md
 ```
 
@@ -70,7 +77,16 @@ docs/                       this file, CONTENT-TODO.md
 * Public enquiry flow: server action validates with Zod → inserts into `enquiries` via service role →
   Resend emails. Uploads go to the private `enquiry-uploads` bucket through a route handler that sniffs
   magic bytes and enforces size/type limits. In-memory rate limiting on both.
-* Financial values will use `numeric(12,2)`; never floats. (No financial tables yet — Phase 5.)
+* Money is `numeric(12,2)` in Postgres (arrives as a string via PostgREST) and integer pence in TS
+  (`lib/money`). Derived values (gross profit, margin) are views (`project_financials`), never columns.
+* Per-org, per-year document numbering (`OAR-P-2026-0001`, later `OAR-Q-…`, `OAR-INV-…`) via
+  `next_document_number()` backed by a `number_sequences` counter table — numbers are never reused.
+* `activity_logs` is append-only; written by `log_activity()` (security definer, member-checked) and by
+  audit triggers on lead/project status changes. Authenticated users have no insert policy on it.
+* Project managers can only see/update projects where `project_manager_id = auth.uid()`; documents attached
+  to projects inherit that rule via `can_read_project()` / `can_write_project()`.
+* Lookups that may need to be configurable (lead sources, service types, document categories) are
+  org-scoped tables seeded for every organisation by trigger, not enums.
 
 ## Content model (Phase 1)
 
@@ -96,7 +112,15 @@ Server-only: `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `EMAIL_FROM`, `INTER
 `ENQUIRY_ORGANISATION_ID`. The site builds and runs without any of them; enquiry persistence/email degrade
 to logged warnings and the form reports an honest error if nothing could be recorded.
 
+## Database testing
+
+`npm run db:test` needs PostgreSQL 16 binaries locally (no Docker, no Supabase project). It initialises a
+throwaway cluster, applies `supabase/tests/00_supabase_shim.sql` (emulates `auth.uid()`, `auth.users`,
+`storage.buckets`, the `authenticated` role), runs every migration and the seed, then executes
+`supabase/tests/*.test.sql`. Tests set `request.jwt.claim.sub` + `role = authenticated` to act as specific
+users and assert cross-tenant isolation and role behaviour. Add a test file whenever a migration adds RLS.
+
 ## Phase roadmap
 
-See the master spec §103. Next: **Phase 2** (core CRM schema: leads, clients, client_contacts, sites,
-projects, documents, activity_logs, notifications + RLS + seed) then **Phase 3** (auth + dashboard shell).
+See the master spec §103. Done: Phase 0, 1, 2. Next: **Phase 3** (login, password reset, protected
+routes, sidebar + mobile dashboard nav, overview, global search shell, permissions framework).

@@ -11,7 +11,7 @@ Hard rules
 - Cost price never reaches customer-facing output. Public quote/invoice URLs use random tokens, never sequential IDs.
 - Never invent facts, statistics, client names or logos. Placeholders are labelled in `src/content/*` and `docs/CONTENT-TODO.md`.
 - Don't fake functionality: hide it, disable it, or label it "Phase N".
-- Schema changes only via `supabase/migrations`. Regenerate `src/lib/supabase/types.ts` with `supabase gen types` once a project exists.
+- Schema changes only via `supabase/migrations`. After any migration: `npm run db:types` (regenerates `src/lib/supabase/types.ts`) and `npm run db:test` (RLS tests on a local Postgres; add a `supabase/tests/NN_*.test.sql` for new policies).
 
 Conventions
 - Server components by default; `"use client"` only for interactivity.
