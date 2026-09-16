@@ -9,7 +9,7 @@ import { FilterBar } from "@/components/dashboard/filter-bar";
 import { ActionLink } from "@/components/dashboard/entity";
 import { ProjectBadge } from "@/lib/domain/badges";
 import { PROJECT_STATUSES } from "@/lib/domain/statuses";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 import { pageHref } from "@/lib/query-string";
 
@@ -43,7 +43,7 @@ export default async function ProjectsPage({ searchParams }: { searchParams: Pro
           { key: "status", header: "Status", render: (r) => <ProjectBadge status={r.status} /> },
           { key: "pm", header: "PM", render: (r) => memberLabel(r.project_manager_id ? mmap.get(r.project_manager_id) : null) },
           { key: "start", header: "Start", render: (r) => (r.start_date ? formatDateUK(r.start_date) : "—") },
-          { key: "value", header: "Contract", align: "right", render: (r) => formatGBP(toPence(r.contract_value), { showPence: false }) },
+          { key: "value", header: "Contract", align: "right", render: (r) => formatMoney(toPence(r.contract_value), { showPence: false }) },
         ]}
         empty={{ title: "No projects match", description: "Projects are created here or by converting a won lead.", action: ctx.can("projects.write") ? { label: "New project", href: "/dashboard/projects/new" } : undefined }}
         pagination={{ page, size, total, hrefFor: pageHref("/dashboard/projects", sp) }}

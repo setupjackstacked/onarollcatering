@@ -7,7 +7,7 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { FilterBar } from "@/components/dashboard/filter-bar";
 import { ActionLink } from "@/components/dashboard/entity";
 import { QuoteBadge } from "@/lib/domain/badges";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 import { pageHref } from "@/lib/query-string";
 
@@ -29,7 +29,7 @@ export default async function QuotesPage({ searchParams }: { searchParams: Promi
           { key: "t", header: "Title", render: (r) => r.title },
           { key: "c", header: "Client", render: (r) => (r.clients as unknown as { name: string } | null)?.name ?? "—" },
           { key: "s", header: "Status", render: (r) => <QuoteBadge status={r.status} /> },
-          { key: "v", header: "Total", align: "right", render: (r) => formatGBP(toPence(r.total)) },
+          { key: "v", header: "Total", align: "right", render: (r) => formatMoney(toPence(r.total)) },
           { key: "e", header: "Expires", render: (r) => formatDateUK(r.expiry_date) },
         ]}
         empty={{ title: "No quotes yet", description: "Create a quote from a lead, a client or here.", action: ctx.can("sales.write") ? { label: "New quote", href: "/dashboard/quotes/new" } : undefined }}

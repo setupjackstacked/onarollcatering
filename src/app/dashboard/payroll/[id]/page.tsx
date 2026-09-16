@@ -9,7 +9,7 @@ import { Panel, Metric, StatusBadge } from "@/components/dashboard/primitives";
 import { ConfirmAction } from "@/components/dashboard/confirm";
 import { RedirectingAction } from "@/components/dashboard/redirecting-action";
 import { AdjustmentForm, PayPeriodForm } from "@/components/dashboard/forms/payroll-forms";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 
 const TONE: Record<string, "grey" | "amber" | "green" | "copper"> = { draft: "grey", review: "amber", finalised: "green", exported: "copper" };
@@ -40,8 +40,8 @@ export default async function PayPeriodPage({ params }: { params: Promise<{ id: 
         <Metric label="Employees" value={totals.employees} />
         <Metric label="Standard hours" value={totals.hours.toFixed(2)} />
         <Metric label="Overtime hours" value={totals.overtime.toFixed(2)} hint={`at ${DEFAULT_OVERTIME_MULTIPLIER}×`} />
-        <Metric label="Gross pay" value={formatGBP(totals.gross, { showPence: false })} hint="Before PAYE, NI and pension" />
-        <Metric label="Reimbursements" value={formatGBP(totals.expenses, { showPence: false })} hint="Paid separately, not taxable" />
+        <Metric label="Gross pay" value={formatMoney(totals.gross, { showPence: false })} hint="Before PAYE, NI and pension" />
+        <Metric label="Reimbursements" value={formatMoney(totals.expenses, { showPence: false })} hint="Paid separately, not taxable" />
       </div>
 
       {unbuilt > 0 && !locked ? (
@@ -68,7 +68,7 @@ export default async function PayPeriodPage({ params }: { params: Promise<{ id: 
                             <ul className="mt-1 space-y-0.5 text-xs text-muted-light">
                               {adjustments.map((a) => (
                                 <li key={a.id} className="flex items-center gap-2">
-                                  <span>{ADJUSTMENT_KINDS.find((k) => k.value === a.kind)?.label ?? a.kind}: {a.label} {formatGBP(toPence(a.amount))}</span>
+                                  <span>{ADJUSTMENT_KINDS.find((k) => k.value === a.kind)?.label ?? a.kind}: {a.label} {formatMoney(toPence(a.amount))}</span>
                                   {canWrite && !locked ? <ConfirmAction action={deleteAdjustment.bind(null, a.id, id)} label="Remove" title="Remove this adjustment?" confirmLabel="Remove" className="h-6 px-2 text-[0.6875rem]" /> : null}
                                 </li>
                               ))}
@@ -77,11 +77,11 @@ export default async function PayPeriodPage({ params }: { params: Promise<{ id: 
                           {canWrite && !locked ? <div className="mt-2"><AdjustmentForm entryId={e.id} /></div> : null}
                         </td>
                         <td className="py-2 pr-3 text-right num-lining">{Number(e.standard_hours).toFixed(2)}</td>
-                        <td className="py-2 pr-3 text-right num-lining">{formatGBP(toPence(e.hourly_rate))}</td>
-                        <td className="py-2 pr-3 text-right num-lining">{Number(e.overtime_hours).toFixed(2)}{Number(e.overtime_hours) > 0 ? <span className="block text-xs text-muted-light">{formatGBP(toPence(e.overtime_pay))}</span> : null}</td>
-                        <td className="py-2 pr-3 text-right num-lining">{formatGBP(toPence(e.adjustments))}</td>
-                        <td className="py-2 pr-3 text-right num-lining font-medium">{formatGBP(toPence(e.gross_pay))}</td>
-                        <td className="py-2 text-right num-lining text-muted-light">{formatGBP(toPence(e.expenses))}</td>
+                        <td className="py-2 pr-3 text-right num-lining">{formatMoney(toPence(e.hourly_rate))}</td>
+                        <td className="py-2 pr-3 text-right num-lining">{Number(e.overtime_hours).toFixed(2)}{Number(e.overtime_hours) > 0 ? <span className="block text-xs text-muted-light">{formatMoney(toPence(e.overtime_pay))}</span> : null}</td>
+                        <td className="py-2 pr-3 text-right num-lining">{formatMoney(toPence(e.adjustments))}</td>
+                        <td className="py-2 pr-3 text-right num-lining font-medium">{formatMoney(toPence(e.gross_pay))}</td>
+                        <td className="py-2 text-right num-lining text-muted-light">{formatMoney(toPence(e.expenses))}</td>
                       </tr>
                     );
                   })}

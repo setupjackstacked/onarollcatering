@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPublicInvoice } from "@/features/invoices/public";
 import { Logo } from "@/components/marketing/logo";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 import { site } from "@/content/site";
 import { DEFAULT_INVOICE_TERMS, PAYMENT_DETAILS } from "@/features/invoices/schema";
@@ -34,7 +34,7 @@ export default async function PublicInvoicePage({ params }: { params: Promise<{ 
         </div>
 
         {inv.status === "paid" ? <p className="mt-8 rounded-md bg-status-success/10 px-4 py-3 text-sm text-status-success">Paid in full{inv.paid_at ? ` on ${formatDateUK(inv.paid_at)}` : ""}. Thank you.</p> : null}
-        {inv.status === "overdue" ? <p className="mt-8 rounded-md bg-status-danger/10 px-4 py-3 text-sm text-status-danger">This invoice is overdue. Balance due {formatGBP(balance)}.</p> : null}
+        {inv.status === "overdue" ? <p className="mt-8 rounded-md bg-status-danger/10 px-4 py-3 text-sm text-status-danger">This invoice is overdue. Balance due {formatMoney(balance)}.</p> : null}
         {inv.status === "cancelled" ? <p className="mt-8 rounded-md bg-graphite/8 px-4 py-3 text-sm">This invoice has been cancelled and is not payable.</p> : null}
 
         <div className="mt-10 overflow-hidden rounded-lg border border-graphite/10 bg-white/60">
@@ -42,16 +42,16 @@ export default async function PublicInvoicePage({ params }: { params: Promise<{ 
             <thead className="bg-graphite/[0.04] text-left text-xs uppercase tracking-wider text-muted-light"><tr><th className="px-4 py-3 font-medium">Description</th><th className="px-4 py-3 text-right font-medium">Qty</th><th className="hidden px-4 py-3 text-right font-medium sm:table-cell">Unit</th><th className="hidden px-4 py-3 text-right font-medium sm:table-cell">VAT</th><th className="px-4 py-3 text-right font-medium">Net</th></tr></thead>
             <tbody className="divide-y divide-graphite/10">
               {items.map((i) => (
-                <tr key={i.id}><td className="px-4 py-3">{i.description}{Number(i.discount_pct) > 0 ? <span className="block text-xs text-muted-light">{Number(i.discount_pct)}% discount</span> : null}</td><td className="px-4 py-3 text-right num-lining">{Number(i.quantity)} {i.unit}</td><td className="hidden px-4 py-3 text-right num-lining sm:table-cell">{formatGBP(toPence(i.sell_price))}</td><td className="hidden px-4 py-3 text-right sm:table-cell">{Number(i.vat_rate)}%</td><td className="px-4 py-3 text-right num-lining">{formatGBP(toPence(i.line_net))}</td></tr>
+                <tr key={i.id}><td className="px-4 py-3">{i.description}{Number(i.discount_pct) > 0 ? <span className="block text-xs text-muted-light">{Number(i.discount_pct)}% discount</span> : null}</td><td className="px-4 py-3 text-right num-lining">{Number(i.quantity)} {i.unit}</td><td className="hidden px-4 py-3 text-right num-lining sm:table-cell">{formatMoney(toPence(i.sell_price))}</td><td className="hidden px-4 py-3 text-right sm:table-cell">{Number(i.vat_rate)}%</td><td className="px-4 py-3 text-right num-lining">{formatMoney(toPence(i.line_net))}</td></tr>
               ))}
             </tbody>
           </table>
           <dl className="ml-auto max-w-xs space-y-1 px-4 py-4 text-sm">
-            <div className="flex justify-between"><dt className="text-muted-light">Subtotal</dt><dd className="num-lining">{formatGBP(toPence(inv.subtotal))}</dd></div>
-            {toPence(inv.discount_amount) > 0 ? <div className="flex justify-between"><dt className="text-muted-light">Discount</dt><dd className="num-lining">−{formatGBP(toPence(inv.discount_amount))}</dd></div> : null}
-            <div className="flex justify-between"><dt className="text-muted-light">VAT</dt><dd className="num-lining">{formatGBP(toPence(inv.vat_amount))}</dd></div>
-            <div className="flex justify-between border-t border-graphite/15 pt-2 text-base font-medium"><dt>Total</dt><dd className="num-lining">{formatGBP(toPence(inv.total))}</dd></div>
-            {!isCredit && toPence(inv.amount_paid) > 0 ? <><div className="flex justify-between"><dt className="text-muted-light">Paid</dt><dd className="num-lining">−{formatGBP(toPence(inv.amount_paid))}</dd></div><div className="flex justify-between font-medium"><dt>Balance due</dt><dd className="num-lining">{formatGBP(balance)}</dd></div></> : null}
+            <div className="flex justify-between"><dt className="text-muted-light">Subtotal</dt><dd className="num-lining">{formatMoney(toPence(inv.subtotal))}</dd></div>
+            {toPence(inv.discount_amount) > 0 ? <div className="flex justify-between"><dt className="text-muted-light">Discount</dt><dd className="num-lining">−{formatMoney(toPence(inv.discount_amount))}</dd></div> : null}
+            <div className="flex justify-between"><dt className="text-muted-light">VAT</dt><dd className="num-lining">{formatMoney(toPence(inv.vat_amount))}</dd></div>
+            <div className="flex justify-between border-t border-graphite/15 pt-2 text-base font-medium"><dt>Total</dt><dd className="num-lining">{formatMoney(toPence(inv.total))}</dd></div>
+            {!isCredit && toPence(inv.amount_paid) > 0 ? <><div className="flex justify-between"><dt className="text-muted-light">Paid</dt><dd className="num-lining">−{formatMoney(toPence(inv.amount_paid))}</dd></div><div className="flex justify-between font-medium"><dt>Balance due</dt><dd className="num-lining">{formatMoney(balance)}</dd></div></> : null}
           </dl>
         </div>
 

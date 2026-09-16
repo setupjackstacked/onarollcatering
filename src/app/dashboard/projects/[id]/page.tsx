@@ -8,7 +8,7 @@ import { DescriptionList } from "@/components/dashboard/entity";
 import { Panel, Metric } from "@/components/dashboard/primitives";
 import { NotesPanel } from "@/components/dashboard/notes-panel";
 import { ProjectStatusForm } from "@/components/dashboard/forms/status-forms";
-import { formatGBP, toPence, marginPct } from "@/lib/money";
+import { formatMoney, toPence, marginPct } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 import { formatAddress, type Address } from "@/lib/domain/address";
 
@@ -25,9 +25,9 @@ export default async function ProjectOverviewPage({ params }: { params: Promise<
     <div className="space-y-6">
       {canWrite ? <Panel title="Status"><ProjectStatusForm id={id} status={project.status} /></Panel> : null}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Metric label="Contract value" value={formatGBP(value, { showPence: false })} />
-        <Metric label="Estimated cost" value={formatGBP(cost, { showPence: false })} />
-        <Metric label="Est. gross profit" value={formatGBP(value - cost, { showPence: false })} />
+        <Metric label="Contract value" value={formatMoney(value, { showPence: false })} />
+        <Metric label="Estimated cost" value={formatMoney(cost, { showPence: false })} />
+        <Metric label="Est. gross profit" value={formatMoney(value - cost, { showPence: false })} />
         <Metric label="Est. margin" value={margin === null ? "—" : `${margin}%`} hint="Estimate — see Costs tab for actuals" />
       </div>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

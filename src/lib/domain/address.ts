@@ -7,7 +7,7 @@ export const addressSchema = z.object({
   city: z.string().trim().max(120).optional().or(z.literal("")),
   county: z.string().trim().max(120).optional().or(z.literal("")),
   postcode: z.string().trim().max(16).optional().or(z.literal("")),
-  country: z.string().trim().length(2).default("GB"),
+  country: z.string().trim().length(2).default("IE"),
 });
 export type Address = z.infer<typeof addressSchema>;
 

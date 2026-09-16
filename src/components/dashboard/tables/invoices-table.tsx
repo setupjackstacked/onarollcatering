@@ -1,6 +1,6 @@
 import { DataTable } from "@/components/dashboard/data-table";
 import { InvoiceBadge } from "@/lib/domain/badges";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 import type { InvoiceStatus, InvoiceKind } from "@/lib/supabase/types";
 
@@ -14,8 +14,8 @@ export function InvoicesTable({ rows, showClient = true, empty }: { rows: Invoic
         { key: "t", header: "Title", render: (r) => r.title },
         ...(showClient ? [{ key: "c", header: "Client", render: (r: InvoiceRow) => (r.clients as { name: string } | null)?.name ?? "—" }] : []),
         { key: "s", header: "Status", render: (r) => <InvoiceBadge status={r.status} /> },
-        { key: "v", header: "Total", align: "right", render: (r) => formatGBP(toPence(r.total)) },
-        { key: "b", header: "Balance", align: "right", render: (r) => formatGBP(toPence(r.total) - toPence(r.amount_paid)) },
+        { key: "v", header: "Total", align: "right", render: (r) => formatMoney(toPence(r.total)) },
+        { key: "b", header: "Balance", align: "right", render: (r) => formatMoney(toPence(r.total) - toPence(r.amount_paid)) },
         { key: "d", header: "Due", render: (r) => formatDateUK(r.due_date) },
       ]}
       empty={empty} />

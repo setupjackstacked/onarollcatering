@@ -5,7 +5,7 @@ import { PageHeader, Panel } from "@/components/dashboard/primitives";
 import { ActionLink } from "@/components/dashboard/entity";
 import { ConfirmAction } from "@/components/dashboard/confirm";
 import { CatalogueItemForm, VatRateForm, CATEGORIES } from "@/components/dashboard/forms/catalogue-forms";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { str } from "@/lib/pagination";
 
 export const metadata = { title: "Catalogue & VAT" };
@@ -43,8 +43,8 @@ export default async function CataloguePage({ searchParams }: { searchParams: Pr
                     <tr key={i.id}>
                       <td className="py-2 pr-3">{i.name}{i.description ? <span className="block text-xs text-muted-light">{i.description}</span> : null}</td>
                       <td className="py-2 pr-3">{i.unit}</td>
-                      <td className="py-2 pr-3 text-right num-lining text-muted-light">{formatGBP(toPence(i.cost_price))}</td>
-                      <td className="py-2 pr-3 text-right num-lining">{formatGBP(toPence(i.sell_price))}</td>
+                      <td className="py-2 pr-3 text-right num-lining text-muted-light">{formatMoney(toPence(i.cost_price))}</td>
+                      <td className="py-2 pr-3 text-right num-lining">{formatMoney(toPence(i.sell_price))}</td>
                       <td className="py-2 pr-3">{i.vat_rate_key}</td>
                       {canWrite ? <td className="py-2 text-right whitespace-nowrap"><ActionLink href={`?item=${i.id}`} className="h-8 px-3 text-xs">Edit</ActionLink> <ConfirmAction action={deactivateCatalogueItem.bind(null, i.id)} label="Remove" title={`Remove ${i.name} from the catalogue?`} description="Existing quote lines keep their values." confirmLabel="Remove" className="h-8 px-3 text-xs" /></td> : null}
                     </tr>

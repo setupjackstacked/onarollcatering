@@ -15,7 +15,7 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { DocumentsPanel } from "@/components/dashboard/documents";
 import { SupplierContactForm } from "@/components/dashboard/forms/supplier-forms";
 import { ExpenseBadge } from "@/lib/domain/badges";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 import { formatAddress, type Address } from "@/lib/domain/address";
 
@@ -47,8 +47,8 @@ export default async function SupplierPage({ params, searchParams }: { params: P
 
       {canSeeCosts ? (
         <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-          <Metric label="Actual spend (net)" value={formatGBP(toPence(spend.actual), { showPence: false })} />
-          <Metric label="Committed (net)" value={formatGBP(toPence(spend.committed), { showPence: false })} />
+          <Metric label="Actual spend (net)" value={formatMoney(toPence(spend.actual), { showPence: false })} />
+          <Metric label="Committed (net)" value={formatMoney(toPence(spend.committed), { showPence: false })} />
           <Metric label="Cost records" value={spend.count} />
           <Metric label="Equipment lines" value={equipment.total} />
         </div>
@@ -69,8 +69,8 @@ export default async function SupplierPage({ params, searchParams }: { params: P
               <DataTable rows={equipment.rows} rowKey={(r) => r.id} rowHref={(r) => `/dashboard/equipment/${r.id}`}
                 columns={[
                   { key: "n", header: "Item", render: (r) => <span>{r.name}{r.supplier_sku ? <span className="block text-xs text-muted-light">SKU {r.supplier_sku}</span> : null}</span> },
-                  ...(canSeeCosts ? [{ key: "c", header: "Cost", align: "right" as const, render: (r: typeof equipment.rows[number]) => formatGBP(toPence(r.cost_price)) }] : []),
-                  { key: "s", header: "Sell", align: "right", render: (r) => formatGBP(toPence(r.sell_price)) },
+                  ...(canSeeCosts ? [{ key: "c", header: "Cost", align: "right" as const, render: (r: typeof equipment.rows[number]) => formatMoney(toPence(r.cost_price)) }] : []),
+                  { key: "s", header: "Sell", align: "right", render: (r) => formatMoney(toPence(r.sell_price)) },
                 ]}
                 empty={{ title: "No equipment" }} />
             </Panel>
@@ -85,7 +85,7 @@ export default async function SupplierPage({ params, searchParams }: { params: P
                   { key: "p", header: "Project", render: (r) => (r.projects as unknown as { name: string } | null)?.name ?? <span className="text-muted-light">Overhead</span> },
                   { key: "c", header: "Category", render: (r) => categoryLabel(r.category) },
                   { key: "s", header: "Status", render: (r) => <ExpenseBadge status={r.status} /> },
-                  { key: "n", header: "Net", align: "right", render: (r) => formatGBP(toPence(r.net)) },
+                  { key: "n", header: "Net", align: "right", render: (r) => formatMoney(toPence(r.net)) },
                 ]}
                 empty={{ title: "No costs recorded against this supplier" }} />
             </Panel>

@@ -19,7 +19,7 @@ export default async function NewTimesheetPage({ searchParams }: { searchParams:
     <div className="max-w-3xl">
       <EntityHeader back={{ href: ret, label: "Timesheets" }} eyebrow="Workforce" title="Log hours" />
       <TimesheetForm employees={employees} projects={projects} sites={sites} returnTo={ret}
-        defaults={{ work_date: str(sp.date) || isoDateOffset(-1), employee_id: str(sp.employee) || undefined, project_id: str(sp.project) || undefined }} />
+        defaults={{ work_date: str(sp.date) || isoDateOffset(-1), employee_id: str(sp.employee) || undefined, project_id: str(sp.project) || undefined, site_id: str(sp.site) || undefined }} />
     </div>
   );
 }

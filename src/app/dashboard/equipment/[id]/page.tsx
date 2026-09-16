@@ -12,7 +12,7 @@ import { ConfirmAction } from "@/components/dashboard/confirm";
 import { RedirectingAction } from "@/components/dashboard/redirecting-action";
 import { DocumentsPanel } from "@/components/dashboard/documents";
 import { EquipmentForm } from "@/components/dashboard/forms/supplier-forms";
-import { formatGBP, toPence, marginPct } from "@/lib/money";
+import { formatMoney, toPence, marginPct } from "@/lib/money";
 
 export default async function EquipmentItemPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -40,8 +40,8 @@ export default async function EquipmentItemPage({ params }: { params: Promise<{ 
         </> : null} />
 
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        {showCost ? <Metric label="Cost price" value={formatGBP(toPence(item.cost_price))} /> : null}
-        <Metric label="Standard sell" value={formatGBP(toPence(item.sell_price))} />
+        {showCost ? <Metric label="Cost price" value={formatMoney(toPence(item.cost_price))} /> : null}
+        <Metric label="Standard sell" value={formatMoney(toPence(item.sell_price))} />
         {showCost ? <Metric label="Margin" value={margin === null ? "—" : `${margin}%`} tone={margin !== null && margin < 15 ? "warning" : "default"} /> : null}
         <Metric label="VAT rate" value={vat.find((v) => v.key === item.vat_rate_key)?.label ?? item.vat_rate_key} />
       </div>

@@ -11,7 +11,7 @@ import { ActionLink } from "@/components/dashboard/entity";
 import { PipelineBoard } from "@/components/dashboard/pipeline-board";
 import { LeadBadge } from "@/lib/domain/badges";
 import { LEAD_STATUSES } from "@/lib/domain/statuses";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 import { pageHref } from "@/lib/query-string";
 import { str } from "@/lib/pagination";
@@ -67,7 +67,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
           { key: "title", header: "Lead", render: (r) => r.title },
           { key: "company", header: "Company", render: (r) => (r.clients as unknown as { name: string } | null)?.name ?? r.company_name ?? "—" },
           { key: "status", header: "Stage", render: (r) => <LeadBadge status={r.status} /> },
-          { key: "value", header: "Est. value", align: "right", render: (r) => (r.estimated_value ? formatGBP(toPence(r.estimated_value), { showPence: false }) : "—") },
+          { key: "value", header: "Est. value", align: "right", render: (r) => (r.estimated_value ? formatMoney(toPence(r.estimated_value), { showPence: false }) : "—") },
           { key: "assigned", header: "Assigned", render: (r) => memberLabel(r.assigned_user_id ? mmap.get(r.assigned_user_id) : null) },
           { key: "updated", header: "Updated", render: (r) => formatDateUK(r.updated_at) },
         ]}

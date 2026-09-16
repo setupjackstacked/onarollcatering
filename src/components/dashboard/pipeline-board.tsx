@@ -5,7 +5,7 @@ import { useOptimistic, useTransition } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { moveLead } from "@/features/leads/actions";
 import { OPEN_LEAD_STATUSES, LEAD_STATUSES } from "@/lib/domain/statuses";
-import { formatGBP } from "@/lib/money";
+import { formatMoney } from "@/lib/money";
 import { RelativeTime } from "./relative-time";
 import { cn } from "@/lib/utils/cn";
 
@@ -39,7 +39,7 @@ export function PipelineBoard({ leads, canMove }: { leads: BoardLead[]; canMove:
           <section key={status} className="flex w-[82vw] shrink-0 snap-start flex-col rounded-lg border border-graphite/10 bg-graphite/[0.03] sm:w-72" aria-label={label}>
             <header className="flex items-baseline justify-between px-3 py-2.5">
               <h2 className="text-sm font-medium">{label} <span className="ml-1 text-xs text-muted-light num-lining">{items.length}</span></h2>
-              {total ? <span className="text-xs text-muted-light num-lining">{formatGBP(total, { showPence: false })}</span> : null}
+              {total ? <span className="text-xs text-muted-light num-lining">{formatMoney(total, { showPence: false })}</span> : null}
             </header>
             <ul className="flex-1 space-y-2 px-2 pb-2">
               {items.map((l) => (
@@ -47,7 +47,7 @@ export function PipelineBoard({ leads, canMove }: { leads: BoardLead[]; canMove:
                   <Link href={`/dashboard/leads/${l.id}`} className="block text-sm font-medium leading-snug hover:underline">{l.title}</Link>
                   <p className="mt-1 truncate text-xs text-muted-light">{l.company || "No company"}</p>
                   <div className="mt-2 flex items-center justify-between text-xs text-muted-light">
-                    <span className="num-lining">{l.value ? formatGBP(l.value, { showPence: false }) : "—"}</span>
+                    <span className="num-lining">{l.value ? formatMoney(l.value, { showPence: false }) : "—"}</span>
                     <span>{l.assignee !== "—" ? l.assignee : ""}</span>
                   </div>
                   <div className="mt-2 flex items-center justify-between">

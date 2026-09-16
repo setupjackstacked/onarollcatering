@@ -2,14 +2,14 @@
 
 import { Form, FormRow, TextField, SelectField, SubmitButton } from "../form";
 import { inviteMember, changeMemberRole } from "@/features/team/actions";
+import { ROLE_LABEL, PRIMARY_ROLES, SECONDARY_ROLES } from "@/lib/auth/roles";
 
+const opt = (r: string) => ({ value: r, label: ROLE_LABEL[r as keyof typeof ROLE_LABEL] ?? r });
+/** Admin, Manager, Staff first; the two specialist roles after them. */
 export const ROLE_OPTIONS = [
-  { value: "owner", label: "Owner" },
-  { value: "administrator", label: "Administrator" },
-  { value: "finance", label: "Finance" },
-  { value: "project_manager", label: "Project Manager" },
-  { value: "staff", label: "Staff (portal only)" },
-  { value: "read_only", label: "Read only" },
+  ...PRIMARY_ROLES.map(opt),
+  ...SECONDARY_ROLES.map(opt),
+  { value: "owner", label: ROLE_LABEL.owner },
 ];
 
 export function InviteForm({ canGrantOwner }: { canGrantOwner: boolean }) {
@@ -19,7 +19,7 @@ export function InviteForm({ canGrantOwner }: { canGrantOwner: boolean }) {
       <FormRow cols={3}>
         <TextField name="full_name" label="Name" optional />
         <TextField name="email" label="Email" type="email" required />
-        <SelectField name="role" label="Role" options={roles} defaultValue="project_manager" />
+        <SelectField name="role" label="Role" options={roles} defaultValue="staff" hint="Staff get the mobile portal; Managers run their sites; Admins run everything" />
       </FormRow>
       <SubmitButton>Send invitation</SubmitButton>
     </Form>

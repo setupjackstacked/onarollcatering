@@ -28,7 +28,7 @@ export function OrganisationJsonLd() {
         logo: `${site.url}/brand/logo-copper.png`,
         description: site.description,
         foundingDate: String(site.established),
-        areaServed: "GB",
+        areaServed: "IE",
         ...(site.contact.email.placeholder ? {} : { email: site.contact.email.display }),
         ...(site.contact.phone.placeholder ? {} : { telephone: site.contact.phone.display }),
       }}
@@ -46,7 +46,7 @@ export function ServiceJsonLd({ service }: { service: Service }) {
         description: service.summary,
         serviceType: service.title,
         provider: { "@type": "Organization", name: site.name, url: site.url },
-        areaServed: "GB",
+        areaServed: "IE",
         url: `${site.url}/services/${service.slug}`,
       }}
     />

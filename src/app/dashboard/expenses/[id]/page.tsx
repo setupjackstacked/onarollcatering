@@ -11,7 +11,7 @@ import { ConfirmAction } from "@/components/dashboard/confirm";
 import { ActivityTimeline } from "@/components/dashboard/activity-timeline";
 import { ReceiptUpload } from "@/components/dashboard/forms/expense-forms";
 import { ExpenseBadge } from "@/lib/domain/badges";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 
 export default async function ExpensePage({ params }: { params: Promise<{ id: string }> }) {
@@ -34,7 +34,7 @@ export default async function ExpensePage({ params }: { params: Promise<{ id: st
           {canApprove ? <ConfirmAction action={archiveExpense.bind(null, id)} label="Remove" title="Remove this cost?" description="It will no longer count towards project costs." confirmLabel="Remove" /> : null}
         </>} />
       <div className="mb-6 grid grid-cols-3 gap-3">
-        <Metric label="Net" value={formatGBP(toPence(e.net))} /><Metric label="VAT" value={formatGBP(toPence(e.vat))} /><Metric label="Gross" value={formatGBP(toPence(e.gross))} />
+        <Metric label="Net" value={formatMoney(toPence(e.net))} /><Metric label="VAT" value={formatMoney(toPence(e.vat))} /><Metric label="Gross" value={formatMoney(toPence(e.gross))} />
       </div>
       {canApprove ? (
         <Panel title="Status" className="mb-6">

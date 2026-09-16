@@ -126,7 +126,7 @@ export function MoneyField({ name, label, hint, optional, className, ...props }:
   return (
     <Wrap name={name} label={label} hint={hint} optional={optional} className={className}>
       <div className="relative">
-        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted-light">£</span>
+        <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-muted-light">€</span>
         <input id={`f-${name}`} name={name} inputMode="decimal" aria-invalid={!!error} className={cn(control, "pl-7 num-lining")} placeholder="0.00" {...props} />
       </div>
     </Wrap>

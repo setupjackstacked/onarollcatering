@@ -12,7 +12,7 @@ import { listActivity } from "@/features/shared/activity";
 import { ActivityTimeline } from "@/components/dashboard/activity-timeline";
 import { TimesheetBadge } from "@/lib/domain/badges";
 import { formatDateUK, hhmm } from "@/lib/dates";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 
 export default async function TimesheetPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -41,7 +41,7 @@ export default async function TimesheetPage({ params }: { params: Promise<{ id: 
         <Metric label="Hours worked" value={Number(ts.hours).toFixed(2)} />
         <Metric label="Overtime" value={Number(ts.overtime_hours).toFixed(2)} />
         <Metric label="Total" value={total.toFixed(2)} />
-        {ctx.can("finance.read") ? <Metric label="Labour cost" value={ts.hourly_rate ? formatGBP(Math.round(total * toPence(ts.hourly_rate))) : "—"} hint={ts.hourly_rate ? `at ${formatGBP(toPence(ts.hourly_rate))}/hr` : "Rate applied on approval"} /> : null}
+        {ctx.can("finance.read") ? <Metric label="Labour cost" value={ts.hourly_rate ? formatMoney(Math.round(total * toPence(ts.hourly_rate))) : "—"} hint={ts.hourly_rate ? `at ${formatMoney(toPence(ts.hourly_rate))}/hr` : "Rate applied on approval"} /> : null}
       </div>
       {ts.status === "rejected" && ts.rejection_note ? <p className="mb-6 rounded-md bg-status-danger/10 px-4 py-3 text-sm text-status-danger">Returned for correction: {ts.rejection_note}</p> : null}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

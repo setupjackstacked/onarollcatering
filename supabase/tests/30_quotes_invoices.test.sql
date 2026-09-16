@@ -125,7 +125,7 @@ begin
   select count(*) into n from public.quotes; if n <> 0 then raise exception 'org B sees quotes'; end if;
   select count(*) into n from public.invoices; if n <> 0 then raise exception 'org B sees invoices'; end if;
   select count(*) into n from public.payments; if n <> 0 then raise exception 'org B sees payments'; end if;
-  select count(*) into n from public.vat_rates; if n <> 4 then raise exception 'org B vat rates % (expected own 4)', n; end if;
+  select count(*) into n from public.vat_rates; if n <> 5 then raise exception 'org B vat rates % (expected own 5: standard, reduced, catering, zero, exempt)', n; end if;
 
   perform test_reset();
   raise notice 'PASS quotes + invoices';

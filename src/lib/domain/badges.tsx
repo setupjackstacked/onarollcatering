@@ -79,3 +79,12 @@ export function VerificationBadge({ status }: { status: string }) {
   const s = VERIFY_TONES[status];
   return <StatusBadge label={s?.label ?? status} tone={s?.tone ?? "grey"} />;
 }
+
+const SITE_TONES: Record<string, { label: string; tone: import("@/lib/domain/statuses").StatusTone }> = {
+  prospective: { label: "Prospective", tone: "grey" }, mobilising: { label: "Mobilising", tone: "amber" },
+  operating: { label: "Operating", tone: "green" }, paused: { label: "Paused", tone: "amber" }, closed: { label: "Closed", tone: "grey" },
+};
+export function SiteBadge({ status }: { status: string }) {
+  const s = SITE_TONES[status];
+  return <StatusBadge label={s?.label ?? status} tone={s?.tone ?? "grey"} />;
+}

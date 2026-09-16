@@ -7,7 +7,7 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { FilterBar } from "@/components/dashboard/filter-bar";
 import { ActionLink } from "@/components/dashboard/entity";
 import { ExpenseBadge } from "@/lib/domain/badges";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 import { pageHref } from "@/lib/query-string";
 
@@ -23,9 +23,9 @@ export default async function ExpensesPage({ searchParams }: { searchParams: Pro
     <>
       <PageHeader eyebrow="Finance" title="Expenses & costs" description="Project and overhead costs. Committed = agreed but not yet incurred; actual = incurred." actions={canRaise ? <ActionLink href="/dashboard/expenses/new" variant="copper">Record cost</ActionLink> : null} />
       <div className="mb-6 grid grid-cols-3 gap-3">
-        <Metric label="Pending approval" value={formatGBP(totals.pending, { showPence: false })} tone={totals.pending > 0 ? "warning" : "default"} href="/dashboard/expenses?status=pending" />
-        <Metric label="Committed (net)" value={formatGBP(totals.committed, { showPence: false })} />
-        <Metric label="Actual (net)" value={formatGBP(totals.actual, { showPence: false })} />
+        <Metric label="Pending approval" value={formatMoney(totals.pending, { showPence: false })} tone={totals.pending > 0 ? "warning" : "default"} href="/dashboard/expenses?status=pending" />
+        <Metric label="Committed (net)" value={formatMoney(totals.committed, { showPence: false })} />
+        <Metric label="Actual (net)" value={formatMoney(totals.actual, { showPence: false })} />
       </div>
       <FilterBar filters={[{ name: "status", label: "All statuses", options: EXPENSE_STATUSES as unknown as { value: string; label: string }[] }, { name: "category", label: "All categories", options: COST_CATEGORIES as unknown as { value: string; label: string }[] }]} searchPlaceholder="Description, reference or supplier" />
       <DataTable rows={rows} rowKey={(r) => r.id} rowHref={(r) => `/dashboard/expenses/${r.id}`}
@@ -35,8 +35,8 @@ export default async function ExpensesPage({ searchParams }: { searchParams: Pro
           { key: "p", header: "Project", render: (r) => (r.projects as unknown as { name: string } | null)?.name ?? <span className="text-muted-light">Overhead</span> },
           { key: "c", header: "Category", render: (r) => categoryLabel(r.category) },
           { key: "s", header: "Status", render: (r) => <ExpenseBadge status={r.status} /> },
-          { key: "n", header: "Net", align: "right", render: (r) => formatGBP(toPence(r.net)) },
-          { key: "g", header: "Gross", align: "right", render: (r) => formatGBP(toPence(r.gross)) },
+          { key: "n", header: "Net", align: "right", render: (r) => formatMoney(toPence(r.net)) },
+          { key: "g", header: "Gross", align: "right", render: (r) => formatMoney(toPence(r.gross)) },
         ]}
         empty={{ title: "No costs recorded", description: "Record supplier invoices, purchase orders and other project costs here.", action: canRaise ? { label: "Record cost", href: "/dashboard/expenses/new" } : undefined }}
         pagination={{ page, size, total, hrefFor: pageHref("/dashboard/expenses", sp) }} />

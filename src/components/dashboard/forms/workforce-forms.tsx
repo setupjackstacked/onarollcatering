@@ -75,7 +75,7 @@ export function LinkAccountForm({ id, members, current }: { id: string; members:
 }
 
 /** Shift form with live conflict warnings (warn, never block — spec §48). */
-export function ShiftForm({ shift, employees, projects, sites, roles, returnTo, defaults }: { shift?: Tables<"shifts"> | null; employees: Opt[]; projects: Opt[]; sites: Opt[]; roles: Opt[]; returnTo?: string; defaults?: { shift_date?: string; employee_id?: string; project_id?: string } }) {
+export function ShiftForm({ shift, employees, projects, sites, roles, returnTo, defaults }: { shift?: Tables<"shifts"> | null; employees: Opt[]; projects: Opt[]; sites: Opt[]; roles: Opt[]; returnTo?: string; defaults?: { shift_date?: string; employee_id?: string; project_id?: string; site_id?: string } }) {
   const [employeeId, setEmployeeId] = useState(shift?.employee_id ?? defaults?.employee_id ?? employees[0]?.value ?? "");
   const [date, setDate] = useState(shift?.shift_date ?? defaults?.shift_date ?? "");
   const [start, setStart] = useState(shift?.start_time?.slice(0, 5) ?? "08:00");
@@ -107,7 +107,7 @@ export function ShiftForm({ shift, employees, projects, sites, roles, returnTo, 
       <FormRow cols={3}>
         <SelectField name="employee_id" label="Employee" options={employees} value={employeeId} onChange={(e) => setEmployeeId(e.target.value)} required />
         <SelectField name="project_id" label="Project" optional options={projects} placeholder="No project" defaultValue={shift?.project_id ?? defaults?.project_id ?? ""} />
-        <SelectField name="site_id" label="Site" optional options={sites} placeholder="No site" defaultValue={shift?.site_id ?? ""} />
+        <SelectField name="site_id" label="Site" optional options={sites} placeholder="No site" defaultValue={shift?.site_id ?? defaults?.site_id ?? ""} />
       </FormRow>
       <FormRow cols={3}>
         <DateField name="shift_date" label="Date" value={date} onChange={(e) => setDate(e.target.value)} required />
@@ -140,7 +140,7 @@ export function ShiftForm({ shift, employees, projects, sites, roles, returnTo, 
   );
 }
 
-export function TimesheetForm({ timesheet, employees, projects, sites, returnTo, defaults, lockEmployee }: { timesheet?: Tables<"timesheets"> | null; employees: Opt[]; projects: Opt[]; sites: Opt[]; returnTo?: string; defaults?: { work_date?: string; employee_id?: string; project_id?: string }; lockEmployee?: boolean }) {
+export function TimesheetForm({ timesheet, employees, projects, sites, returnTo, defaults, lockEmployee }: { timesheet?: Tables<"timesheets"> | null; employees: Opt[]; projects: Opt[]; sites: Opt[]; returnTo?: string; defaults?: { work_date?: string; employee_id?: string; project_id?: string; site_id?: string }; lockEmployee?: boolean }) {
   const [start, setStart] = useState(timesheet?.start_time?.slice(0, 5) ?? "08:00");
   const [end, setEnd] = useState(timesheet?.end_time?.slice(0, 5) ?? "16:00");
   const [breakMins, setBreakMins] = useState(String(timesheet?.break_minutes ?? 30));
@@ -153,7 +153,7 @@ export function TimesheetForm({ timesheet, employees, projects, sites, returnTo,
       <FormRow cols={3}>
         {lockEmployee ? null : <SelectField name="employee_id" label="Employee" options={employees} defaultValue={employeeId} required />}
         <SelectField name="project_id" label="Project" optional options={projects} placeholder="No project" defaultValue={timesheet?.project_id ?? defaults?.project_id ?? ""} hint="Needed for project labour costs" />
-        <SelectField name="site_id" label="Site" optional options={sites} placeholder="No site" defaultValue={timesheet?.site_id ?? ""} />
+        <SelectField name="site_id" label="Site" optional options={sites} placeholder="No site" defaultValue={timesheet?.site_id ?? defaults?.site_id ?? ""} />
       </FormRow>
       <FormRow cols={3}>
         <DateField name="work_date" label="Date" defaultValue={timesheet?.work_date ?? defaults?.work_date} required />

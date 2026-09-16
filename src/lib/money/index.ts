@@ -1,8 +1,14 @@
 /**
  * Money helpers. Postgres stores numeric(12,2) and returns it as a string
- * through PostgREST. Internally we work in integer pence to avoid float error.
+ * through PostgREST. Internally we work in integer cents to avoid float error.
  */
-export type Pence = number; // integer
+export type Pence = number; // integer cents — name kept for call-site stability
+export type Cents = Pence;
+
+/** The organisation trades in euro; `currency` on a document can still override. */
+export const CURRENCY = "EUR";
+export const CURRENCY_SYMBOL = "€";
+export const LOCALE = "en-IE";
 
 export function toPence(value: string | number | null | undefined): Pence {
   if (value === null || value === undefined || value === "") return 0;
@@ -22,9 +28,9 @@ export function toDecimalString(p: Pence): string {
   return `${sign}${Math.floor(abs / 100)}.${String(abs % 100).padStart(2, "0")}`;
 }
 
-export function formatGBP(p: Pence, opts: { currency?: string; showPence?: boolean } = {}) {
-  const { currency = "GBP", showPence = true } = opts;
-  return new Intl.NumberFormat("en-GB", {
+export function formatMoney(p: Pence, opts: { currency?: string; showPence?: boolean } = {}) {
+  const { currency = CURRENCY, showPence = true } = opts;
+  return new Intl.NumberFormat(LOCALE, {
     style: "currency",
     currency,
     minimumFractionDigits: showPence ? 2 : 0,
@@ -32,7 +38,7 @@ export function formatGBP(p: Pence, opts: { currency?: string; showPence?: boole
   }).format(p / 100);
 }
 
-/** Margin % (2dp) from revenue and cost in pence; null when revenue is 0. */
+/** Margin % (2dp) from revenue and cost in cents; null when revenue is 0. */
 export function marginPct(revenue: Pence, cost: Pence): number | null {
   if (revenue <= 0) return null;
   return Math.round(((revenue - cost) / revenue) * 10000) / 100;

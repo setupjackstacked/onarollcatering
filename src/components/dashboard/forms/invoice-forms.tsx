@@ -66,7 +66,7 @@ export function RecordPaymentForm({ id, balance, today }: { id: string; balance:
   return (
     <Form action={recordPayment.bind(null, id)}>
       <FormRow cols={3}>
-        <TextField name="amount" label="Amount (£)" inputMode="decimal" defaultValue={balance} required />
+        <TextField name="amount" label="Amount (€)" inputMode="decimal" defaultValue={balance} required />
         <DateField name="paid_on" label="Received on" defaultValue={today} required />
         <SelectField name="method" label="Method" options={PAYMENT_METHODS} defaultValue="bank_transfer" />
       </FormRow>

@@ -2,7 +2,7 @@ import "server-only";
 
 import type { OrgContext } from "@/lib/auth/context";
 import { OPEN_LEAD_STATUSES, ACTIVE_PROJECT_STATUSES } from "@/lib/domain/statuses";
-import { toPence, formatGBP, type Pence } from "@/lib/money";
+import { toPence, formatMoney, type Pence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 
 export type OverviewData = {
@@ -59,7 +59,7 @@ export async function loadOverview(ctx: OrgContext): Promise<OverviewData> {
 
   const attention: OverviewData["attention"] = [];
   for (const i of (openInvoices.data ?? []).filter((x) => x.status === "overdue").slice(0, 5)) {
-    attention.push({ key: `inv-${i.id}`, title: `Invoice ${i.invoice_number} overdue`, detail: `${formatGBP(toPence(i.total) - toPence(i.amount_paid))} outstanding · due ${formatDateUK(i.due_date)}`, href: `/dashboard/invoices/${i.id}`, tone: "red" });
+    attention.push({ key: `inv-${i.id}`, title: `Invoice ${i.invoice_number} overdue`, detail: `${formatMoney(toPence(i.total) - toPence(i.amount_paid))} outstanding · due ${formatDateUK(i.due_date)}`, href: `/dashboard/invoices/${i.id}`, tone: "red" });
   }
   for (const e of enquiries.data ?? []) {
     attention.push({ key: `enq-${e.id}`, title: `New enquiry — ${e.company_name}`, detail: e.project_name, tone: "copper" });

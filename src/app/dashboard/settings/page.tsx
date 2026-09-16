@@ -4,10 +4,12 @@ import { PageHeader, Panel, StatusBadge } from "@/components/dashboard/primitive
 import { DescriptionList, ActionLink } from "@/components/dashboard/entity";
 import { ConfirmAction } from "@/components/dashboard/confirm";
 import { InviteForm, RoleForm } from "@/components/dashboard/forms/team-forms";
+import { roleLabel, ROLE_DESCRIPTION, PRIMARY_ROLES } from "@/lib/auth/roles";
+import type { OrganisationRole } from "@/lib/supabase/types";
 
 export const metadata = { title: "Settings" };
 
-const ROLE_LABEL: Record<string, string> = { owner: "Owner", administrator: "Administrator", finance: "Finance", project_manager: "Project Manager", staff: "Staff", read_only: "Read only" };
+
 
 export default async function SettingsPage() {
   const ctx = await requireOrgContext("/dashboard/settings");
@@ -22,13 +24,18 @@ export default async function SettingsPage() {
       <PageHeader title="Settings" description="Organisation and team access." />
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Panel title="Organisation">
-          <DescriptionList cols={1} items={[{ label: "Name", value: ctx.organisation.name }, { label: "Your role", value: ROLE_LABEL[ctx.role] }, { label: "Signed in as", value: ctx.user.email }]} />
+          <DescriptionList cols={1} items={[{ label: "Name", value: ctx.organisation.name }, { label: "Your role", value: roleLabel(ctx.role) }, { label: "Signed in as", value: ctx.user.email }]} />
           {ctx.can("finance.read") || ctx.role === "administrator" ? <div className="mt-4 border-t border-graphite/10 pt-4"><ActionLink href="/dashboard/settings/catalogue">Catalogue &amp; VAT rates</ActionLink></div> : null}
         </Panel>
         <div className="space-y-6 lg:col-span-2">
           {canManage ? (
             <Panel title="Invite a team member">
-              <p className="mb-4 text-sm text-muted-light">They receive an email with a link to set their password. Roles: Owner and Administrator run everything; Finance handles sales, quotes, invoices and payroll prep; Project Managers see only their assigned projects; Staff use the mobile portal; Read only can look but not change.</p>
+              <p className="mb-3 text-sm text-muted-light">They receive an email with a link to set their password.</p>
+              <ul className="mb-4 space-y-1 text-sm text-muted-light">
+                {PRIMARY_ROLES.map((r) => (
+                  <li key={r}><span className="font-medium text-graphite">{roleLabel(r)}</span> — {ROLE_DESCRIPTION[r as OrganisationRole]}</li>
+                ))}
+              </ul>
               <InviteForm canGrantOwner={ctx.role === "owner"} />
             </Panel>
           ) : null}
@@ -44,7 +51,7 @@ export default async function SettingsPage() {
                       <span className="block truncate text-sm font-medium">{p?.full_name ?? p?.email ?? m.user_id}{isSelf ? " (you)" : ""}</span>
                       {p?.full_name && p?.email ? <span className="block truncate text-xs text-muted-light">{p.email}</span> : null}
                     </span>
-                    {editable ? <RoleForm memberId={m.id} role={m.role} canGrantOwner={ctx.role === "owner"} /> : <StatusBadge label={ROLE_LABEL[m.role] ?? m.role} tone={m.role === "owner" ? "copper" : "grey"} />}
+                    {editable ? <RoleForm memberId={m.id} role={m.role} canGrantOwner={ctx.role === "owner"} /> : <StatusBadge label={roleLabel(m.role)} tone={m.role === "owner" ? "copper" : "grey"} />}
                     {editable && ctx.role === "owner" ? <ConfirmAction action={removeMember.bind(null, m.id)} label="Remove" title={`Remove ${p?.full_name ?? p?.email}?`} description="They lose access immediately. Their account isn’t deleted." confirmLabel="Remove" /> : null}
                   </li>
                 );

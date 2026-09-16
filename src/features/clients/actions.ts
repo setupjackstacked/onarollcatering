@@ -93,7 +93,14 @@ export async function saveSite(id: string | null, _: FormState, formData: FormDa
   const d = p.data;
   const row = {
     name: d.name,
-    address: { line1: d.line1 ?? "", line2: d.line2 ?? "", city: d.city ?? "", county: d.county ?? "", postcode: d.postcode ?? "", country: "GB" },
+    site_type: d.site_type,
+    status: d.status,
+    oar_manager_id: nullable(d.oar_manager_id),
+    site_manager_name: nullable(d.site_manager_name),
+    site_manager_email: nullable(d.site_manager_email),
+    site_manager_phone: nullable(d.site_manager_phone),
+    opened_on: nullable(d.opened_on),
+    address: { line1: d.line1 ?? "", line2: d.line2 ?? "", city: d.city ?? "", county: d.county ?? "", postcode: d.postcode ?? "", country: "IE" },
     postcode: nullable(d.postcode),
     site_contact_id: nullable(d.site_contact_id),
     access_details: nullable(d.access_details),
@@ -106,7 +113,9 @@ export async function saveSite(id: string | null, _: FormState, formData: FormDa
   if (!id) await logActivity(ctx, "client", d.client_id, "site.added", { name: d.name });
   revalidatePath(`/dashboard/clients/${d.client_id}/sites`);
   revalidatePath("/dashboard/sites");
-  return { success: "Saved.", redirectTo: `/dashboard/clients/${d.client_id}/sites` };
+  if (id) revalidatePath(`/dashboard/sites/${id}`);
+  const back = String(formData.get("return") ?? "");
+  return { success: "Saved.", redirectTo: back.startsWith("/dashboard") ? back : `/dashboard/clients/${d.client_id}/sites` };
 }
 
 export async function archiveSite(id: string, clientId: string) {

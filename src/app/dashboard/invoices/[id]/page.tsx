@@ -12,7 +12,7 @@ import { NotesPanel } from "@/components/dashboard/notes-panel";
 import { IssueInvoiceForm, RecordPaymentForm, CancelInvoiceForm, SendInvoiceForm } from "@/components/dashboard/forms/invoice-forms";
 import { RedirectingAction } from "@/components/dashboard/redirecting-action";
 import { InvoiceBadge } from "@/lib/domain/badges";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK, isoDateOffset } from "@/lib/dates";
 import { publicEnv } from "@/lib/env";
 import { PAYMENT_METHODS } from "@/features/invoices/schema";
@@ -57,14 +57,14 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
       />
 
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Metric label="Net" value={formatGBP(toPence(inv.total) - toPence(inv.vat_amount), { showPence: false })} />
-        <Metric label="Total inc. VAT" value={formatGBP(toPence(inv.total), { showPence: false })} />
-        {!isCredit ? <Metric label="Paid" value={formatGBP(toPence(inv.amount_paid), { showPence: false })} /> : null}
-        {!isCredit ? <Metric label="Balance due" value={formatGBP(balance, { showPence: false })} tone={inv.status === "overdue" ? "warning" : "default"} hint={inv.status === "overdue" && inv.due_date ? `Overdue since ${formatDateUK(inv.due_date)}` : undefined} /> : null}
+        <Metric label="Net" value={formatMoney(toPence(inv.total) - toPence(inv.vat_amount), { showPence: false })} />
+        <Metric label="Total inc. VAT" value={formatMoney(toPence(inv.total), { showPence: false })} />
+        {!isCredit ? <Metric label="Paid" value={formatMoney(toPence(inv.amount_paid), { showPence: false })} /> : null}
+        {!isCredit ? <Metric label="Balance due" value={formatMoney(balance, { showPence: false })} tone={inv.status === "overdue" ? "warning" : "default"} hint={inv.status === "overdue" && inv.due_date ? `Overdue since ${formatDateUK(inv.due_date)}` : undefined} /> : null}
       </div>
 
       {inv.status === "cancelled" ? <p className="mb-6 rounded-md bg-graphite/8 px-4 py-3 text-sm">Cancelled {formatDateUK(inv.cancelled_at, true)}{inv.cancel_reason ? ` — ${inv.cancel_reason}` : ""}.</p> : null}
-      {creditNotes.length ? <p className="mb-6 rounded-md bg-graphite/8 px-4 py-3 text-sm">Credit notes against this invoice: {creditNotes.map((c, i) => <span key={c.id}>{i ? ", " : ""}<Link href={`/dashboard/invoices/${c.id}`} className="underline">{c.invoice_number || "draft"}</Link> ({formatGBP(toPence(c.total))})</span>)}</p> : null}
+      {creditNotes.length ? <p className="mb-6 rounded-md bg-graphite/8 px-4 py-3 text-sm">Credit notes against this invoice: {creditNotes.map((c, i) => <span key={c.id}>{i ? ", " : ""}<Link href={`/dashboard/invoices/${c.id}`} className="underline">{c.invoice_number || "draft"}</Link> ({formatMoney(toPence(c.total))})</span>)}</p> : null}
       {isCredit && inv.credit_for_invoice_id ? <p className="mb-6 rounded-md bg-graphite/8 px-4 py-3 text-sm">Credits <Link href={`/dashboard/invoices/${inv.credit_for_invoice_id}`} className="underline">the original invoice</Link>.</p> : null}
 
       {canWrite && isDraft ? (
@@ -100,19 +100,19 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                       <tr key={i.id}>
                         <td className="py-2 pr-3">{i.description}{Number(i.discount_pct) > 0 ? <span className="block text-xs text-muted-light">{Number(i.discount_pct)}% line discount</span> : null}</td>
                         <td className="py-2 pr-3 text-right num-lining">{Number(i.quantity)} {i.unit}</td>
-                        <td className="py-2 pr-3 text-right num-lining">{formatGBP(toPence(i.sell_price))}</td>
+                        <td className="py-2 pr-3 text-right num-lining">{formatMoney(toPence(i.sell_price))}</td>
                         <td className="py-2 pr-3 text-right">{Number(i.vat_rate)}%</td>
-                        <td className="py-2 text-right num-lining">{formatGBP(toPence(i.line_net))}</td>
+                        <td className="py-2 text-right num-lining">{formatMoney(toPence(i.line_net))}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
                 <dl className="ml-auto mt-4 max-w-xs space-y-1 text-sm">
-                  <div className="flex justify-between"><dt className="text-muted-light">Subtotal</dt><dd className="num-lining">{formatGBP(toPence(inv.subtotal))}</dd></div>
-                  {toPence(inv.discount_amount) > 0 ? <div className="flex justify-between"><dt className="text-muted-light">Discount ({Number(inv.discount_pct)}%)</dt><dd className="num-lining">−{formatGBP(toPence(inv.discount_amount))}</dd></div> : null}
-                  <div className="flex justify-between"><dt className="text-muted-light">VAT</dt><dd className="num-lining">{formatGBP(toPence(inv.vat_amount))}</dd></div>
-                  <div className="flex justify-between border-t border-graphite/15 pt-1 text-base font-medium"><dt>Total</dt><dd className="num-lining">{formatGBP(toPence(inv.total))}</dd></div>
-                  {!isCredit && toPence(inv.amount_paid) > 0 ? <><div className="flex justify-between"><dt className="text-muted-light">Paid</dt><dd className="num-lining">−{formatGBP(toPence(inv.amount_paid))}</dd></div><div className="flex justify-between font-medium"><dt>Balance due</dt><dd className="num-lining">{formatGBP(balance)}</dd></div></> : null}
+                  <div className="flex justify-between"><dt className="text-muted-light">Subtotal</dt><dd className="num-lining">{formatMoney(toPence(inv.subtotal))}</dd></div>
+                  {toPence(inv.discount_amount) > 0 ? <div className="flex justify-between"><dt className="text-muted-light">Discount ({Number(inv.discount_pct)}%)</dt><dd className="num-lining">−{formatMoney(toPence(inv.discount_amount))}</dd></div> : null}
+                  <div className="flex justify-between"><dt className="text-muted-light">VAT</dt><dd className="num-lining">{formatMoney(toPence(inv.vat_amount))}</dd></div>
+                  <div className="flex justify-between border-t border-graphite/15 pt-1 text-base font-medium"><dt>Total</dt><dd className="num-lining">{formatMoney(toPence(inv.total))}</dd></div>
+                  {!isCredit && toPence(inv.amount_paid) > 0 ? <><div className="flex justify-between"><dt className="text-muted-light">Paid</dt><dd className="num-lining">−{formatMoney(toPence(inv.amount_paid))}</dd></div><div className="flex justify-between font-medium"><dt>Balance due</dt><dd className="num-lining">{formatMoney(balance)}</dd></div></> : null}
                 </dl>
               </div>
             ) : (
@@ -126,7 +126,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 <ul className="divide-y divide-graphite/10 text-sm">
                   {payments.map((p) => (
                     <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
-                      <span><span className="num-lining font-medium">{formatGBP(toPence(p.amount))}</span> <span className="text-muted-light">· {formatDateUK(p.paid_on)} · {PAYMENT_METHODS.find((m) => m.value === p.method)?.label ?? p.method}{p.reference ? ` · ${p.reference}` : ""}</span>{p.notes ? <span className="block text-xs text-muted-light">{p.notes}</span> : null}</span>
+                      <span><span className="num-lining font-medium">{formatMoney(toPence(p.amount))}</span> <span className="text-muted-light">· {formatDateUK(p.paid_on)} · {PAYMENT_METHODS.find((m) => m.value === p.method)?.label ?? p.method}{p.reference ? ` · ${p.reference}` : ""}</span>{p.notes ? <span className="block text-xs text-muted-light">{p.notes}</span> : null}</span>
                       {ctx.can("org.manage") ? <ConfirmAction action={deletePayment.bind(null, p.id, id)} label="Remove" title="Remove this payment?" description="The invoice balance will be recalculated." confirmLabel="Remove" className="h-8 px-3 text-xs" /> : null}
                     </li>
                   ))}

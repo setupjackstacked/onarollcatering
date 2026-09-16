@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { toPence, toDecimalString, formatGBP, marginPct } from "@/lib/money";
+import { toPence, toDecimalString, formatMoney, marginPct } from "@/lib/money";
 
 describe("money", () => {
   it("parses numeric strings from Postgres without float error", () => {
@@ -19,9 +19,13 @@ describe("money", () => {
     expect(() => toPence("12.345")).toThrow();
     expect(() => toPence("abc")).toThrow();
   });
-  it("formats GBP", () => {
-    expect(formatGBP(18500000)).toBe("£185,000.00");
-    expect(formatGBP(18500000, { showPence: false })).toBe("£185,000");
+  it("formats euro in the Irish locale", () => {
+    expect(formatMoney(18500000)).toBe("€185,000.00");
+    expect(formatMoney(18500000, { showPence: false })).toBe("€185,000");
+    expect(formatMoney(-505)).toBe("-€5.05");
+  });
+  it("honours a per-document currency override", () => {
+    expect(formatMoney(1999, { currency: "GBP" })).toBe("£19.99");
   });
   it("computes margin matching the SQL view", () => {
     expect(marginPct(18500000, 14200000)).toBe(23.24);

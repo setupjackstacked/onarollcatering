@@ -6,7 +6,7 @@ import { PageHeader, StatusBadge } from "@/components/dashboard/primitives";
 import { DataTable } from "@/components/dashboard/data-table";
 import { FilterBar } from "@/components/dashboard/filter-bar";
 import { ActionLink } from "@/components/dashboard/entity";
-import { formatGBP, toPence, marginPct } from "@/lib/money";
+import { formatMoney, toPence, marginPct } from "@/lib/money";
 import { pageHref } from "@/lib/query-string";
 
 export const metadata = { title: "Equipment" };
@@ -33,8 +33,8 @@ export default async function EquipmentPage({ searchParams }: { searchParams: Pr
           { key: "n", header: "Item", render: (r) => <span>{r.name}{r.supplier_sku ? <span className="block text-xs text-muted-light">SKU {r.supplier_sku}</span> : null}</span> },
           { key: "c", header: "Category", render: (r) => EQUIPMENT_CATEGORIES.find((c) => c.value === r.category)?.label ?? r.category },
           { key: "s", header: "Supplier", render: (r) => (r.suppliers as unknown as { name: string } | null)?.name ?? <span className="text-muted-light">—</span> },
-          ...(showCost ? [{ key: "cp", header: "Cost", align: "right" as const, render: (r: typeof rows[number]) => <span className="text-muted-light">{formatGBP(toPence(r.cost_price))}</span> }] : []),
-          { key: "sp", header: "Sell", align: "right", render: (r) => formatGBP(toPence(r.sell_price)) },
+          ...(showCost ? [{ key: "cp", header: "Cost", align: "right" as const, render: (r: typeof rows[number]) => <span className="text-muted-light">{formatMoney(toPence(r.cost_price))}</span> }] : []),
+          { key: "sp", header: "Sell", align: "right", render: (r) => formatMoney(toPence(r.sell_price)) },
           ...(showCost ? [{ key: "m", header: "Margin", align: "right" as const, render: (r: typeof rows[number]) => { const m = marginPct(toPence(r.sell_price), toPence(r.cost_price)); return m === null ? "—" : `${m}%`; } }] : []),
           { key: "q", header: "On quotes", render: (r) => ((r.catalogue_items as unknown as unknown[] | null)?.length ? <StatusBadge label="Published" tone="green" /> : <StatusBadge label="Not published" tone="grey" />) },
         ]}

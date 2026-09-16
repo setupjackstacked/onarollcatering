@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2, ArrowUp, ArrowDown, Loader2 } from "lucide-react";
 import { calcTotals, marginFromTotals } from "@/lib/money/calc";
-import { formatGBP } from "@/lib/money";
+import { formatMoney } from "@/lib/money";
 import { QUOTE_CATEGORIES } from "@/features/quotes/schema";
 import type { FormState } from "@/lib/forms";
 import { cn } from "@/lib/utils/cn";
@@ -67,7 +67,7 @@ export function LineBuilder({
                 {catalogue.length ? (
                   <select value={l.catalogue_item_id ?? ""} onChange={(e) => fromCatalogue(l.key, e.target.value)} disabled={disabled} className={cn(cell, "mb-1 text-xs text-muted-light")} aria-label="Catalogue item">
                     <option value="">— from catalogue —</option>
-                    {catalogue.map((c) => <option key={c.id} value={c.id}>{c.name} · {formatGBP(Number(c.sell_price) * 100, { showPence: false })}</option>)}
+                    {catalogue.map((c) => <option key={c.id} value={c.id}>{c.name} · {formatMoney(Number(c.sell_price) * 100, { showPence: false })}</option>)}
                   </select>
                 ) : null}
                 <textarea value={l.description} onChange={(e) => update(l.key, { description: e.target.value })} disabled={disabled} rows={2} placeholder="Line description (customer-facing)" className={cn(cell, "h-auto min-h-10 py-2")} aria-label="Description" />
@@ -84,7 +84,7 @@ export function LineBuilder({
                 {!vatRates.some((v) => v.rate === l.vat_rate) ? <option value={l.vat_rate}>{Number(l.vat_rate)}%</option> : null}
               </select>
               <div className="col-span-2 flex items-center justify-between gap-1 md:col-span-1 md:justify-end">
-                <span className="text-sm num-lining md:hidden">Net {formatGBP(t.net)}</span>
+                <span className="text-sm num-lining md:hidden">Net {formatMoney(t.net)}</span>
                 {!disabled ? (
                   <span className="flex gap-0.5">
                     <button type="button" onClick={() => move(idx, -1)} aria-label="Move up" className="inline-flex size-8 items-center justify-center rounded-full text-muted-light hover:bg-graphite/5"><ArrowUp className="size-3.5" /></button>
@@ -103,16 +103,16 @@ export function LineBuilder({
       <div className="flex flex-col gap-4 border-t border-graphite/10 pt-4 md:flex-row md:items-start md:justify-between">
         {showCost ? (
           <dl className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm md:grid-cols-3">
-            <dt className="text-muted-light">Cost total</dt><dd className="num-lining md:col-span-2">{formatGBP(totals.costTotal)}</dd>
-            <dt className="text-muted-light">Expected profit</dt><dd className="num-lining md:col-span-2">{formatGBP(totals.subtotal - totals.discountAmount - totals.costTotal)}</dd>
+            <dt className="text-muted-light">Cost total</dt><dd className="num-lining md:col-span-2">{formatMoney(totals.costTotal)}</dd>
+            <dt className="text-muted-light">Expected profit</dt><dd className="num-lining md:col-span-2">{formatMoney(totals.subtotal - totals.discountAmount - totals.costTotal)}</dd>
             <dt className="text-muted-light">Margin</dt><dd className={cn("num-lining md:col-span-2", margin !== null && margin < 15 && "text-status-warning")}>{margin === null ? "—" : `${margin}%`}</dd>
           </dl>
         ) : <span />}
         <dl className="w-full max-w-xs space-y-1 text-sm">
-          <div className="flex justify-between"><dt className="text-muted-light">Subtotal</dt><dd className="num-lining">{formatGBP(totals.subtotal)}</dd></div>
-          {totals.discountAmount ? <div className="flex justify-between"><dt className="text-muted-light">Discount ({docDiscountPct}%)</dt><dd className="num-lining">−{formatGBP(totals.discountAmount)}</dd></div> : null}
-          <div className="flex justify-between"><dt className="text-muted-light">VAT</dt><dd className="num-lining">{formatGBP(totals.vatAmount)}</dd></div>
-          <div className="flex justify-between border-t border-graphite/15 pt-1 text-base font-medium"><dt>Total</dt><dd className="num-lining">{formatGBP(totals.total)}</dd></div>
+          <div className="flex justify-between"><dt className="text-muted-light">Subtotal</dt><dd className="num-lining">{formatMoney(totals.subtotal)}</dd></div>
+          {totals.discountAmount ? <div className="flex justify-between"><dt className="text-muted-light">Discount ({docDiscountPct}%)</dt><dd className="num-lining">−{formatMoney(totals.discountAmount)}</dd></div> : null}
+          <div className="flex justify-between"><dt className="text-muted-light">VAT</dt><dd className="num-lining">{formatMoney(totals.vatAmount)}</dd></div>
+          <div className="flex justify-between border-t border-graphite/15 pt-1 text-base font-medium"><dt>Total</dt><dd className="num-lining">{formatMoney(totals.total)}</dd></div>
         </dl>
       </div>
 

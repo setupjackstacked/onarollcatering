@@ -8,7 +8,7 @@ import { FilterBar } from "@/components/dashboard/filter-bar";
 import { ActionLink } from "@/components/dashboard/entity";
 import { TimesheetBadge } from "@/lib/domain/badges";
 import { formatDateUK, hhmm } from "@/lib/dates";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { pageHref } from "@/lib/query-string";
 
 export const metadata = { title: "Timesheets" };
@@ -36,7 +36,7 @@ export default async function TimesheetsPage({ searchParams }: { searchParams: P
           { key: "p", header: "Project", render: (r) => (r.projects as unknown as { name: string } | null)?.name ?? <span className="text-muted-light">—</span> },
           { key: "t", header: "Times", render: (r) => <span className="num-lining">{hhmm(r.start_time)}–{hhmm(r.end_time)}{r.break_minutes ? <span className="text-muted-light"> · {r.break_minutes}m break</span> : null}</span> },
           { key: "h", header: "Hours", align: "right", render: (r) => <span className="num-lining">{Number(r.hours).toFixed(2)}{Number(r.overtime_hours) > 0 ? <span className="text-copper-dark"> +{Number(r.overtime_hours).toFixed(2)} OT</span> : null}</span> },
-          { key: "c", header: "Cost", align: "right", render: (r) => (ctx.can("finance.read") && r.hourly_rate ? formatGBP(Math.round((Number(r.hours) + Number(r.overtime_hours)) * toPence(r.hourly_rate))) : "—") },
+          { key: "c", header: "Cost", align: "right", render: (r) => (ctx.can("finance.read") && r.hourly_rate ? formatMoney(Math.round((Number(r.hours) + Number(r.overtime_hours)) * toPence(r.hourly_rate))) : "—") },
           { key: "s", header: "Status", render: (r) => <TimesheetBadge status={r.status} /> },
         ]}
         empty={{ title: "No timesheets yet", description: "Staff can submit their own hours from the staff portal, or log them here.", action: canWrite ? { label: "Log hours", href: "/dashboard/timesheets/new" } : undefined }}

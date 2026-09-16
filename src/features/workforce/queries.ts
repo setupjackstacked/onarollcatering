@@ -64,12 +64,13 @@ export async function expiringDocuments(ctx: OrgContext, days = 90) {
 }
 
 // ---------- rota -------------------------------------------------------------
-export async function listShifts(ctx: OrgContext, range: { from: string; to: string }, filter?: { projectId?: string; employeeId?: string; status?: string }) {
+export async function listShifts(ctx: OrgContext, range: { from: string; to: string }, filter?: { projectId?: string; employeeId?: string; siteId?: string; status?: string }) {
   let q = ctx.supabase.from("shifts").select("*, projects(id, name, project_number), sites(id, name)")
     .eq("organisation_id", ctx.organisation.id).gte("shift_date", range.from).lte("shift_date", range.to)
     .order("shift_date").order("start_time").limit(1000);
   if (filter?.projectId) q = q.eq("project_id", filter.projectId);
   if (filter?.employeeId) q = q.eq("employee_id", filter.employeeId);
+  if (filter?.siteId) q = q.eq("site_id", filter.siteId);
   if (filter?.status) q = q.eq("status", filter.status as ShiftStatus);
   const { data } = await q;
   return data ?? [];
@@ -88,7 +89,7 @@ export async function shiftConflicts(ctx: OrgContext, args: { employeeId: string
 }
 
 // ---------- timesheets -------------------------------------------------------
-export async function listTimesheets(ctx: OrgContext, sp: Record<string, string | string[] | undefined>, filter?: { projectId?: string; employeeId?: string }) {
+export async function listTimesheets(ctx: OrgContext, sp: Record<string, string | string[] | undefined>, filter?: { projectId?: string; employeeId?: string; siteId?: string }) {
   const { from, to, page, size } = pageParams(sp);
   const status = str(sp.status), fromDate = str(sp.from), toDate = str(sp.to);
   let q = ctx.supabase.from("timesheets").select("*, projects(id, name, project_number)", { count: "exact" })
@@ -98,6 +99,7 @@ export async function listTimesheets(ctx: OrgContext, sp: Record<string, string 
   if (toDate) q = q.lte("work_date", toDate);
   if (filter?.projectId) q = q.eq("project_id", filter.projectId);
   if (filter?.employeeId) q = q.eq("employee_id", filter.employeeId);
+  if (filter?.siteId) q = q.eq("site_id", filter.siteId);
   const { data, count } = await q;
   return { rows: data ?? [], total: count ?? 0, page, size };
 }

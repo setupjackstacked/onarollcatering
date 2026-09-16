@@ -23,7 +23,7 @@ const LABELS: Record<string, (m: Record<string, unknown>) => string> = {
   "quotes.accepted": () => "Quote accepted",
   "quotes.rejected": () => "Quote rejected",
   "invoices.issued": () => "Invoice issued",
-  "invoices.payment_recorded": (m) => `Payment recorded${m.amount ? ` — £${m.amount}` : ""}`,
+  "invoices.payment_recorded": (m) => `Payment recorded${m.amount ? ` — €${m.amount}` : ""}`,
   "timesheets.approved": () => "Timesheet approved",
 };
 

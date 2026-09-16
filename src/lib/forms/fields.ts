@@ -11,7 +11,7 @@ export const checkbox = z.preprocess((v) => v === "on" || v === "true" || v === 
 export const money = z
   .string()
   .trim()
-  .transform((s) => s.replace(/[£,\s]/g, ""))
+  .transform((s) => s.replace(/[€£,\s]/g, ""))
   .refine((s) => s === "" || /^\d+(\.\d{1,2})?$/.test(s), "Enter an amount like 1250.00")
   .transform((s) => (s === "" ? "0.00" : Number(s).toFixed(2)));
 export const optionalMoney = money.optional();

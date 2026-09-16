@@ -1,7 +1,7 @@
 "use client";
 
 import { ResponsiveContainer, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell } from "recharts";
-import { formatGBP } from "@/lib/money";
+import { formatMoney } from "@/lib/money";
 
 /** Brand palette — copper leads, graphite supports. Kept small on purpose. */
 const COPPER = "#B06A3B";
@@ -10,7 +10,7 @@ const MUTED = "#9A958C";
 const TONES = ["#B06A3B", "#3A3A38", "#7B8B7A", "#9A958C", "#C9A227", "#8C5A4A"];
 
 const axis = { stroke: MUTED, fontSize: 12, tickLine: false, axisLine: false } as const;
-const money = (pence: number) => formatGBP(pence, { showPence: false });
+const money = (pence: number) => formatMoney(pence, { showPence: false });
 /** Recharts passes `ValueType`; every series here is numeric pence. */
 const num = (v: unknown) => (typeof v === "number" ? v : Number(v ?? 0));
 

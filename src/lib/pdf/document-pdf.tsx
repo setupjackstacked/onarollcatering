@@ -2,7 +2,7 @@ import "server-only";
 
 import { Document, Page, Text, View, Image, StyleSheet, renderToBuffer } from "@react-pdf/renderer";
 import { site } from "@/content/site";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 import type { Address } from "@/lib/domain/address";
 import { formatAddress } from "@/lib/domain/address";
@@ -67,7 +67,7 @@ export type PdfDoc = {
   logoUrl: string;
 };
 
-const money = (v: string) => formatGBP(toPence(v));
+const money = (v: string) => formatMoney(toPence(v));
 
 function DocPdf({ d }: { d: PdfDoc }) {
   const titleWord = d.kind === "quotation" ? "QUOTATION" : d.kind === "credit_note" ? "CREDIT NOTE" : "INVOICE";
@@ -135,7 +135,7 @@ function DocPdf({ d }: { d: PdfDoc }) {
           {balance !== null && d.kind === "invoice" ? (
             <>
               <View style={s.totRow}><Text style={s.muted}>Paid</Text><Text>{money(d.amountPaid!)}</Text></View>
-              <View style={s.totRow}><Text style={{ fontFamily: "Helvetica-Bold" }}>Balance due</Text><Text style={{ fontFamily: "Helvetica-Bold" }}>{formatGBP(balance)}</Text></View>
+              <View style={s.totRow}><Text style={{ fontFamily: "Helvetica-Bold" }}>Balance due</Text><Text style={{ fontFamily: "Helvetica-Bold" }}>{formatMoney(balance)}</Text></View>
             </>
           ) : null}
         </View>

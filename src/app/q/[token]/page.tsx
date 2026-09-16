@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getPublicQuote, markQuoteViewed } from "@/features/quotes/public";
 import { Logo } from "@/components/marketing/logo";
 import { DecisionForm } from "./decision-form";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 import { site } from "@/content/site";
 import { DEFAULT_TERMS } from "@/features/quotes/schema";
@@ -45,15 +45,15 @@ export default async function PublicQuotePage({ params }: { params: Promise<{ to
             <thead className="bg-graphite/[0.04] text-left text-xs uppercase tracking-wider text-muted-light"><tr><th className="px-4 py-3 font-medium">Description</th><th className="px-4 py-3 text-right font-medium">Qty</th><th className="hidden px-4 py-3 text-right font-medium sm:table-cell">Unit</th><th className="hidden px-4 py-3 text-right font-medium sm:table-cell">VAT</th><th className="px-4 py-3 text-right font-medium">Net</th></tr></thead>
             <tbody className="divide-y divide-graphite/10">
               {items.map((i) => (
-                <tr key={i.id}><td className="px-4 py-3">{i.description}{Number(i.discount_pct) > 0 ? <span className="block text-xs text-muted-light">{Number(i.discount_pct)}% discount</span> : null}</td><td className="px-4 py-3 text-right num-lining">{Number(i.quantity)} {i.unit}</td><td className="hidden px-4 py-3 text-right num-lining sm:table-cell">{formatGBP(toPence(i.sell_price))}</td><td className="hidden px-4 py-3 text-right sm:table-cell">{Number(i.vat_rate)}%</td><td className="px-4 py-3 text-right num-lining">{formatGBP(toPence(i.line_net))}</td></tr>
+                <tr key={i.id}><td className="px-4 py-3">{i.description}{Number(i.discount_pct) > 0 ? <span className="block text-xs text-muted-light">{Number(i.discount_pct)}% discount</span> : null}</td><td className="px-4 py-3 text-right num-lining">{Number(i.quantity)} {i.unit}</td><td className="hidden px-4 py-3 text-right num-lining sm:table-cell">{formatMoney(toPence(i.sell_price))}</td><td className="hidden px-4 py-3 text-right sm:table-cell">{Number(i.vat_rate)}%</td><td className="px-4 py-3 text-right num-lining">{formatMoney(toPence(i.line_net))}</td></tr>
               ))}
             </tbody>
           </table>
           <dl className="ml-auto max-w-xs space-y-1 px-4 py-4 text-sm">
-            <div className="flex justify-between"><dt className="text-muted-light">Subtotal</dt><dd className="num-lining">{formatGBP(toPence(quote.subtotal))}</dd></div>
-            {toPence(quote.discount_amount) > 0 ? <div className="flex justify-between"><dt className="text-muted-light">Discount</dt><dd className="num-lining">−{formatGBP(toPence(quote.discount_amount))}</dd></div> : null}
-            <div className="flex justify-between"><dt className="text-muted-light">VAT</dt><dd className="num-lining">{formatGBP(toPence(quote.vat_amount))}</dd></div>
-            <div className="flex justify-between border-t border-graphite/15 pt-2 text-base font-medium"><dt>Total</dt><dd className="num-lining">{formatGBP(toPence(quote.total))}</dd></div>
+            <div className="flex justify-between"><dt className="text-muted-light">Subtotal</dt><dd className="num-lining">{formatMoney(toPence(quote.subtotal))}</dd></div>
+            {toPence(quote.discount_amount) > 0 ? <div className="flex justify-between"><dt className="text-muted-light">Discount</dt><dd className="num-lining">−{formatMoney(toPence(quote.discount_amount))}</dd></div> : null}
+            <div className="flex justify-between"><dt className="text-muted-light">VAT</dt><dd className="num-lining">{formatMoney(toPence(quote.vat_amount))}</dd></div>
+            <div className="flex justify-between border-t border-graphite/15 pt-2 text-base font-medium"><dt>Total</dt><dd className="num-lining">{formatMoney(toPence(quote.total))}</dd></div>
           </dl>
         </div>
 

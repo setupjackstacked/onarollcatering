@@ -13,7 +13,7 @@ import { ActivityTimeline } from "@/components/dashboard/activity-timeline";
 import { NotesPanel } from "@/components/dashboard/notes-panel";
 import { SendQuoteForm, ConvertQuoteForm, InvoiceFromQuoteForm } from "@/components/dashboard/forms/quote-forms";
 import { QuoteBadge } from "@/lib/domain/badges";
-import { formatGBP, toPence, marginPct } from "@/lib/money";
+import { formatMoney, toPence, marginPct } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 import { publicEnv } from "@/lib/env";
 import { RedirectingAction } from "@/components/dashboard/redirecting-action";
@@ -59,10 +59,10 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
       />
 
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Metric label="Net" value={formatGBP(net, { showPence: false })} />
-        <Metric label="Total inc. VAT" value={formatGBP(toPence(quote.total), { showPence: false })} />
-        {showCost ? <Metric label="Internal cost" value={formatGBP(toPence(quote.cost_total), { showPence: false })} /> : null}
-        {showCost ? <Metric label="Expected margin" value={margin === null ? "—" : `${margin}%`} tone={margin !== null && margin < 15 ? "warning" : "default"} hint={`Profit ${formatGBP(net - toPence(quote.cost_total), { showPence: false })}`} /> : null}
+        <Metric label="Net" value={formatMoney(net, { showPence: false })} />
+        <Metric label="Total inc. VAT" value={formatMoney(toPence(quote.total), { showPence: false })} />
+        {showCost ? <Metric label="Internal cost" value={formatMoney(toPence(quote.cost_total), { showPence: false })} /> : null}
+        {showCost ? <Metric label="Expected margin" value={margin === null ? "—" : `${margin}%`} tone={margin !== null && margin < 15 ? "warning" : "default"} hint={`Profit ${formatMoney(net - toPence(quote.cost_total), { showPence: false })}`} /> : null}
       </div>
 
       {canWrite && isOpen ? (
@@ -101,19 +101,19 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
                       <tr key={i.id}>
                         <td className="py-2 pr-3">{i.description}{i.internal_notes && showCost ? <span className="block text-xs text-muted-light">Internal: {i.internal_notes}</span> : null}{Number(i.discount_pct) > 0 ? <span className="block text-xs text-muted-light">{Number(i.discount_pct)}% line discount</span> : null}</td>
                         <td className="py-2 pr-3 text-right num-lining">{Number(i.quantity)} {i.unit}</td>
-                        {showCost ? <td className="py-2 pr-3 text-right num-lining text-muted-light">{formatGBP(toPence(i.cost_price))}</td> : null}
-                        <td className="py-2 pr-3 text-right num-lining">{formatGBP(toPence(i.sell_price))}</td>
+                        {showCost ? <td className="py-2 pr-3 text-right num-lining text-muted-light">{formatMoney(toPence(i.cost_price))}</td> : null}
+                        <td className="py-2 pr-3 text-right num-lining">{formatMoney(toPence(i.sell_price))}</td>
                         <td className="py-2 pr-3 text-right">{Number(i.vat_rate)}%</td>
-                        <td className="py-2 text-right num-lining">{formatGBP(toPence(i.line_net))}</td>
+                        <td className="py-2 text-right num-lining">{formatMoney(toPence(i.line_net))}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
                 <dl className="ml-auto mt-4 max-w-xs space-y-1 text-sm">
-                  <div className="flex justify-between"><dt className="text-muted-light">Subtotal</dt><dd className="num-lining">{formatGBP(toPence(quote.subtotal))}</dd></div>
-                  {toPence(quote.discount_amount) > 0 ? <div className="flex justify-between"><dt className="text-muted-light">Discount ({Number(quote.discount_pct)}%)</dt><dd className="num-lining">−{formatGBP(toPence(quote.discount_amount))}</dd></div> : null}
-                  <div className="flex justify-between"><dt className="text-muted-light">VAT</dt><dd className="num-lining">{formatGBP(toPence(quote.vat_amount))}</dd></div>
-                  <div className="flex justify-between border-t border-graphite/15 pt-1 text-base font-medium"><dt>Total</dt><dd className="num-lining">{formatGBP(toPence(quote.total))}</dd></div>
+                  <div className="flex justify-between"><dt className="text-muted-light">Subtotal</dt><dd className="num-lining">{formatMoney(toPence(quote.subtotal))}</dd></div>
+                  {toPence(quote.discount_amount) > 0 ? <div className="flex justify-between"><dt className="text-muted-light">Discount ({Number(quote.discount_pct)}%)</dt><dd className="num-lining">−{formatMoney(toPence(quote.discount_amount))}</dd></div> : null}
+                  <div className="flex justify-between"><dt className="text-muted-light">VAT</dt><dd className="num-lining">{formatMoney(toPence(quote.vat_amount))}</dd></div>
+                  <div className="flex justify-between border-t border-graphite/15 pt-1 text-base font-medium"><dt>Total</dt><dd className="num-lining">{formatMoney(toPence(quote.total))}</dd></div>
                 </dl>
               </div>
             ) : (
@@ -138,7 +138,7 @@ export default async function QuotePage({ params }: { params: Promise<{ id: stri
                 {revisions.map((r) => (
                   <li key={r.id} className="flex items-center justify-between">
                     {r.id === id ? <span className="font-medium">Revision {r.revision} (this)</span> : <Link href={`/dashboard/quotes/${r.id}`} className="underline">Revision {r.revision}</Link>}
-                    <span className="flex items-center gap-2"><QuoteBadge status={r.status} /><span className="num-lining text-muted-light">{formatGBP(toPence(r.total), { showPence: false })}</span></span>
+                    <span className="flex items-center gap-2"><QuoteBadge status={r.status} /><span className="num-lining text-muted-light">{formatMoney(toPence(r.total), { showPence: false })}</span></span>
                   </li>
                 ))}
               </ul>

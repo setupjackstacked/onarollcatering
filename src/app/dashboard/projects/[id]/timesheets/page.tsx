@@ -7,7 +7,7 @@ import { ActionLink } from "@/components/dashboard/entity";
 import { Metric } from "@/components/dashboard/primitives";
 import { TimesheetBadge } from "@/lib/domain/badges";
 import { formatDateUK, hhmm } from "@/lib/dates";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { pageHref } from "@/lib/query-string";
 
 export default async function ProjectTimesheetsPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {
@@ -35,7 +35,7 @@ export default async function ProjectTimesheetsPage({ params, searchParams }: { 
           { key: "e", header: "Employee", render: (r) => emap.get(r.employee_id)?.full_name ?? "—" },
           { key: "t", header: "Times", render: (r) => <span className="num-lining">{hhmm(r.start_time)}–{hhmm(r.end_time)}</span> },
           { key: "h", header: "Hours", align: "right", render: (r) => <span className="num-lining">{(Number(r.hours) + Number(r.overtime_hours)).toFixed(2)}</span> },
-          { key: "c", header: "Cost", align: "right", render: (r) => (ctx.can("finance.read") && r.hourly_rate ? formatGBP(Math.round((Number(r.hours) + Number(r.overtime_hours)) * toPence(r.hourly_rate))) : "—") },
+          { key: "c", header: "Cost", align: "right", render: (r) => (ctx.can("finance.read") && r.hourly_rate ? formatMoney(Math.round((Number(r.hours) + Number(r.overtime_hours)) * toPence(r.hourly_rate))) : "—") },
           { key: "s", header: "Status", render: (r) => <TimesheetBadge status={r.status} /> },
         ]}
         empty={{ title: "No timesheets against this project" }}

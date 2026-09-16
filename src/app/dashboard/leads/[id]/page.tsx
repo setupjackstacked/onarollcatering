@@ -15,7 +15,7 @@ import { NotesPanel } from "@/components/dashboard/notes-panel";
 import { DocumentsPanel } from "@/components/dashboard/documents";
 import { LeadStatusForm } from "@/components/dashboard/forms/status-forms";
 import { LeadBadge } from "@/lib/domain/badges";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 
 export default async function LeadPage({ params }: { params: Promise<{ id: string }> }) {
@@ -39,7 +39,7 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
         eyebrow={`Lead · ${sources.find((s) => s.key === lead.source_key)?.label ?? lead.source_key}`}
         title={lead.title}
         badge={<LeadBadge status={lead.status} />}
-        meta={<><span>{client ? <Link href={`/dashboard/clients/${client.id}`} className="underline">{client.name}</Link> : lead.company_name ?? "No company"}</span>{lead.estimated_value ? <span className="num-lining">{formatGBP(toPence(lead.estimated_value), { showPence: false })}</span> : null}<span>Assigned: {memberLabel(members.find((m) => m.user_id === lead.assigned_user_id))}</span></>}
+        meta={<><span>{client ? <Link href={`/dashboard/clients/${client.id}`} className="underline">{client.name}</Link> : lead.company_name ?? "No company"}</span>{lead.estimated_value ? <span className="num-lining">{formatMoney(toPence(lead.estimated_value), { showPence: false })}</span> : null}<span>Assigned: {memberLabel(members.find((m) => m.user_id === lead.assigned_user_id))}</span></>}
         actions={
           <>
             {ctx.can("sales.write") ? <ActionLink href={`${path}/edit`}>Edit</ActionLink> : null}

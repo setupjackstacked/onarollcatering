@@ -9,7 +9,7 @@ import { ActionLink } from "@/components/dashboard/entity";
 import { RedirectingAction } from "@/components/dashboard/redirecting-action";
 import { RevenueChart, ConversionChart, CategoryBarChart, StackedCostChart } from "@/components/dashboard/charts";
 import { QuoteBadge } from "@/lib/domain/badges";
-import { formatGBP, toPence } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
 import { str } from "@/lib/pagination";
 import { cn } from "@/lib/utils/cn";
 
@@ -64,11 +64,11 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
       ) : (
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-            <Metric label="Invoiced (net)" value={formatGBP(invoicedTotal, { showPence: false })} />
-            <Metric label="Received" value={formatGBP(receivedTotal, { showPence: false })} />
-            <Metric label="Outstanding" value={formatGBP(outstandingTotal, { showPence: false })} tone={outstandingTotal > 0 ? "warning" : "default"} href="/dashboard/invoices?status=outstanding" />
+            <Metric label="Invoiced (net)" value={formatMoney(invoicedTotal, { showPence: false })} />
+            <Metric label="Received" value={formatMoney(receivedTotal, { showPence: false })} />
+            <Metric label="Outstanding" value={formatMoney(outstandingTotal, { showPence: false })} tone={outstandingTotal > 0 ? "warning" : "default"} href="/dashboard/invoices?status=outstanding" />
             <Metric label="Quote conversion" value={conversionRate === null ? "—" : `${conversionRate}%`} hint={`${totalAccepted} of ${totalSent} issued`} />
-            <Metric label="Accepted quote value" value={formatGBP(acceptedValue, { showPence: false })} />
+            <Metric label="Accepted quote value" value={formatMoney(acceptedValue, { showPence: false })} />
           </div>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -85,7 +85,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
                       <tr key={q.status}>
                         <td className="py-2"><QuoteBadge status={q.status} /></td>
                         <td className="py-2 text-right num-lining">{q.quote_count}</td>
-                        <td className="py-2 text-right num-lining">{formatGBP(toPence(q.value), { showPence: false })}</td>
+                        <td className="py-2 text-right num-lining">{formatMoney(toPence(q.value), { showPence: false })}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -113,11 +113,11 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
                       return (
                         <tr key={p.project_id}>
                           <td className="py-2 pr-3"><Link href={`/dashboard/projects/${p.project_id}/costs`} className="underline">{p.name}</Link><span className="block text-xs text-muted-light num-lining">{p.project_number}</span></td>
-                          <td className="py-2 pr-3 text-right num-lining">{formatGBP(toPence(p.contract_value), { showPence: false })}</td>
-                          <td className="py-2 pr-3 text-right num-lining">{formatGBP(toPence(p.actual_cost), { showPence: false })}</td>
-                          <td className="py-2 pr-3 text-right num-lining text-muted-light">{formatGBP(toPence(p.committed_cost), { showPence: false })}</td>
-                          <td className="py-2 pr-3 text-right num-lining text-muted-light">{formatGBP(toPence(p.labour_cost), { showPence: false })}</td>
-                          <td className="py-2 pr-3 text-right num-lining">{formatGBP(toPence(p.forecast_gross_profit), { showPence: false })}</td>
+                          <td className="py-2 pr-3 text-right num-lining">{formatMoney(toPence(p.contract_value), { showPence: false })}</td>
+                          <td className="py-2 pr-3 text-right num-lining">{formatMoney(toPence(p.actual_cost), { showPence: false })}</td>
+                          <td className="py-2 pr-3 text-right num-lining text-muted-light">{formatMoney(toPence(p.committed_cost), { showPence: false })}</td>
+                          <td className="py-2 pr-3 text-right num-lining text-muted-light">{formatMoney(toPence(p.labour_cost), { showPence: false })}</td>
+                          <td className="py-2 pr-3 text-right num-lining">{formatMoney(toPence(p.forecast_gross_profit), { showPence: false })}</td>
                           <td className={cn("py-2 text-right num-lining", margin !== null && margin < 15 && "text-status-danger")}>{margin === null ? "—" : `${margin}%`}</td>
                         </tr>
                       );
@@ -157,7 +157,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
                         <td className="py-2 pr-3"><Link href={`/dashboard/employees/${e.employee_id}/timesheets`} className="underline">{e.full_name}</Link></td>
                         <td className="py-2 pr-3 text-right num-lining">{Number(e.hours).toFixed(2)}</td>
                         <td className="py-2 pr-3 text-right num-lining">{Number(e.overtime).toFixed(2)}</td>
-                        <td className="py-2 text-right num-lining">{formatGBP(toPence(e.labour_cost), { showPence: false })}</td>
+                        <td className="py-2 text-right num-lining">{formatMoney(toPence(e.labour_cost), { showPence: false })}</td>
                       </tr>
                     ))}
                   </tbody>

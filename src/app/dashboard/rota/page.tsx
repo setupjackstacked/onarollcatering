@@ -19,15 +19,16 @@ export default async function RotaPage({ searchParams }: { searchParams: Promise
   const week = startOfWeekISO(str(sp.week) || isoDateOffset(0));
   const view = str(sp.view) === "project" ? "project" : "employee";
   const projectFilter = str(sp.project) || undefined;
+  const siteFilter = str(sp.site) || undefined;
   const days = isoRange(week, 7);
   const [shifts, employees, projects, roles] = await Promise.all([
-    listShifts(ctx, { from: days[0], to: days[6] }, { projectId: projectFilter }),
+    listShifts(ctx, { from: days[0], to: days[6] }, { projectId: projectFilter, siteId: siteFilter }),
     employeeMap(ctx), listProjectOptions(ctx), listEmployeeRoles(ctx),
   ]);
   const canWrite = ctx.can("workforce.write") || ctx.role === "project_manager";
   const href = (p: Record<string, string | undefined>) => {
     const q = new URLSearchParams();
-    const merged = { week, view, project: projectFilter, ...p };
+    const merged = { week, view, project: projectFilter, site: siteFilter, ...p };
     for (const [k, v] of Object.entries(merged)) if (v) q.set(k, v);
     return `/dashboard/rota?${q.toString()}`;
   };
@@ -43,7 +44,7 @@ export default async function RotaPage({ searchParams }: { searchParams: Promise
 
   return (
     <>
-      <PageHeader eyebrow="Workforce" title="Rota" description={`Week commencing ${formatDateUK(days[0])}`} actions={canWrite ? <ActionLink href={`/dashboard/rota/new?date=${days[0]}&return=${encodeURIComponent(self)}`} variant="copper">Add shift</ActionLink> : null} />
+      <PageHeader eyebrow="Workforce" title="Rota" description={`Week commencing ${formatDateUK(days[0])}`} actions={canWrite ? <ActionLink href={`/dashboard/rota/new?date=${days[0]}${siteFilter ? `&site=${siteFilter}` : ""}&return=${encodeURIComponent(self)}`} variant="copper">Add shift</ActionLink> : null} />
 
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">

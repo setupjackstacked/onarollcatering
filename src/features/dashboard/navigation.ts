@@ -13,7 +13,10 @@ export type NavSection = { label?: string; items: NavItem[] };
 
 /** Sidebar structure from the spec §33. Items with `phase` render disabled until built. */
 export const DASHBOARD_NAV: NavSection[] = [
-  { items: [{ label: "Overview", href: "/dashboard", icon: "home" }] },
+  { items: [
+    { label: "Overview", href: "/dashboard", icon: "home" },
+    { label: "Sites", href: "/dashboard/sites", icon: "sites", permission: "projects.read" },
+  ] },
   {
     label: "Sales",
     items: [
@@ -27,7 +30,6 @@ export const DASHBOARD_NAV: NavSection[] = [
     label: "Projects",
     items: [
       { label: "Projects", href: "/dashboard/projects", icon: "projects", permission: "projects.read" },
-      { label: "Sites", href: "/dashboard/sites", icon: "sites", permission: "projects.read" },
       { label: "Tasks", href: "/dashboard/tasks", icon: "tasks", permission: "projects.read" },
       { label: "Documents", href: "/dashboard/documents", icon: "documents", permission: "projects.read" },
     ],
@@ -35,7 +37,7 @@ export const DASHBOARD_NAV: NavSection[] = [
   {
     label: "Workforce",
     items: [
-      { label: "Employees", href: "/dashboard/employees", icon: "employees", permission: "workforce.read" },
+      { label: "Staff", href: "/dashboard/employees", icon: "employees", permission: "workforce.read" },
       { label: "Rota", href: "/dashboard/rota", icon: "rota", permission: "workforce.read" },
       { label: "Timesheets", href: "/dashboard/timesheets", icon: "timesheets", permission: "workforce.read" },
       { label: "Leave", href: "/dashboard/leave", icon: "leave", permission: "workforce.read" },

@@ -2,12 +2,9 @@ import { redirect } from "next/navigation";
 import { requireOrgContext } from "@/lib/auth/context";
 import { PERMISSIONS, hasPermission, type Permission } from "@/lib/auth/permissions";
 import { DashboardShell } from "@/components/dashboard/shell";
+import { roleLabel } from "@/lib/auth/roles";
 
 export const metadata = { robots: { index: false, follow: false } };
-
-const ROLE_LABEL: Record<string, string> = {
-  owner: "Owner", administrator: "Administrator", finance: "Finance", project_manager: "Project Manager", staff: "Staff", read_only: "Read only",
-};
 
 /** All /dashboard routes: authenticated + org member (proxy.ts pre-check, this is the real one). */
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -25,7 +22,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <DashboardShell
       orgName={ctx.organisation.name}
       userEmail={ctx.user.email ?? ""}
-      roleLabel={ROLE_LABEL[ctx.role] ?? ctx.role}
+      roleLabel={roleLabel(ctx.role)}
       permissions={permissions}
       unreadNotifications={count ?? 0}
     >

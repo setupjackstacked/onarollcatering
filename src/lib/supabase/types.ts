@@ -482,6 +482,7 @@ export type Database = {
           created_by: string | null;
           created_at: string;
           updated_at: string;
+          primary_site_id: string | null;
         };
         Insert: {
           id?: string;
@@ -506,6 +507,7 @@ export type Database = {
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
+          primary_site_id?: string | null;
         };
         Update: {
           id?: string;
@@ -530,6 +532,7 @@ export type Database = {
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
+          primary_site_id?: string | null;
         };
         Relationships: [
           {
@@ -551,6 +554,13 @@ export type Database = {
             columns: ["created_by"];
             isOneToOne: false;
             referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "employees_primary_site_id_fkey";
+            columns: ["primary_site_id"];
+            isOneToOne: false;
+            referencedRelation: "sites";
             referencedColumns: ["id"];
           },
         ];
@@ -2470,6 +2480,90 @@ export type Database = {
           },
         ];
       };
+      site_assignments: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          site_id: string;
+          user_id: string;
+          employee_id: string | null;
+          role: Database["public"]["Enums"]["site_role"];
+          is_primary: boolean;
+          starts_on: string | null;
+          ends_on: string | null;
+          notes: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          site_id: string;
+          user_id: string;
+          employee_id?: string | null;
+          role?: Database["public"]["Enums"]["site_role"];
+          is_primary?: boolean;
+          starts_on?: string | null;
+          ends_on?: string | null;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          site_id?: string;
+          user_id?: string;
+          employee_id?: string | null;
+          role?: Database["public"]["Enums"]["site_role"];
+          is_primary?: boolean;
+          starts_on?: string | null;
+          ends_on?: string | null;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "site_assignments_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "site_assignments_site_id_fkey";
+            columns: ["site_id"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "site_assignments_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "site_assignments_employee_id_fkey";
+            columns: ["employee_id"];
+            isOneToOne: false;
+            referencedRelation: "employees";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "site_assignments_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       sites: {
         Row: {
           id: string;
@@ -2486,6 +2580,14 @@ export type Database = {
           archived_at: string | null;
           created_at: string;
           updated_at: string;
+          site_type: Database["public"]["Enums"]["site_type"];
+          status: Database["public"]["Enums"]["site_status"];
+          oar_manager_id: string | null;
+          site_manager_name: string | null;
+          site_manager_email: string | null;
+          site_manager_phone: string | null;
+          opened_on: string | null;
+          closed_on: string | null;
         };
         Insert: {
           id?: string;
@@ -2502,6 +2604,14 @@ export type Database = {
           archived_at?: string | null;
           created_at?: string;
           updated_at?: string;
+          site_type?: Database["public"]["Enums"]["site_type"];
+          status?: Database["public"]["Enums"]["site_status"];
+          oar_manager_id?: string | null;
+          site_manager_name?: string | null;
+          site_manager_email?: string | null;
+          site_manager_phone?: string | null;
+          opened_on?: string | null;
+          closed_on?: string | null;
         };
         Update: {
           id?: string;
@@ -2518,6 +2628,14 @@ export type Database = {
           archived_at?: string | null;
           created_at?: string;
           updated_at?: string;
+          site_type?: Database["public"]["Enums"]["site_type"];
+          status?: Database["public"]["Enums"]["site_status"];
+          oar_manager_id?: string | null;
+          site_manager_name?: string | null;
+          site_manager_email?: string | null;
+          site_manager_phone?: string | null;
+          opened_on?: string | null;
+          closed_on?: string | null;
         };
         Relationships: [
           {
@@ -2539,6 +2657,13 @@ export type Database = {
             columns: ["site_contact_id"];
             isOneToOne: false;
             referencedRelation: "client_contacts";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "sites_oar_manager_id_fkey";
+            columns: ["oar_manager_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];
@@ -2780,6 +2905,9 @@ export type Database = {
           created_by: string | null;
           created_at: string;
           updated_at: string;
+          amendment_reason: string | null;
+          amended_by: string | null;
+          amended_at: string | null;
         };
         Insert: {
           id?: string;
@@ -2805,6 +2933,9 @@ export type Database = {
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
+          amendment_reason?: string | null;
+          amended_by?: string | null;
+          amended_at?: string | null;
         };
         Update: {
           id?: string;
@@ -2830,6 +2961,9 @@ export type Database = {
           created_by?: string | null;
           created_at?: string;
           updated_at?: string;
+          amendment_reason?: string | null;
+          amended_by?: string | null;
+          amended_at?: string | null;
         };
         Relationships: [
           {
@@ -2886,6 +3020,13 @@ export type Database = {
             columns: ["payroll_entry_id"];
             isOneToOne: false;
             referencedRelation: "payroll_entries";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "timesheets_amended_by_fkey";
+            columns: ["amended_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];
@@ -3029,13 +3170,14 @@ export type Database = {
         Args: { p_token: string; p_decision: string; p_name: string; p_note?: unknown };
         Returns: boolean;
       };
-      seed_org_finance_defaults: { Args: { org: string }; Returns: undefined };
       convert_quote_to_project: {
         Args: { p_quote_id: string; p_project_manager?: unknown; p_site_id?: unknown };
         Returns: string;
       };
+      seed_org_finance_defaults: { Args: { org: string }; Returns: undefined };
       replace_quote_items: { Args: { p_quote_id: string; p_items: Json }; Returns: undefined };
       recalculate_invoice: { Args: { p_invoice_id: string }; Returns: undefined };
+      seed_org_site_defaults: { Args: { org: string }; Returns: undefined };
       refresh_overdue_invoices: { Args: { p_org: string }; Returns: number };
       cancel_invoice: { Args: { p_invoice_id: string; p_reason: string }; Returns: undefined };
       issue_invoice: { Args: { p_invoice_id: string; p_issue_date?: unknown; p_due_date?: unknown }; Returns: string };
@@ -3075,8 +3217,8 @@ export type Database = {
         };
         Returns: number;
       };
-      generate_alerts: { Args: { p_org: string }; Returns: number };
       expire_documents: { Args: { p_org: string }; Returns: number };
+      generate_alerts: { Args: { p_org: string }; Returns: number };
       finalise_payroll_period: { Args: { p_period_id: string }; Returns: undefined };
       supplier_spend: { Args: { p_supplier_id: string }; Returns: unknown };
       reopen_payroll_period: { Args: { p_period_id: string }; Returns: undefined };
@@ -3088,6 +3230,11 @@ export type Database = {
       report_revenue_by_client: { Args: { p_org: string; p_months?: unknown }; Returns: unknown };
       report_labour_by_project: { Args: { p_org: string; p_days?: unknown }; Returns: unknown };
       report_employee_hours: { Args: { p_org: string; p_days?: unknown }; Returns: unknown };
+      can_write_site: { Args: { p_site_id: string }; Returns: boolean };
+      manages_employee: { Args: { p_employee_id: string }; Returns: boolean };
+      my_site_ids: { Args: Record<string, never>; Returns: unknown };
+      my_managed_site_ids: { Args: Record<string, never>; Returns: unknown };
+      can_read_site: { Args: { p_site_id: string }; Returns: boolean };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";
@@ -3164,6 +3311,9 @@ export type Database = {
         | "agency_staff"
         | "cleaning"
         | "other";
+      site_type: "kitchen" | "project_site" | "office" | "other";
+      site_status: "prospective" | "mobilising" | "operating" | "paused" | "closed";
+      site_role: "manager" | "staff";
     };
     CompositeTypes: Record<string, never>;
   };
@@ -3197,5 +3347,8 @@ export type VerificationStatus = Database["public"]["Enums"]["verification_statu
 export type PayPeriodStatus = Database["public"]["Enums"]["pay_period_status"];
 export type PayAdjustmentKind = Database["public"]["Enums"]["pay_adjustment_kind"];
 export type SupplierCategory = Database["public"]["Enums"]["supplier_category"];
+export type SiteType = Database["public"]["Enums"]["site_type"];
+export type SiteStatus = Database["public"]["Enums"]["site_status"];
+export type SiteRole = Database["public"]["Enums"]["site_role"];
 export type TablesInsert<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Insert"];
 export type TablesUpdate<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Update"];
