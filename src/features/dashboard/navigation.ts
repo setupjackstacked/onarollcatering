@@ -6,7 +6,7 @@ export type NavItem = {
   permission?: Permission;
   /** Phase in which the module ships. Undefined = available now. */
   phase?: number;
-  icon: "home" | "vouchers" | "leads" | "clients" | "quotes" | "projects" | "sites" | "tasks" | "documents" | "employees" | "rota" | "timesheets" | "leave" | "invoices" | "payments" | "expenses" | "payroll" | "suppliers" | "equipment" | "reports" | "settings" | "enquiries";
+  icon: "home" | "vouchers" | "messages" | "leads" | "clients" | "quotes" | "projects" | "sites" | "tasks" | "documents" | "employees" | "rota" | "timesheets" | "leave" | "invoices" | "payments" | "expenses" | "payroll" | "suppliers" | "equipment" | "reports" | "settings" | "enquiries";
 };
 
 export type NavSection = { label?: string; items: NavItem[] };
@@ -17,6 +17,7 @@ export const DASHBOARD_NAV: NavSection[] = [
     { label: "Overview", href: "/dashboard", icon: "home" },
     { label: "Sites", href: "/dashboard/sites", icon: "sites", permission: "projects.read" },
     { label: "Vouchers", href: "/dashboard/vouchers", icon: "vouchers", permission: "projects.read" },
+    { label: "Messages", href: "/dashboard/messages", icon: "messages" },
   ] },
   {
     label: "Sales",

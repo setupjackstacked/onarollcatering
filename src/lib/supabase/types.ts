@@ -275,6 +275,119 @@ export type Database = {
           },
         ];
       };
+      conversation_participants: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          conversation_id: string;
+          user_id: string;
+          last_read_at: string | null;
+          muted: boolean;
+          added_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          conversation_id: string;
+          user_id: string;
+          last_read_at?: string | null;
+          muted?: boolean;
+          added_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          conversation_id?: string;
+          user_id?: string;
+          last_read_at?: string | null;
+          muted?: boolean;
+          added_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conversation_participants_conversation_id_fkey";
+            columns: ["conversation_id"];
+            isOneToOne: false;
+            referencedRelation: "conversations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conversation_participants_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      conversations: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          kind: Database["public"]["Enums"]["conversation_kind"];
+          subject: string | null;
+          site_id: string | null;
+          created_by: string | null;
+          last_message_at: string;
+          last_message_preview: string | null;
+          closed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          kind?: Database["public"]["Enums"]["conversation_kind"];
+          subject?: string | null;
+          site_id?: string | null;
+          created_by?: string | null;
+          last_message_at?: string;
+          last_message_preview?: string | null;
+          closed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          kind?: Database["public"]["Enums"]["conversation_kind"];
+          subject?: string | null;
+          site_id?: string | null;
+          created_by?: string | null;
+          last_message_at?: string;
+          last_message_preview?: string | null;
+          closed_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "conversations_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conversations_site_id_fkey";
+            columns: ["site_id"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "conversations_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       document_categories: {
         Row: {
           id: string;
@@ -1365,6 +1478,65 @@ export type Database = {
           },
           {
             foreignKeyName: "leave_requests_document_id_fkey";
+            columns: ["document_id"];
+            isOneToOne: false;
+            referencedRelation: "documents";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      messages: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          conversation_id: string;
+          sender_id: string | null;
+          body: string;
+          document_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          conversation_id: string;
+          sender_id?: string | null;
+          body: string;
+          document_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          conversation_id?: string;
+          sender_id?: string | null;
+          body?: string;
+          document_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "messages_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "messages_conversation_id_fkey";
+            columns: ["conversation_id"];
+            isOneToOne: false;
+            referencedRelation: "conversations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey";
+            columns: ["sender_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "messages_document_id_fkey";
             columns: ["document_id"];
             isOneToOne: false;
             referencedRelation: "documents";
@@ -3439,6 +3611,13 @@ export type Database = {
       attach_leave_document: { Args: { p_leave_id: string; p_document_id: string }; Returns: undefined };
       leave_missing_documents: { Args: { p_org: string }; Returns: unknown };
       seed_org_sick_note_category: { Args: { org: string }; Returns: undefined };
+      in_conversation: { Args: { p_conversation_id: string }; Returns: boolean };
+      start_direct_conversation: { Args: { p_other_user: string }; Returns: string };
+      start_broadcast: { Args: { p_subject: string; p_body: string; p_site_id?: unknown }; Returns: string };
+      site_conversation: { Args: { p_site_id: string }; Returns: string };
+      mark_conversation_read: { Args: { p_conversation_id: string }; Returns: undefined };
+      my_conversations: { Args: Record<string, never>; Returns: unknown };
+      my_unread_messages: { Args: Record<string, never>; Returns: unknown };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";
@@ -3518,6 +3697,7 @@ export type Database = {
       site_type: "kitchen" | "project_site" | "office" | "other";
       site_status: "prospective" | "mobilising" | "operating" | "paused" | "closed";
       site_role: "manager" | "staff";
+      conversation_kind: "direct" | "site" | "broadcast";
     };
     CompositeTypes: Record<string, never>;
   };
@@ -3554,5 +3734,6 @@ export type SupplierCategory = Database["public"]["Enums"]["supplier_category"];
 export type SiteType = Database["public"]["Enums"]["site_type"];
 export type SiteStatus = Database["public"]["Enums"]["site_status"];
 export type SiteRole = Database["public"]["Enums"]["site_role"];
+export type ConversationKind = Database["public"]["Enums"]["conversation_kind"];
 export type TablesInsert<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Insert"];
 export type TablesUpdate<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Update"];

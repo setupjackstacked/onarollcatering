@@ -1,4 +1,5 @@
 import type { OverviewData } from "@/features/dashboard/overview";
+import Link from "next/link";
 import { PageHeader, Metric, Panel, EmptyState, StatusBadge } from "@/components/dashboard/primitives";
 import { formatMoney } from "@/lib/money";
 import { RelativeTime } from "./relative-time";
@@ -24,6 +25,26 @@ export function OverviewView({ data, orgName, canSales }: { data: OverviewData; 
         <p role="alert" className="mb-6 rounded-md bg-status-danger/10 px-4 py-3 text-sm text-status-danger">Some figures couldn’t be loaded. Try refreshing.</p>
       ) : null}
 
+      {data.workforce ? (
+        <section className="mb-6">
+          <h2 className="eyebrow mb-3 text-copper-dark">Today</h2>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6 md:gap-4">
+            <Metric label="On shift" value={data.workforce.onShift} href="/dashboard/rota" />
+            <Metric label="On holiday" value={data.workforce.onLeave} href="/dashboard/leave?status=approved" />
+            <Metric label="Off sick" value={data.workforce.offSick} tone={data.workforce.offSick > 0 ? "warning" : "default"} />
+            <Metric label="Timesheets to approve" value={data.workforce.pendingTimesheets} tone={data.workforce.pendingTimesheets ? "warning" : "default"} href="/dashboard/timesheets?status=submitted" />
+            <Metric label="Leave to decide" value={data.workforce.pendingLeave} tone={data.workforce.pendingLeave ? "warning" : "default"} href="/dashboard/leave?status=requested" />
+            {data.operations ? <Metric label="Meals logged today" value={data.operations.vouchersToday} hint={data.operations.complimentaryToday ? `${data.operations.complimentaryToday} free / complimentary` : undefined} href="/dashboard/vouchers" /> : null}
+          </div>
+        </section>
+      ) : null}
+
+      {data.operations && data.operations.unreadMessages > 0 ? (
+        <p className="mb-6 rounded-md bg-copper/10 px-4 py-3 text-sm">
+          You have <Link href="/dashboard/messages" className="font-medium underline">{data.operations.unreadMessages} unread {data.operations.unreadMessages === 1 ? "message" : "messages"}</Link>.
+        </p>
+      ) : null}
+
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
         <Metric label="Active projects" value={data.kpis.activeProjects} />
         <Metric label="Open leads" value={data.kpis.openLeads} />
@@ -41,7 +62,7 @@ export function OverviewView({ data, orgName, canSales }: { data: OverviewData; 
                 <li key={a.key} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
                   <span className={`mt-1.5 size-2 shrink-0 rounded-full ${a.tone === "red" ? "bg-status-danger" : a.tone === "amber" ? "bg-status-warning" : "bg-copper"}`} aria-hidden />
                   <div className="min-w-0">
-                    <p className="text-sm font-medium">{a.title}</p>
+                    <p className="text-sm font-medium">{a.href ? <Link href={a.href} className="underline">{a.title}</Link> : a.title}</p>
                     <p className="truncate text-sm text-muted-light">{a.detail}</p>
                   </div>
                 </li>

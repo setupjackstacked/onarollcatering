@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Clock, FileText, Home, Plane, Utensils } from "lucide-react";
+import { Clock, Home, MessageSquare, Plane, Utensils } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 const TABS = [
@@ -10,7 +10,7 @@ const TABS = [
   { href: "/staff/timesheets", label: "Hours", icon: Clock },
   { href: "/staff/vouchers", label: "Vouchers", icon: Utensils },
   { href: "/staff/leave", label: "Leave", icon: Plane },
-  { href: "/staff/documents", label: "Docs", icon: FileText },
+  { href: "/staff/messages", label: "Messages", icon: MessageSquare },
 ];
 
 /** Bottom tab bar — thumb-reachable, the only navigation staff need. */

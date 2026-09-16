@@ -33,6 +33,7 @@ export default async function StaffProfilePage() {
       </section>
 
       <section className="border-t border-graphite/10 pt-5">
+        <p className="mb-4 text-sm"><Link href="/staff/documents" className="underline">Your documents and certificates</Link></p>
         {ctx.can("workforce.read") ? <p className="mb-4 text-sm"><Link href="/dashboard" className="underline">Open the management dashboard</Link></p> : null}
         <form action={signOut}>
           <button type="submit" className="h-12 w-full rounded-full border border-graphite/25 text-sm font-medium">Sign out</button>
