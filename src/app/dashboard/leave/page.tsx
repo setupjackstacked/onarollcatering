@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { requireOrgContext } from "@/lib/auth/context";
-import { listLeave, employeeMap, pendingLeaveCount } from "@/features/workforce/queries";
+import { listLeave, employeeMap, pendingLeaveCount, leaveMissingDocuments } from "@/features/workforce/queries";
 import { setLeaveStatus } from "@/features/workforce/actions";
 import { LEAVE_STATUSES, LEAVE_TYPES } from "@/features/workforce/schema";
 import { PageHeader, Metric } from "@/components/dashboard/primitives";
@@ -18,15 +18,22 @@ export default async function LeavePage({ searchParams }: { searchParams: Promis
   const ctx = await requireOrgContext("/dashboard/leave");
   if (!ctx.can("workforce.read")) redirect("/dashboard");
   const sp = await searchParams;
-  const [{ rows, total, page, size }, emap, pending] = await Promise.all([listLeave(ctx, sp), employeeMap(ctx), pendingLeaveCount(ctx)]);
+  const [{ rows, total, page, size }, emap, pending, missing] = await Promise.all([listLeave(ctx, sp), employeeMap(ctx), pendingLeaveCount(ctx), leaveMissingDocuments(ctx)]);
   const canDecide = ctx.can("workforce.write");
   return (
     <>
       <PageHeader eyebrow="Workforce" title="Leave" description="Approved leave shows as a warning when scheduling shifts." actions={canDecide ? <ActionLink href="/dashboard/leave/new" variant="copper">Record leave</ActionLink> : null} />
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3">
         <Metric label="Awaiting decision" value={pending} tone={pending ? "warning" : "default"} href="/dashboard/leave?status=requested" />
+        <Metric label="Sick notes outstanding" value={missing.length} tone={missing.length ? "warning" : "default"} hint="A note is required for every sick absence" />
         <Metric label="Requests" value={total} />
       </div>
+      {missing.length ? (
+        <p className="mb-6 rounded-md bg-status-warning/10 px-4 py-3 text-sm">
+          Waiting on a doctor’s note from {missing.slice(0, 4).map((m, i) => <span key={m.leave_id}>{i ? ", " : ""}{m.employee_name} ({formatDateUK(m.start_date)})</span>)}
+          {missing.length > 4 ? ` and ${missing.length - 4} more` : ""}.
+        </p>
+      ) : null}
       <FilterBar showSearch={false} filters={[{ name: "status", label: "All statuses", options: LEAVE_STATUSES }]} />
       <DataTable rows={rows} rowKey={(r) => r.id}
         columns={[
@@ -34,7 +41,7 @@ export default async function LeavePage({ searchParams }: { searchParams: Promis
           { key: "t", header: "Type", render: (r) => LEAVE_TYPES.find((t) => t.value === r.leave_type)?.label ?? r.leave_type },
           { key: "d", header: "Dates", render: (r) => `${formatDateUK(r.start_date)} – ${formatDateUK(r.end_date)}` },
           { key: "n", header: "Days", align: "right", render: (r) => <span className="num-lining">{Number(r.days)}</span> },
-          { key: "r", header: "Reason", render: (r) => r.reason ?? <span className="text-muted-light">—</span> },
+          { key: "r", header: "Reason", render: (r) => <span>{r.reason ?? <span className="text-muted-light">—</span>}{r.document_required ? (r.document_id ? <a href={`/api/documents/${r.document_id}`} className="block text-xs underline">Doctor’s note</a> : <span className="block text-xs text-status-warning">Note outstanding</span>) : null}</span> },
           { key: "s", header: "Status", render: (r) => <LeaveBadge status={r.status} /> },
           { key: "a", header: "", align: "right", render: (r) => (canDecide && r.status === "requested" ? (
             <span className="flex justify-end gap-1">

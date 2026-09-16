@@ -1299,6 +1299,9 @@ export type Database = {
           decision_note: string | null;
           created_at: string;
           updated_at: string;
+          document_id: string | null;
+          document_required: boolean;
+          document_received_at: string | null;
         };
         Insert: {
           id?: string;
@@ -1315,6 +1318,9 @@ export type Database = {
           decision_note?: string | null;
           created_at?: string;
           updated_at?: string;
+          document_id?: string | null;
+          document_required?: boolean;
+          document_received_at?: string | null;
         };
         Update: {
           id?: string;
@@ -1331,6 +1337,9 @@ export type Database = {
           decision_note?: string | null;
           created_at?: string;
           updated_at?: string;
+          document_id?: string | null;
+          document_required?: boolean;
+          document_received_at?: string | null;
         };
         Relationships: [
           {
@@ -1352,6 +1361,13 @@ export type Database = {
             columns: ["decided_by"];
             isOneToOne: false;
             referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "leave_requests_document_id_fkey";
+            columns: ["document_id"];
+            isOneToOne: false;
+            referencedRelation: "documents";
             referencedColumns: ["id"];
           },
         ];
@@ -3078,6 +3094,173 @@ export type Database = {
           },
         ];
       };
+      voucher_categories: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          key: string;
+          label: string;
+          description: string | null;
+          is_chargeable: boolean;
+          sort_order: number;
+          active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          key: string;
+          label: string;
+          description?: string | null;
+          is_chargeable?: boolean;
+          sort_order?: number;
+          active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          key?: string;
+          label?: string;
+          description?: string | null;
+          is_chargeable?: boolean;
+          sort_order?: number;
+          active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "voucher_categories_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      voucher_entries: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          site_id: string;
+          entry_date: string;
+          notes: string | null;
+          recorded_by: string | null;
+          confirmed_by: string | null;
+          confirmed_at: string | null;
+          total_quantity: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          site_id: string;
+          entry_date: string;
+          notes?: string | null;
+          recorded_by?: string | null;
+          confirmed_by?: string | null;
+          confirmed_at?: string | null;
+          total_quantity?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          site_id?: string;
+          entry_date?: string;
+          notes?: string | null;
+          recorded_by?: string | null;
+          confirmed_by?: string | null;
+          confirmed_at?: string | null;
+          total_quantity?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "voucher_entries_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "voucher_entries_site_id_fkey";
+            columns: ["site_id"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "voucher_entries_recorded_by_fkey";
+            columns: ["recorded_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "voucher_entries_confirmed_by_fkey";
+            columns: ["confirmed_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      voucher_entry_lines: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          entry_id: string;
+          category_id: string;
+          quantity: number;
+          notes: string | null;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          entry_id: string;
+          category_id: string;
+          quantity?: number;
+          notes?: string | null;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          entry_id?: string;
+          category_id?: string;
+          quantity?: number;
+          notes?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "voucher_entry_lines_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "voucher_entry_lines_entry_id_fkey";
+            columns: ["entry_id"];
+            isOneToOne: false;
+            referencedRelation: "voucher_entries";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "voucher_entry_lines_category_id_fkey";
+            columns: ["category_id"];
+            isOneToOne: false;
+            referencedRelation: "voucher_categories";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       employee_directory: {
@@ -3235,6 +3418,27 @@ export type Database = {
       my_site_ids: { Args: Record<string, never>; Returns: unknown };
       my_managed_site_ids: { Args: Record<string, never>; Returns: unknown };
       can_read_site: { Args: { p_site_id: string }; Returns: boolean };
+      record_vouchers: {
+        Args: { p_site_id: string; p_date: unknown; p_lines: Json; p_notes?: unknown };
+        Returns: string;
+      };
+      sites_missing_vouchers: { Args: { p_org: string; p_date?: unknown }; Returns: unknown };
+      confirm_vouchers: { Args: { p_entry_id: string }; Returns: undefined };
+      report_vouchers: {
+        Args: {
+          p_org: string;
+          p_from: unknown;
+          p_to: unknown;
+          p_grain?: string;
+          p_site_id?: unknown;
+          p_category_id?: unknown;
+        };
+        Returns: unknown;
+      };
+      seed_org_voucher_defaults: { Args: { org: string }; Returns: undefined };
+      attach_leave_document: { Args: { p_leave_id: string; p_document_id: string }; Returns: undefined };
+      leave_missing_documents: { Args: { p_org: string }; Returns: unknown };
+      seed_org_sick_note_category: { Args: { org: string }; Returns: undefined };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";

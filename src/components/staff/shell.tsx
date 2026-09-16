@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Clock, FileText, Home, Plane } from "lucide-react";
+import { Clock, FileText, Home, Plane, Utensils } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 const TABS = [
   { href: "/staff", label: "Today", icon: Home },
-  { href: "/staff/shifts", label: "Shifts", icon: CalendarDays },
   { href: "/staff/timesheets", label: "Hours", icon: Clock },
+  { href: "/staff/vouchers", label: "Vouchers", icon: Utensils },
   { href: "/staff/leave", label: "Leave", icon: Plane },
   { href: "/staff/documents", label: "Docs", icon: FileText },
 ];

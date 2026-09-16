@@ -25,7 +25,10 @@ export default async function SettingsPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Panel title="Organisation">
           <DescriptionList cols={1} items={[{ label: "Name", value: ctx.organisation.name }, { label: "Your role", value: roleLabel(ctx.role) }, { label: "Signed in as", value: ctx.user.email }]} />
-          {ctx.can("finance.read") || ctx.role === "administrator" ? <div className="mt-4 border-t border-graphite/10 pt-4"><ActionLink href="/dashboard/settings/catalogue">Catalogue &amp; VAT rates</ActionLink></div> : null}
+          <div className="mt-4 flex flex-wrap gap-2 border-t border-graphite/10 pt-4">
+            {ctx.can("finance.read") || ctx.role === "administrator" ? <ActionLink href="/dashboard/settings/catalogue">Catalogue &amp; VAT</ActionLink> : null}
+            {ctx.can("org.manage") ? <ActionLink href="/dashboard/settings/vouchers">Voucher categories</ActionLink> : null}
+          </div>
         </Panel>
         <div className="space-y-6 lg:col-span-2">
           {canManage ? (

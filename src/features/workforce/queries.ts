@@ -135,3 +135,9 @@ export const myEmployee = cache(async (ctx: OrgContext) => {
   const { data } = await ctx.supabase.from("employees").select("*").eq("user_id", ctx.user.id).is("archived_at", null).maybeSingle();
   return data;
 });
+
+/** Sick absences still waiting on a doctor's note. */
+export async function leaveMissingDocuments(ctx: OrgContext) {
+  const { data } = await ctx.supabase.rpc("leave_missing_documents", { p_org: ctx.organisation.id });
+  return (data ?? []) as unknown as { leave_id: string; employee_id: string; employee_name: string; start_date: string; end_date: string; days: string }[];
+}

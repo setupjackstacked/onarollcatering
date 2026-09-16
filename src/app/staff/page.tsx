@@ -13,7 +13,8 @@ export default async function StaffHomePage() {
   ]);
   const today = isoDateOffset(0);
   const rejected = timesheets.filter((t) => t.status === "rejected");
-  const pendingLeave = leave.filter((l) => l.status === "requested");
+  const pendingLeave = leave.filter((l) => l.status === "requested" && l.leave_type !== "sick");
+  const missingNotes = leave.filter((l) => l.document_required && !l.document_id && l.status !== "cancelled");
 
   return (
     <div className="space-y-6">
@@ -25,6 +26,15 @@ export default async function StaffHomePage() {
       {next ? <ShiftCard shift={next as unknown as StaffShift} highlight /> : (
         <p className="rounded-lg border border-dashed border-graphite/20 px-4 py-8 text-center text-sm text-muted-light">Nothing on the rota for you yet. Published shifts appear here.</p>
       )}
+
+      {missingNotes.length ? (
+        <section className="rounded-lg bg-status-warning/10 p-4">
+          <h2 className="text-sm font-medium">Doctor’s note needed</h2>
+          <p className="mt-1 text-sm">
+            {missingNotes.map((l, i) => <span key={l.id}>{i ? ", " : ""}{formatDateUK(l.start_date)}</span>)} — <Link href="/staff/leave" className="underline">upload it here</Link>.
+          </p>
+        </section>
+      ) : null}
 
       {rejected.length ? (
         <section className="rounded-lg bg-status-danger/10 p-4">
@@ -60,9 +70,11 @@ export default async function StaffHomePage() {
         </section>
       ) : null}
 
-      <section className="grid grid-cols-1 gap-3">
-        <Link href="/staff/timesheets/new" className="flex h-12 items-center justify-center rounded-full bg-copper px-5 text-sm font-medium text-ivory">Log hours</Link>
-        <Link href="/staff/leave/new" className="flex h-12 items-center justify-center rounded-full border border-graphite/25 px-5 text-sm font-medium">Request leave</Link>
+      <section className="grid grid-cols-2 gap-3">
+        <Link href="/staff/timesheets/new" className="col-span-2 flex h-12 items-center justify-center rounded-full bg-copper px-5 text-sm font-medium text-ivory">Log hours</Link>
+        <Link href="/staff/vouchers" className="flex h-12 items-center justify-center rounded-full border border-graphite/25 px-4 text-sm font-medium">Log vouchers</Link>
+        <Link href="/staff/leave/new" className="flex h-12 items-center justify-center rounded-full border border-graphite/25 px-4 text-sm font-medium">Request holiday</Link>
+        <Link href="/staff/leave/sick" className="col-span-2 flex h-12 items-center justify-center rounded-full border border-graphite/25 px-5 text-sm font-medium">Report sick</Link>
       </section>
 
       {timesheets.length ? (

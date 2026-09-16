@@ -11,6 +11,7 @@ export function SiteTabs({ base, counts }: { base: string; counts: { staff: numb
       { key: "overview", label: "Overview" },
       { key: "staff", label: "Team", count: counts.staff },
       { key: "timesheets", label: "Timesheets", count: counts.pendingTimesheets || undefined },
+      { key: "vouchers", label: "Vouchers" },
       { key: "leave", label: "Leave" },
       { key: "documents", label: "Documents", count: counts.documents },
     ]} />

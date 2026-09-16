@@ -82,3 +82,43 @@ export async function updateMyContactDetails(_: FormState, formData: FormData): 
   revalidatePath("/staff/profile");
   return { success: "Saved." };
 }
+
+const sickSchema = z.object({
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a date"),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a date"),
+  reason: z.string().trim().max(1000).optional().or(z.literal("")),
+});
+
+/** Sick absences are reported, not requested — they are recorded immediately. */
+export async function reportSickness(_: FormState, formData: FormData): Promise<FormState> {
+  const { ctx, employee } = await requireStaff();
+  const p = parseForm(sickSchema, formData);
+  if (!p.ok) return p.state;
+  const d = p.data;
+  if (d.end_date < d.start_date) return { fieldErrors: { end_date: ["That's before the first day off"] } };
+  const days = workingDaysBetween(d.start_date, d.end_date);
+  const { data, error } = await ctx.supabase.from("leave_requests").insert({
+    organisation_id: ctx.organisation.id, employee_id: employee.id, leave_type: "sick",
+    start_date: d.start_date, end_date: d.end_date, days: days.toFixed(2), reason: nullable(d.reason),
+  }).select("id").single();
+  if (error || !data) return { error: "Couldn’t record your absence. Please try again." };
+  revalidatePath("/staff/leave"); revalidatePath("/staff");
+  return { success: "Recorded. Please upload your doctor’s note when you have it.", redirectTo: "/staff/leave" };
+}
+
+export async function attachSickNote(leaveId: string, documentId: string) {
+  const { ctx } = await requireStaff();
+  const { error } = await ctx.supabase.rpc("attach_leave_document", { p_leave_id: leaveId, p_document_id: documentId });
+  if (error) return { error: error.message.replace(/^[^:]*: /, "") };
+  revalidatePath("/staff/leave"); revalidatePath("/staff");
+}
+
+/** Mon–Fri between two ISO dates, inclusive. Bank holidays are not modelled. */
+function workingDaysBetween(from: string, to: string) {
+  let n = 0;
+  for (let d = new Date(`${from}T00:00:00Z`); d <= new Date(`${to}T00:00:00Z`); d.setUTCDate(d.getUTCDate() + 1)) {
+    const day = d.getUTCDay();
+    if (day !== 0 && day !== 6) n++;
+  }
+  return n || 1;
+}
