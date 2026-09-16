@@ -1,8 +1,16 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireOrgContext } from "@/lib/auth/context";
-import { getInvoice, listInvoiceItems, listPayments, listCreditNotesFor } from "@/features/invoices/queries";
-import { createCreditNote, archiveInvoice, deletePayment } from "@/features/invoices/actions";
+import { getInvoice, listInvoiceItems, listPayments, listCreditNotesFor, listInvoiceEvents, listPaymentPacks } from "@/features/invoices/queries";
+import { createCreditNote, archiveInvoice, deletePayment, advanceStage } from "@/features/invoices/actions";
+import { listEntityDocuments, documentCategories } from "@/features/documents/queries";
+import { listMembers, memberMap, memberLabel, memberOptions } from "@/features/shared/members";
+import { listSiteOptionsForUser } from "@/features/sites/queries";
+import { DocumentsPanel } from "@/components/dashboard/documents";
+import { InvoiceTimeline } from "@/components/dashboard/invoice-timeline";
+import { StageForm, CaseNoteForm, CaseDetailsForm, GeneratePackButton } from "@/components/dashboard/forms/invoice-case-forms";
+import { StageBadge } from "@/lib/domain/badges";
+import { nextStage, stageLabel, STAGE_ACTION } from "@/features/invoices/schema";
 import { listActivity, listNotes } from "@/features/shared/activity";
 import { EntityHeader, DescriptionList, ActionLink } from "@/components/dashboard/entity";
 import { Panel, Metric } from "@/components/dashboard/primitives";
@@ -23,7 +31,12 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   const inv = await getInvoice(ctx, id);
   if (!inv) notFound();
   if (!ctx.can("finance.read") && !inv.project_id) redirect("/dashboard");
-  const [items, payments, activity, notes, creditNotes] = await Promise.all([listInvoiceItems(ctx, id), listPayments(ctx, id), listActivity(ctx, "invoices", id), listNotes(ctx, "invoice", id), listCreditNotesFor(ctx, id)]);
+  const [items, payments, activity, notes, creditNotes, events, packs, docs, docCategories, members, sites] = await Promise.all([
+    listInvoiceItems(ctx, id), listPayments(ctx, id), listActivity(ctx, "invoices", id), listNotes(ctx, "invoice", id),
+    listCreditNotesFor(ctx, id), listInvoiceEvents(ctx, id), listPaymentPacks(ctx, id),
+    listEntityDocuments(ctx, "invoice", id), documentCategories(ctx, "invoice"), listMembers(ctx), listSiteOptionsForUser(ctx),
+  ]);
+  const mmap = await memberMap(ctx);
   const client = inv.clients as unknown as { id: string; name: string; email: string | null; payment_terms_days: number } | null;
   const contact = inv.client_contacts as unknown as { email: string | null } | null;
   const project = inv.projects as unknown as { id: string; name: string; project_number: string } | null;
@@ -37,6 +50,10 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
   const today = isoDateOffset(0);
   const customerUrl = `${publicEnv.NEXT_PUBLIC_SITE_URL}/i/${inv.public_token}`;
   const label = isCredit ? "Credit note" : "Invoice";
+  const stage = inv.workflow_stage;
+  const suggested = isCredit ? null : nextStage(stage);
+  const latestPack = packs[0];
+  const readyForPack = !isCredit && !isDraft;
 
   return (
     <>
@@ -44,13 +61,14 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
         back={{ href: "/dashboard/invoices", label: "Invoices" }}
         eyebrow={`${label} ${inv.invoice_number || "(draft — number assigned on issue)"}${inv.kind !== "standard" && !isCredit ? ` · ${inv.kind}` : ""}`}
         title={inv.title}
-        badge={<InvoiceBadge status={inv.status} />}
+        badge={<span className="flex flex-wrap gap-2"><InvoiceBadge status={inv.status} />{!isCredit ? <StageBadge stage={stage} /> : null}</span>}
         meta={<>{client ? <Link href={`/dashboard/clients/${client.id}`} className="underline">{client.name}</Link> : null}{project ? <Link href={`/dashboard/projects/${project.id}`} className="underline">{project.project_number}</Link> : null}{quote ? <Link href={`/dashboard/quotes/${quote.id}`} className="underline">From {quote.quote_number}</Link> : null}{inv.issue_date ? <span>Issued {formatDateUK(inv.issue_date)}</span> : null}{inv.due_date && !isCredit ? <span>Due {formatDateUK(inv.due_date)}</span> : null}</>}
         actions={
           <>
             <ActionLink href={`/api/invoices/${id}/pdf`}>PDF</ActionLink>
             {canWrite ? <ActionLink href={`${path}/edit`} variant="obsidian">{isDraft ? "Edit" : "Edit internal fields"}</ActionLink> : null}
             {canWrite && !isDraft && !isCredit && inv.status !== "cancelled" ? <RedirectingAction action={createCreditNote.bind(null, id)} label="Raise credit note" /> : null}
+            {canWrite && suggested ? <RedirectingAction action={advanceStage.bind(null, id, suggested)} label={STAGE_ACTION[suggested] ?? `Move to ${stageLabel(suggested)}`} variant="copper" /> : null}
             {canWrite && isDraft ? <ConfirmAction action={archiveInvoice.bind(null, id)} label="Archive draft" title="Archive this draft?" confirmLabel="Archive" /> : null}
           </>
         }
@@ -86,6 +104,43 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
             </Panel>
           ) : null}
         </div>
+      ) : null}
+
+      {!isCredit && canWrite ? (
+        <Panel title="Where this invoice has got to" className="mb-6">
+          <p className="mb-4 text-sm text-muted-light">
+            This is the paperwork trail, separate from whether the money has arrived. Currently <span className="font-medium text-graphite">{stageLabel(stage)}</span>
+            {inv.stage_changed_at ? <> since {formatDateUK(inv.stage_changed_at)}</> : null}
+            {inv.stage_note ? <> — {inv.stage_note}</> : null}.
+          </p>
+          <StageForm id={id} current={stage} />
+        </Panel>
+      ) : null}
+
+      {readyForPack && canWrite ? (
+        <Panel title="Final payment pack" className="mb-6">
+          <p className="mb-4 text-sm text-muted-light">
+            One PDF for the client’s finance department: the invoice, then the payment certificate, the signed estimate and the
+            backup documentation. Generating again creates a new version — earlier packs are kept.
+          </p>
+          {packs.length ? (
+            <ul className="mb-4 divide-y divide-graphite/10 text-sm">
+              {packs.map((p) => {
+                const d = p.documents as unknown as { id: string; name: string } | null;
+                return (
+                  <li key={p.id} className="flex flex-wrap items-center justify-between gap-2 py-2 first:pt-0">
+                    <span>
+                      <span className="font-medium">Version {p.version}</span>
+                      <span className="block text-xs text-muted-light">{p.page_count} pages · {formatDateUK(p.generated_at, true)} · {memberLabel(mmap.get(p.generated_by ?? ""))}</span>
+                    </span>
+                    {d ? <a href={`/api/documents/${d.id}`} className="text-sm underline">Download</a> : null}
+                  </li>
+                );
+              })}
+            </ul>
+          ) : null}
+          <GeneratePackButton id={id} hasPack={!!latestPack} />
+        </Panel>
       ) : null}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -136,6 +191,10 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
           ) : null}
 
           {inv.notes ? <Panel title="Customer notes"><p className="whitespace-pre-wrap text-sm">{inv.notes}</p></Panel> : null}
+          <Panel title="Documents">
+            <p className="mb-4 text-sm text-muted-light">The signed estimate, payment certificate and everything else this case needs. Each upload is recorded in the history.</p>
+            <DocumentsPanel entityType="invoice" entityId={id} documents={docs} categories={docCategories} canWrite={canWrite} revalidate={path} />
+          </Panel>
           <NotesPanel entityType="invoice" entityId={id} notes={notes} canWrite={canWrite} currentUserId={ctx.user.id} revalidate={path} />
         </div>
         <div className="space-y-6">
@@ -152,6 +211,17 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
               <CancelInvoiceForm id={id} />
             </Panel>
           ) : null}
+          {!isCredit ? (
+            <Panel title="Case details">
+              {canWrite
+                ? <CaseDetailsForm id={id} members={memberOptions(members)} sites={sites} assignedTo={inv.assigned_to} siteId={inv.site_id} reference={inv.client_reference} />
+                : <DescriptionList cols={1} items={[{ label: "Owned by", value: inv.assigned_to ? memberLabel(mmap.get(inv.assigned_to)) : null }, { label: "Client reference", value: inv.client_reference }]} />}
+            </Panel>
+          ) : null}
+          <Panel title="History">
+            <InvoiceTimeline events={events} nameFor={(uid) => memberLabel(mmap.get(uid ?? ""))} />
+            {canWrite ? <div className="mt-5 border-t border-graphite/10 pt-4"><CaseNoteForm id={id} /></div> : null}
+          </Panel>
           <Panel title="Activity"><ActivityTimeline rows={activity} /></Panel>
         </div>
       </div>

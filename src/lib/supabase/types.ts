@@ -985,6 +985,142 @@ export type Database = {
           },
         ];
       };
+      generated_payment_packs: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          invoice_id: string;
+          version: number;
+          document_id: string | null;
+          source_document_ids: Json;
+          page_count: number | null;
+          generated_by: string | null;
+          generated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          invoice_id: string;
+          version: number;
+          document_id?: string | null;
+          source_document_ids?: Json;
+          page_count?: number | null;
+          generated_by?: string | null;
+          generated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          invoice_id?: string;
+          version?: number;
+          document_id?: string | null;
+          source_document_ids?: Json;
+          page_count?: number | null;
+          generated_by?: string | null;
+          generated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "generated_payment_packs_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "generated_payment_packs_invoice_id_fkey";
+            columns: ["invoice_id"];
+            isOneToOne: false;
+            referencedRelation: "invoices";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "generated_payment_packs_document_id_fkey";
+            columns: ["document_id"];
+            isOneToOne: false;
+            referencedRelation: "documents";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "generated_payment_packs_generated_by_fkey";
+            columns: ["generated_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      invoice_events: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          invoice_id: string;
+          action: string;
+          from_stage: Database["public"]["Enums"]["invoice_stage"] | null;
+          to_stage: Database["public"]["Enums"]["invoice_stage"] | null;
+          note: string | null;
+          document_id: string | null;
+          amount: string | null;
+          user_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          invoice_id: string;
+          action: string;
+          from_stage?: Database["public"]["Enums"]["invoice_stage"] | null;
+          to_stage?: Database["public"]["Enums"]["invoice_stage"] | null;
+          note?: string | null;
+          document_id?: string | null;
+          amount?: string | null;
+          user_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          invoice_id?: string;
+          action?: string;
+          from_stage?: Database["public"]["Enums"]["invoice_stage"] | null;
+          to_stage?: Database["public"]["Enums"]["invoice_stage"] | null;
+          note?: string | null;
+          document_id?: string | null;
+          amount?: string | null;
+          user_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "invoice_events_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoice_events_invoice_id_fkey";
+            columns: ["invoice_id"];
+            isOneToOne: false;
+            referencedRelation: "invoices";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoice_events_document_id_fkey";
+            columns: ["document_id"];
+            isOneToOne: false;
+            referencedRelation: "documents";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoice_events_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       invoice_items: {
         Row: {
           id: string;
@@ -1093,6 +1229,12 @@ export type Database = {
           archived_at: string | null;
           created_at: string;
           updated_at: string;
+          workflow_stage: Database["public"]["Enums"]["invoice_stage"];
+          site_id: string | null;
+          assigned_to: string | null;
+          stage_changed_at: string | null;
+          stage_note: string | null;
+          client_reference: string | null;
         };
         Insert: {
           id?: string;
@@ -1129,6 +1271,12 @@ export type Database = {
           archived_at?: string | null;
           created_at?: string;
           updated_at?: string;
+          workflow_stage?: Database["public"]["Enums"]["invoice_stage"];
+          site_id?: string | null;
+          assigned_to?: string | null;
+          stage_changed_at?: string | null;
+          stage_note?: string | null;
+          client_reference?: string | null;
         };
         Update: {
           id?: string;
@@ -1165,6 +1313,12 @@ export type Database = {
           archived_at?: string | null;
           created_at?: string;
           updated_at?: string;
+          workflow_stage?: Database["public"]["Enums"]["invoice_stage"];
+          site_id?: string | null;
+          assigned_to?: string | null;
+          stage_changed_at?: string | null;
+          stage_note?: string | null;
+          client_reference?: string | null;
         };
         Relationships: [
           {
@@ -1212,6 +1366,20 @@ export type Database = {
           {
             foreignKeyName: "invoices_created_by_fkey";
             columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoices_site_id_fkey";
+            columns: ["site_id"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "invoices_assigned_to_fkey";
+            columns: ["assigned_to"];
             isOneToOne: false;
             referencedRelation: "users";
             referencedColumns: ["id"];
@@ -1861,6 +2029,14 @@ export type Database = {
           notes: string | null;
           recorded_by: string | null;
           created_at: string;
+          bank_transaction_id: string | null;
+          bank_account_id: string | null;
+          transaction_date: string | null;
+          transaction_reference: string | null;
+          reconciliation_status: string;
+          reconciled_by: string | null;
+          reconciled_at: string | null;
+          proof_document_id: string | null;
         };
         Insert: {
           id?: string;
@@ -1873,6 +2049,14 @@ export type Database = {
           notes?: string | null;
           recorded_by?: string | null;
           created_at?: string;
+          bank_transaction_id?: string | null;
+          bank_account_id?: string | null;
+          transaction_date?: string | null;
+          transaction_reference?: string | null;
+          reconciliation_status?: string;
+          reconciled_by?: string | null;
+          reconciled_at?: string | null;
+          proof_document_id?: string | null;
         };
         Update: {
           id?: string;
@@ -1885,6 +2069,14 @@ export type Database = {
           notes?: string | null;
           recorded_by?: string | null;
           created_at?: string;
+          bank_transaction_id?: string | null;
+          bank_account_id?: string | null;
+          transaction_date?: string | null;
+          transaction_reference?: string | null;
+          reconciliation_status?: string;
+          reconciled_by?: string | null;
+          reconciled_at?: string | null;
+          proof_document_id?: string | null;
         };
         Relationships: [
           {
@@ -1906,6 +2098,20 @@ export type Database = {
             columns: ["recorded_by"];
             isOneToOne: false;
             referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payments_reconciled_by_fkey";
+            columns: ["reconciled_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payments_proof_document_id_fkey";
+            columns: ["proof_document_id"];
+            isOneToOne: false;
+            referencedRelation: "documents";
             referencedColumns: ["id"];
           },
         ];
@@ -3517,6 +3723,7 @@ export type Database = {
         };
         Returns: string;
       };
+      add_invoice_note: { Args: { p_invoice_id: string; p_note: string }; Returns: undefined };
       recalculate_quote: { Args: { p_quote_id: string }; Returns: undefined };
       create_quote_revision: { Args: { p_quote_id: string }; Returns: string };
       my_employee_id: { Args: Record<string, never>; Returns: string };
@@ -3618,6 +3825,23 @@ export type Database = {
       mark_conversation_read: { Args: { p_conversation_id: string }; Returns: undefined };
       my_conversations: { Args: Record<string, never>; Returns: unknown };
       my_unread_messages: { Args: Record<string, never>; Returns: unknown };
+      set_invoice_stage: {
+        Args: {
+          p_invoice_id: string;
+          p_stage: Database["public"]["Enums"]["invoice_stage"];
+          p_note?: unknown;
+          p_document_id?: unknown;
+        };
+        Returns: undefined;
+      };
+      seed_org_invoice_doc_categories: { Args: { org: string }; Returns: undefined };
+      report_invoice_pipeline: { Args: { p_org: string }; Returns: unknown };
+      report_payment_time: { Args: { p_org: string; p_months?: unknown }; Returns: unknown };
+      next_pack_version: { Args: { p_invoice_id: string }; Returns: number };
+      record_payment_pack: {
+        Args: { p_invoice_id: string; p_document_id: string; p_sources: Json; p_pages: number };
+        Returns: string;
+      };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";
@@ -3698,6 +3922,21 @@ export type Database = {
       site_status: "prospective" | "mobilising" | "operating" | "paused" | "closed";
       site_role: "manager" | "staff";
       conversation_kind: "direct" | "site" | "broadcast";
+      invoice_stage:
+        | "draft"
+        | "sent_to_site"
+        | "site_approved"
+        | "with_procurement"
+        | "procurement_approved"
+        | "payment_certificate"
+        | "ready_for_finance"
+        | "with_finance"
+        | "awaiting_payment"
+        | "paid"
+        | "closed"
+        | "query"
+        | "on_hold"
+        | "rejected";
     };
     CompositeTypes: Record<string, never>;
   };
@@ -3735,5 +3974,6 @@ export type SiteType = Database["public"]["Enums"]["site_type"];
 export type SiteStatus = Database["public"]["Enums"]["site_status"];
 export type SiteRole = Database["public"]["Enums"]["site_role"];
 export type ConversationKind = Database["public"]["Enums"]["conversation_kind"];
+export type InvoiceStage = Database["public"]["Enums"]["invoice_stage"];
 export type TablesInsert<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Insert"];
 export type TablesUpdate<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Update"];

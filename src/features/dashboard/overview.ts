@@ -8,6 +8,7 @@ import { formatDateUK } from "@/lib/dates";
 export type OverviewData = {
   kpis: { activeProjects: number; openLeads: number; newEnquiries: number; clients: number };
   finance: { openQuotes: number; openQuoteValue: Pence; outstanding: Pence; overdue: Pence; overdueCount: number } | null;
+  invoicePipeline: { stage: string; invoice_count: number; value: string; oldest_days: number }[];
   workforce: {
     onShift: number; onLeave: number; offSick: number;
     pendingLeave: number; pendingTimesheets: number; missingSickNotes: number;
@@ -38,7 +39,7 @@ export async function loadOverview(ctx: OrgContext): Promise<OverviewData> {
   const stale = new Date(Date.now() - 14 * 864e5).toISOString();
 
   const [projects, leads, enquiries, clients, staleLeads, unassigned, financials, activity, openQuotes, openInvoices,
-         shiftsToday, leaveToday, pendingLeave, pendingTimesheets, missingNotes, voucherRows, missingVouchers, unread] = await Promise.all([
+         shiftsToday, leaveToday, pendingLeave, pendingTimesheets, missingNotes, voucherRows, missingVouchers, unread, pipeline] = await Promise.all([
     supabase.from("projects").select("id", { count: "exact", head: true }).eq("organisation_id", org).is("archived_at", null).in("status", ACTIVE_PROJECT_STATUSES),
     supabase.from("leads").select("id, estimated_value", ).eq("organisation_id", org).is("archived_at", null).in("status", OPEN_LEAD_STATUSES),
     can("sales.read") ? supabase.from("enquiries").select("id, company_name, project_name, created_at").eq("organisation_id", org).eq("status", "new").order("created_at", { ascending: false }).limit(5) : Promise.resolve({ data: [], error: null }),
@@ -57,10 +58,11 @@ export async function loadOverview(ctx: OrgContext): Promise<OverviewData> {
     supabase.rpc("report_vouchers", { p_org: org, p_from: today, p_to: today, p_grain: "day" }),
     supabase.rpc("sites_missing_vouchers", { p_org: org, p_date: yesterday }),
     supabase.rpc("my_unread_messages"),
+    can("finance.read") ? supabase.rpc("report_invoice_pipeline", { p_org: org }) : Promise.resolve({ data: null, error: null }),
   ]);
 
   for (const r of [projects, leads, enquiries, clients, staleLeads, unassigned, financials, activity, openQuotes, openInvoices,
-                   shiftsToday, leaveToday, pendingLeave, pendingTimesheets, missingNotes, voucherRows, missingVouchers, unread]) {
+                   shiftsToday, leaveToday, pendingLeave, pendingTimesheets, missingNotes, voucherRows, missingVouchers, unread, pipeline]) {
     if (r.error) errors.push(r.error.message);
   }
 
@@ -125,6 +127,7 @@ export async function loadOverview(ctx: OrgContext): Promise<OverviewData> {
     },
     attention,
     finance,
+    invoicePipeline: (pipeline.data ?? []) as unknown as OverviewData["invoicePipeline"],
     workforce,
     operations,
     snapshot: { pipelineValue, contractedValue: contracted.v, estimatedMargin, openLeadCount: openLeads.length },

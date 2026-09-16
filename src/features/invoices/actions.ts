@@ -126,3 +126,50 @@ export async function archiveInvoice(id: string) {
   revalidatePath("/dashboard/invoices");
   return { redirectTo: "/dashboard/invoices" };
 }
+
+// ---------- approval workflow -------------------------------------------------
+
+/** Moves the invoice along the client's approval chain. */
+export async function setStage(id: string, stage: string, _: FormState, formData: FormData): Promise<FormState> {
+  const ctx = await requirePermission("finance.write");
+  const note = String(formData.get("note") ?? "").trim();
+  const { error } = await ctx.supabase.rpc("set_invoice_stage", {
+    p_invoice_id: id, p_stage: stage as never, p_note: note || undefined,
+  });
+  if (error) return { error: error.message.replace(/^[^:]*: /, "") };
+  revalidatePath(`/dashboard/invoices/${id}`);
+  revalidatePath("/dashboard/invoices");
+  return { success: "Updated." };
+}
+
+/** Same move, without asking for a note — for the one-click next step. */
+export async function advanceStage(id: string, stage: string) {
+  const ctx = await requirePermission("finance.write");
+  const { error } = await ctx.supabase.rpc("set_invoice_stage", { p_invoice_id: id, p_stage: stage as never });
+  if (error) return { error: error.message.replace(/^[^:]*: /, "") };
+  revalidatePath(`/dashboard/invoices/${id}`);
+  revalidatePath("/dashboard/invoices");
+}
+
+export async function addCaseNote(id: string, _: FormState, formData: FormData): Promise<FormState> {
+  const ctx = await requirePermission("finance.write");
+  const note = String(formData.get("note") ?? "").trim();
+  if (note.length < 2) return { fieldErrors: { note: ["Write a note first"] } };
+  const { error } = await ctx.supabase.rpc("add_invoice_note", { p_invoice_id: id, p_note: note });
+  if (error) return { error: "Couldn’t add the note." };
+  revalidatePath(`/dashboard/invoices/${id}`);
+  return { success: "Note added." };
+}
+
+export async function assignInvoice(id: string, _: FormState, formData: FormData): Promise<FormState> {
+  const ctx = await requirePermission("finance.write");
+  const userId = String(formData.get("assigned_to") ?? "");
+  const siteId = String(formData.get("site_id") ?? "");
+  const reference = String(formData.get("client_reference") ?? "").trim();
+  const { error } = await ctx.supabase.from("invoices").update({
+    assigned_to: userId || null, site_id: siteId || null, client_reference: reference || null,
+  }).eq("id", id);
+  if (error) return { error: "Couldn’t update the case." };
+  revalidatePath(`/dashboard/invoices/${id}`);
+  return { success: "Saved." };
+}

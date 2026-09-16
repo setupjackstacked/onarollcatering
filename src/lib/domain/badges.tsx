@@ -88,3 +88,24 @@ export function SiteBadge({ status }: { status: string }) {
   const s = SITE_TONES[status];
   return <StatusBadge label={s?.label ?? status} tone={s?.tone ?? "grey"} />;
 }
+
+const STAGE_TONES: Record<string, { label: string; tone: import("@/lib/domain/statuses").StatusTone }> = {
+  draft: { label: "Draft", tone: "grey" },
+  sent_to_site: { label: "Sent to site", tone: "blue" },
+  site_approved: { label: "Site approved", tone: "blue" },
+  with_procurement: { label: "With procurement", tone: "amber" },
+  procurement_approved: { label: "Procurement approved", tone: "blue" },
+  payment_certificate: { label: "Payment certificate", tone: "blue" },
+  ready_for_finance: { label: "Ready for finance", tone: "copper" },
+  with_finance: { label: "With finance", tone: "amber" },
+  awaiting_payment: { label: "Awaiting payment", tone: "amber" },
+  paid: { label: "Paid", tone: "green" },
+  closed: { label: "Closed", tone: "grey" },
+  query: { label: "Query", tone: "red" },
+  on_hold: { label: "On hold", tone: "grey" },
+  rejected: { label: "Rejected", tone: "red" },
+};
+export function StageBadge({ stage }: { stage: string }) {
+  const s = STAGE_TONES[stage];
+  return <StatusBadge label={s?.label ?? stage} tone={s?.tone ?? "grey"} />;
+}

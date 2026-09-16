@@ -1,7 +1,8 @@
 import type { OverviewData } from "@/features/dashboard/overview";
 import Link from "next/link";
 import { PageHeader, Metric, Panel, EmptyState, StatusBadge } from "@/components/dashboard/primitives";
-import { formatMoney } from "@/lib/money";
+import { formatMoney, toPence } from "@/lib/money";
+import { stageLabel } from "@/features/invoices/schema";
 import { RelativeTime } from "./relative-time";
 
 const ACTION_LABEL: Record<string, string> = {
@@ -53,6 +54,20 @@ export function OverviewView({ data, orgName, canSales }: { data: OverviewData; 
         {data.finance ? <Metric label="Quotes awaiting decision" value={data.finance.openQuotes} hint={formatMoney(data.finance.openQuoteValue, { showPence: false })} href="/dashboard/quotes?status=sent" /> : null}
         {data.finance ? <Metric label="Invoices outstanding" value={formatMoney(data.finance.outstanding, { showPence: false })} hint={data.finance.overdueCount ? `${formatMoney(data.finance.overdue, { showPence: false })} overdue (${data.finance.overdueCount})` : "Nothing overdue"} tone={data.finance.overdueCount ? "warning" : "default"} href="/dashboard/invoices?status=outstanding" /> : null}
       </div>
+
+      {data.invoicePipeline.length ? (
+        <section className="mt-8">
+          <h2 className="eyebrow mb-3 text-copper-dark">Invoices in the approval chain</h2>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-6">
+            {data.invoicePipeline.map((p) => (
+              <Metric key={p.stage} label={stageLabel(p.stage)} value={p.invoice_count}
+                hint={formatMoney(toPence(p.value), { showPence: false })}
+                tone={p.oldest_days > 21 ? "warning" : "default"}
+                href={`/dashboard/invoices?stage=${p.stage}`} />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Panel title="Needs attention" className="lg:col-span-2">

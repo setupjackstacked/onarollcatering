@@ -6,5 +6,12 @@ export default defineConfig({
     environment: "node",
     include: ["tests/**/*.test.ts"],
   },
-  resolve: { alias: { "@": path.resolve(__dirname, "src") } },
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+      // `server-only` is a Next build-time guard with no runtime; stub it so
+      // server modules can be unit tested directly.
+      "server-only": path.resolve(__dirname, "tests/stubs/server-only.ts"),
+    },
+  },
 });
