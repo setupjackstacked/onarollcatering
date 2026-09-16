@@ -8,7 +8,8 @@ import { PageHeader, Panel, Metric, EmptyState } from "@/components/dashboard/pr
 import { ActionLink } from "@/components/dashboard/entity";
 import { RedirectingAction } from "@/components/dashboard/redirecting-action";
 import { RevenueChart, ConversionChart, CategoryBarChart, StackedCostChart } from "@/components/dashboard/charts";
-import { QuoteBadge } from "@/lib/domain/badges";
+import { QuoteBadge, StageBadge } from "@/lib/domain/badges";
+
 import { formatMoney, toPence } from "@/lib/money";
 import { str } from "@/lib/pagination";
 import { cn } from "@/lib/utils/cn";
@@ -44,6 +45,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
   const hasData = invoicedTotal > 0 || totalSent > 0 || data.profitability.length > 0;
 
   const href = (m: string) => `/dashboard/reports?months=${m}`;
+  const exportHref = (report: string) => `/dashboard/reports/${report}/export?from=${data.range.from}&to=${data.range.to}`;
 
   return (
     <>
@@ -100,7 +102,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
             </Panel>
           </div>
 
-          <Panel title="Project profitability" action={<ActionLink href="/dashboard/projects" className="h-8 px-3 text-xs">All projects</ActionLink>}>
+          <Panel title="Project profitability" action={<><ActionLink href={exportHref("outstanding-invoices")} className="h-8 px-3 text-xs">Debt CSV</ActionLink><ActionLink href="/dashboard/projects" className="h-8 px-3 text-xs">All projects</ActionLink></>}>
             {data.profitability.length ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -134,7 +136,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
                 <CategoryBarChart data={data.clients.slice(0, 8).map((c) => ({ label: c.client_name, value: toPence(c.invoiced_net) }))} valueLabel="Invoiced (net)" />
               ) : <p className="text-sm text-muted-light">No invoiced revenue in this period.</p>}
             </Panel>
-            <Panel title="Costs by category">
+            <Panel title="Costs by category" action={<ActionLink href={exportHref("project-costs")} className="h-8 px-3 text-xs">CSV</ActionLink>}>
               {data.costs.length ? (
                 <StackedCostChart data={data.costs.map((c) => ({ label: categoryLabel(c.category), committed: toPence(c.committed), actual: toPence(c.actual) }))} />
               ) : <p className="text-sm text-muted-light">No costs recorded in this period.</p>}
@@ -147,7 +149,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
                 <CategoryBarChart data={data.labour.slice(0, 8).map((l) => ({ label: l.name, value: toPence(l.labour_cost) }))} valueLabel="Labour cost" />
               ) : <p className="text-sm text-muted-light">No approved timesheets in this period.</p>}
             </Panel>
-            <Panel title="Employee hours" action={<ActionLink href="/dashboard/timesheets" className="h-8 px-3 text-xs">Timesheets</ActionLink>}>
+            <Panel title="Employee hours" action={<ActionLink href={exportHref("hours-by-employee")} className="h-8 px-3 text-xs">CSV</ActionLink>}>
               {data.employees.length ? (
                 <table className="w-full text-sm">
                   <thead className="text-left text-xs uppercase tracking-wider text-muted-light"><tr><th className="py-2 pr-3 font-medium">Employee</th><th className="py-2 pr-3 text-right font-medium">Hours</th><th className="py-2 pr-3 text-right font-medium">Overtime</th><th className="py-2 text-right font-medium">Cost</th></tr></thead>
@@ -165,6 +167,84 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
               ) : <p className="text-sm text-muted-light">No approved timesheets in this period.</p>}
             </Panel>
           </div>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <Panel title="Invoice approval chain" action={<ActionLink href={exportHref("invoice-pipeline")} className="h-8 px-3 text-xs">CSV</ActionLink>}>
+              {data.pipeline.length ? (
+                <table className="w-full text-sm">
+                  <thead className="text-left text-xs uppercase tracking-wider text-muted-light"><tr><th className="py-2 pr-3 font-medium">Stage</th><th className="py-2 pr-3 text-right font-medium">Invoices</th><th className="py-2 pr-3 text-right font-medium">Outstanding</th><th className="py-2 text-right font-medium">Oldest</th></tr></thead>
+                  <tbody className="divide-y divide-graphite/10">
+                    {data.pipeline.map((p) => (
+                      <tr key={p.stage}>
+                        <td className="py-2 pr-3"><StageBadge stage={p.stage} /></td>
+                        <td className="py-2 pr-3 text-right num-lining">{p.invoice_count}</td>
+                        <td className="py-2 pr-3 text-right num-lining">{formatMoney(toPence(p.value), { showPence: false })}</td>
+                        <td className={cn("py-2 text-right num-lining", p.oldest_days > 21 && "text-status-danger")}>{p.oldest_days}d</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : <p className="text-sm text-muted-light">No invoices in the approval chain.</p>}
+            </Panel>
+
+            <Panel title="How long clients take to pay" action={<ActionLink href={exportHref("payment-time")} className="h-8 px-3 text-xs">CSV</ActionLink>}>
+              {data.paymentTime.length ? (
+                <table className="w-full text-sm">
+                  <thead className="text-left text-xs uppercase tracking-wider text-muted-light"><tr><th className="py-2 pr-3 font-medium">Month</th><th className="py-2 pr-3 text-right font-medium">Invoices paid</th><th className="py-2 text-right font-medium">Average days</th></tr></thead>
+                  <tbody className="divide-y divide-graphite/10">
+                    {data.paymentTime.map((p) => (
+                      <tr key={p.month}>
+                        <td className="py-2 pr-3">{monthLabel(p.month)}</td>
+                        <td className="py-2 pr-3 text-right num-lining">{p.invoices}</td>
+                        <td className={cn("py-2 text-right num-lining", Number(p.avg_days) > 45 && "text-status-warning")}>{Number(p.avg_days).toFixed(1)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : <p className="text-sm text-muted-light">No invoices settled yet.</p>}
+            </Panel>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <Panel title="Hours by site" action={<ActionLink href={exportHref("hours-by-site")} className="h-8 px-3 text-xs">CSV</ActionLink>}>
+              {data.hoursBySite.length ? (
+                <CategoryBarChart data={data.hoursBySite.map((h) => ({ label: h.site_name, value: toPence(h.labour_cost) }))} valueLabel="Labour cost" />
+              ) : <p className="text-sm text-muted-light">No approved hours at any site in this period.</p>}
+            </Panel>
+
+            <Panel title="Vouchers and meals" action={<ActionLink href={exportHref("vouchers")} className="h-8 px-3 text-xs">CSV</ActionLink>}>
+              {data.vouchers.length ? (
+                <CategoryBarChart money={false} valueLabel="Meals"
+                  data={Object.entries(data.vouchers.reduce<Record<string, number>>((acc, v) => {
+                    acc[v.category_label] = (acc[v.category_label] ?? 0) + Number(v.quantity);
+                    return acc;
+                  }, {})).map(([label, value]) => ({ label, value }))} />
+              ) : <p className="text-sm text-muted-light">Nothing logged in this period.</p>}
+            </Panel>
+          </div>
+
+          <Panel title="Holiday and sickness" action={<ActionLink href={exportHref("absence")} className="h-8 px-3 text-xs">CSV</ActionLink>}>
+            {data.absence.length ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="text-left text-xs uppercase tracking-wider text-muted-light">
+                    <tr><th className="py-2 pr-3 font-medium">Employee</th><th className="py-2 pr-3 font-medium">Site</th><th className="py-2 pr-3 text-right font-medium">Holiday</th><th className="py-2 pr-3 text-right font-medium">Sick</th><th className="py-2 pr-3 text-right font-medium">Occasions</th><th className="py-2 text-right font-medium">Notes outstanding</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-graphite/10">
+                    {data.absence.map((a) => (
+                      <tr key={a.employee_id}>
+                        <td className="py-2 pr-3"><Link href={`/dashboard/employees/${a.employee_id}/leave`} className="underline">{a.employee_name}</Link></td>
+                        <td className="py-2 pr-3 text-muted-light">{a.site_name ?? "—"}</td>
+                        <td className="py-2 pr-3 text-right num-lining">{Number(a.holiday_days)}</td>
+                        <td className="py-2 pr-3 text-right num-lining">{Number(a.sick_days)}</td>
+                        <td className="py-2 pr-3 text-right num-lining">{a.sick_occasions}</td>
+                        <td className={cn("py-2 text-right num-lining", a.missing_notes > 0 && "text-status-warning")}>{a.missing_notes || "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : <p className="text-sm text-muted-light">No absence recorded in this period.</p>}
+          </Panel>
         </div>
       )}
     </>

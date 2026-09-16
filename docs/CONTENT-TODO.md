@@ -57,3 +57,20 @@ All imagery is currently hotlinked from Unsplash (Unsplash License — free for 
 ## Photography direction (spec §97)
 Industrial kitchens, site compounds, modular units, installation, teams at work, dining facilities.
 No cupcakes, coffee cups, restaurant tables or stock chefs.
+
+## Irish business — copy that still says UK
+The platform now trades in euro with Irish VAT rates. The public site was written for
+a UK business and still needs confirming:
+- [ ] Phone number (currently a +44 placeholder in `src/content/site.ts`)
+- [ ] Coverage statement in `src/content/about.ts` — currently "across the UK"
+- [ ] Registered address, company number and VAT number (Irish formats)
+- [ ] Confirm which VAT rate applies to each service with your accountant. Seeded:
+      23% standard, 13.5% reduced (construction/installation), 9% catering and hot
+      food (from 1 July 2026), 0% zero, exempt. Change them in Settings → Catalogue & VAT.
+
+## Meet the Team — `src/content/team.ts`
+- [ ] Real names, roles and short biographies for Leadership, Administration, Chefs and Site teams
+- [ ] A professional photograph per person
+Until real people are supplied the page shows the four group descriptions and says the
+team is being photographed. It is `noindex` and excluded from the sitemap until then.
+Nothing has been invented — no placeholder names, no invented biographies.

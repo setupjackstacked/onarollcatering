@@ -30,13 +30,16 @@ export async function GET(request: Request) {
   let alerts = 0;
   const failures: string[] = [];
   for (const org of orgs ?? []) {
-    const [a, d] = await Promise.all([
+    const [a, d, o] = await Promise.all([
       admin.rpc("generate_alerts", { p_org: org.id }),
       admin.rpc("expire_documents", { p_org: org.id }),
+      admin.rpc("generate_operations_alerts", { p_org: org.id }),
     ]);
     if (a.error) failures.push(`${org.id}: ${a.error.message}`);
     else alerts += Number(a.data ?? 0);
     if (d.error) failures.push(`${org.id}: ${d.error.message}`);
+    if (o.error) failures.push(`${org.id}: ${o.error.message}`);
+    else alerts += Number(o.data ?? 0);
   }
   if (failures.length) logger.error("cron.daily_partial", { failures });
   logger.info("cron.daily", { organisations: (orgs ?? []).length, alerts });

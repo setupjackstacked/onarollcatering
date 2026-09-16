@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
-import { Form, FormRow, TextField, TextArea, SelectField, SubmitButton } from "../form";
+import { Form, FormRow, TextField, SelectField, SubmitButton } from "../form";
 import { setStage, addCaseNote, assignInvoice } from "@/features/invoices/actions";
 import { INVOICE_STAGES } from "@/features/invoices/schema";
 

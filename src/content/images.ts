@@ -23,5 +23,6 @@ export const stock = {
   galleryWarehouse: u("photo-1772305336606-989a457ffbae"), // industrial warehouse interior
   galleryFridge: u("photo-1782750161991-23529c9462bb"), // commercial refrigerator
   galleryConstruction: u("photo-1694521787162-5373b598945c"), // construction site from above
+  team: u("photo-1666479258732-5ea17469b610"), // catering team at work — PLACEHOLDER
   og: u("photo-1589109807644-924edf14ee09", 1200),
 } as const;

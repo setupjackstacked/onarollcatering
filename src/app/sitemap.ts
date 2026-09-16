@@ -2,11 +2,14 @@ import type { MetadataRoute } from "next";
 import { site } from "@/content/site";
 import { services } from "@/content/services";
 import { projects } from "@/content/projects";
+import { hasTeamProfiles } from "@/content/team";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = site.url;
   const now = new Date();
-  const statics = ["", "/services", "/projects", "/about", "/contact", "/quote"].map((p) => ({
+  // Meet the Team is only worth indexing once it has real people on it.
+  const pages = ["", "/services", "/projects", "/about", "/contact", "/quote", ...(hasTeamProfiles ? ["/meet-the-team"] : [])];
+  const statics = pages.map((p) => ({
     url: `${base}${p}`,
     lastModified: now,
     changeFrequency: "monthly" as const,

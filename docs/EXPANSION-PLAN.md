@@ -234,6 +234,12 @@ Nothing in the plan requires deleting or rewriting a working feature.
 
 ## 11. Three decisions needed, and the proposed sequence
 
+> **Answered 16 September 2026.** Euro (Irish business). Three roles presented over
+> the existing six. A doctor's note is required for **every** sick absence, with no
+> self-certification window. Sites and staff operations built first.
+>
+> Delivered: phases A–E and most of F. See the commit log from `573aff3` onward.
+
 ### Decision 1 — currency (blocking)
 
 The brief's audit example reads **€18,420** and asks about **Bank of Ireland**. The platform is built
@@ -245,7 +251,16 @@ EUR business — I change the money formatter, the default currency and the VAT 
 (c) both, invoicing in either — that needs a currency per client and per invoice, which is a bigger job and
 affects every report that sums money.
 
-I am not guessing at this.
+**Answer: euro.** The money layer now formats `en-IE` euro, documents default to
+`EUR`, addresses default to `IE`, and the seeded VAT rates are Irish: 23% standard,
+13.5% reduced, **9% for catering and hot food** (the rate that took effect on
+1 July 2026), zero and exempt. A per-document `currency` override is kept, so
+sterling invoicing remains possible if it is ever needed. Existing VAT rates that
+had been edited by hand were left alone; only untouched UK defaults were re-pointed.
+
+The public site still describes UK coverage in `src/content/about.ts` and carries a
++44 placeholder phone number — that is copy, not code, and is listed in
+`docs/CONTENT-TODO.md` for the client to confirm.
 
 ### Decision 2 — roles
 
@@ -259,14 +274,17 @@ The brief wants three roles. Six exist. I propose **keeping the enum** and prese
 
 `finance` and `read_only` stay available but are not offered by default in the invite form. This keeps every
 existing policy working. The alternative — collapsing to three enum values — means rewriting all 60-odd RLS
-policies and risks losing the finance/read-only distinction the invoice module relies on. Say the word if
-you want the harder version.
+policies and risks losing the finance/read-only distinction the invoice module relies on. **Answer: keep six, present three.** `src/lib/auth/roles.ts` is the single place the
+two vocabularies meet — Admin, Manager and Staff are what the interface offers, and
+Finance and Read only remain available for the people who need them.
 
 ### Decision 3 — sick note threshold
 
 "A doctor's note must be uploaded when required by the workflow." Required when? Common UK/IE practice is
-after seven consecutive calendar days (self-certification below that). I will default to **more than seven
-consecutive days**, configurable per organisation in Settings, unless you tell me otherwise.
+after seven consecutive calendar days (self-certification below that). **Answer: every sick absence.** Set by trigger on `leave_requests`, so it holds
+however the row is created. Staff report the absence immediately and upload the note
+when they have it; until then the absence is flagged outstanding on the staff home
+screen, the manager's leave list, the absence report and the nightly alert sweep.
 
 ### Bank of Ireland — answered
 

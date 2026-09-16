@@ -3842,6 +3842,9 @@ export type Database = {
         Args: { p_invoice_id: string; p_document_id: string; p_sources: Json; p_pages: number };
         Returns: string;
       };
+      report_hours_by_site: { Args: { p_org: string; p_from: unknown; p_to: unknown }; Returns: unknown };
+      report_absence: { Args: { p_org: string; p_from: unknown; p_to: unknown }; Returns: unknown };
+      generate_operations_alerts: { Args: { p_org: string }; Returns: number };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";

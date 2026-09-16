@@ -10,6 +10,7 @@ export async function runAlerts() {
   const [alerts] = await Promise.all([
     ctx.supabase.rpc("generate_alerts", { p_org: ctx.organisation.id }),
     ctx.supabase.rpc("expire_documents", { p_org: ctx.organisation.id }),
+    ctx.supabase.rpc("generate_operations_alerts", { p_org: ctx.organisation.id }),
   ]);
   if (alerts.error) return { error: alerts.error.message };
   revalidatePath("/dashboard/notifications");

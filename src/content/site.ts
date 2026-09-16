@@ -39,12 +39,14 @@ export const navigation = {
     { label: "Services", href: "/services" },
     { label: "Projects", href: "/projects" },
     { label: "About", href: "/about" },
+    { label: "Meet the Team", href: "/meet-the-team" },
     { label: "Contact", href: "/contact" },
   ],
   cta: { label: "Request a Quote", href: "/quote" },
   footer: {
     company: [
       { label: "About", href: "/about" },
+      { label: "Meet the Team", href: "/meet-the-team" },
       { label: "Projects", href: "/projects" },
       { label: "Contact", href: "/contact" },
       { label: "Request a Quote", href: "/quote" },
