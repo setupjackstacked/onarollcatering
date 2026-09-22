@@ -21,7 +21,7 @@ export type Mail = { to: string | string[]; subject: string; html: string; text:
  */
 export async function sendMail(mail: Mail): Promise<{ ok: boolean; id?: string }> {
   const resend = getClient();
-  const { EMAIL_FROM } = serverEnv();
+  const { EMAIL_FROM, EMAIL_REPLY_TO } = serverEnv();
   if (!resend) {
     logger.warn("email.skipped", { reason: "RESEND_API_KEY not set", to: mail.to, subject: mail.subject });
     return { ok: false };
@@ -32,7 +32,10 @@ export async function sendMail(mail: Mail): Promise<{ ok: boolean; id?: string }
     subject: mail.subject,
     html: mail.html,
     text: mail.text,
-    replyTo: mail.replyTo,
+    // The business sends from the verified website domain but reads its email
+    // somewhere else, so every message needs a reply-to a human actually
+    // watches. A caller can override it; otherwise the account default wins.
+    replyTo: mail.replyTo ?? EMAIL_REPLY_TO,
   });
   if (error) {
     logger.error("email.failed", { error: error.message, subject: mail.subject });

@@ -24,7 +24,7 @@ export default async function EmailSettingsPage() {
   const ctx = await requireOrgContext("/dashboard/settings/email");
   if (!ctx.can("org.manage")) redirect("/dashboard/settings");
 
-  const { RESEND_API_KEY, EMAIL_FROM, INTERNAL_NOTIFICATION_EMAIL } = serverEnv();
+  const { RESEND_API_KEY, EMAIL_FROM, EMAIL_REPLY_TO, INTERNAL_NOTIFICATION_EMAIL } = serverEnv();
   const configured = Boolean(RESEND_API_KEY);
   const domain = fromDomain(EMAIL_FROM);
   const siteDomain = publicEnv.NEXT_PUBLIC_SITE_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
@@ -48,6 +48,7 @@ export default async function EmailSettingsPage() {
             items={[
               { label: "From address", value: EMAIL_FROM },
               { label: "Sending domain", value: domain },
+              { label: "Replies go to", value: EMAIL_REPLY_TO ?? "Nowhere — replies will bounce" },
               { label: "Application", value: publicEnv.NEXT_PUBLIC_SITE_URL },
               { label: "Internal alerts go to", value: INTERNAL_NOTIFICATION_EMAIL ?? "Not set" },
             ]}
@@ -56,6 +57,13 @@ export default async function EmailSettingsPage() {
             <p className="mt-4 rounded-md bg-status-warning/10 px-4 py-3 text-sm">
               Nothing can be emailed until <code>RESEND_API_KEY</code> is set in Vercel and the project is
               redeployed. Until then the system logs what it would have sent and carries on, so no work is lost.
+            </p>
+          ) : null}
+          {configured && !EMAIL_REPLY_TO ? (
+            <p className="mt-4 rounded-md bg-status-warning/10 px-4 py-3 text-sm">
+              No reply-to address is set. Anyone who replies to an invoice, quote or welcome email will be
+              writing to <code>{EMAIL_FROM}</code>, which nobody reads. Set <code>EMAIL_REPLY_TO</code> in
+              Vercel to the inbox the business actually watches.
             </p>
           ) : null}
           {configured && !domainMatches ? (

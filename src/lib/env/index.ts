@@ -24,6 +24,7 @@ const serverSchema = z.object({
     .string()
     .min(3)
     .default("On A Roll Catering <noreply@onarollcatering.com>"),
+  EMAIL_REPLY_TO: z.string().email().optional(),
   INTERNAL_NOTIFICATION_EMAIL: z.string().email().optional(),
   ENQUIRY_ORGANISATION_ID: z.string().uuid().optional(),
 });
@@ -45,6 +46,7 @@ export function serverEnv() {
       SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
       RESEND_API_KEY: process.env.RESEND_API_KEY,
       EMAIL_FROM: process.env.EMAIL_FROM,
+      EMAIL_REPLY_TO: process.env.EMAIL_REPLY_TO,
       INTERNAL_NOTIFICATION_EMAIL: process.env.INTERNAL_NOTIFICATION_EMAIL,
       ENQUIRY_ORGANISATION_ID: process.env.ENQUIRY_ORGANISATION_ID,
     });
