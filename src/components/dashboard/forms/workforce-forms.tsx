@@ -23,7 +23,7 @@ export function EmployeeForm({ employee, roles }: { employee?: Tables<"employees
           <TextField name="last_name" label="Last name" defaultValue={employee?.last_name} required />
         </FormRow>
         <FormRow>
-          <TextField name="email" label="Email" type="email" optional defaultValue={employee?.email ?? ""} />
+          <TextField name="email" label="Email" type="email" optional defaultValue={employee?.email ?? ""} hint="Saved here only — send their login from the employee page afterwards" />
           <TextField name="phone" label="Phone" type="tel" optional defaultValue={employee?.phone ?? ""} />
         </FormRow>
         <FormRow cols={3}>

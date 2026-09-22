@@ -21,6 +21,14 @@ export default async function EmployeeOverviewPage({ params }: { params: Promise
   const emg = (employee.emergency_contact ?? {}) as { name?: string; relationship?: string; phone?: string };
   return (
     <div className="space-y-6">
+      {!employee.user_id ? (
+        <p className="rounded-md bg-status-warning/10 px-4 py-3 text-sm">
+          <strong>{employee.first_name} can&rsquo;t log in yet.</strong>{" "}
+          {employee.email
+            ? <>Adding their email saved it to this record — it doesn&rsquo;t send anything. Use <em>Login and access</em> below to send the welcome email.</>
+            : <>Add an email address in <em>Login and access</em> below and send them a welcome email.</>}
+        </p>
+      ) : null}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Metric label="Hourly rate" value={employee.hourly_rate ? formatMoney(toPence(employee.hourly_rate)) : "—"} />
         <Metric label="Annual salary" value={employee.salary ? formatMoney(toPence(employee.salary), { showPence: false }) : "—"} />
