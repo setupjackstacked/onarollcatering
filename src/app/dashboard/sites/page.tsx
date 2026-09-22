@@ -15,10 +15,10 @@ export const metadata = { title: "Sites" };
 
 export default async function SitesPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const ctx = await requireOrgContext("/dashboard/sites");
-  if (!ctx.can("projects.read")) redirect("/dashboard");
+  if (!ctx.can("sites.read")) redirect("/dashboard");
   const sp = await searchParams;
   const [{ rows, total, page, size }, mmap] = await Promise.all([listSites(ctx, sp), memberMap(ctx)]);
-  const canCreate = ctx.can("sales.write") || ctx.can("projects.write");
+  const canCreate = ctx.can("sales.write") || ctx.can("sites.write");
   const kitchens = rows.filter((r) => r.site_type === "kitchen").length;
   const operating = rows.filter((r) => r.status === "operating").length;
 

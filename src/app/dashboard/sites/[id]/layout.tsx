@@ -13,12 +13,12 @@ import { SiteTabs } from "./tabs";
 export default async function SiteLayout({ children, params }: { children: React.ReactNode; params: Promise<{ id: string }> }) {
   const { id } = await params;
   const ctx = await requireOrgContext(`/dashboard/sites/${id}`);
-  if (!ctx.can("projects.read")) redirect("/dashboard");
+  if (!ctx.can("sites.read")) redirect("/dashboard");
   const [site, counts, mmap] = await Promise.all([getSite(ctx, id), siteCounts(ctx, id), memberMap(ctx)]);
   if (!site) notFound();
   const client = site.clients as unknown as { id: string; name: string } | null;
   const base = `/dashboard/sites/${id}`;
-  const canEdit = ctx.can("sales.write") || ctx.can("projects.write");
+  const canEdit = ctx.can("sales.write") || ctx.can("sites.write");
 
   return (
     <>
@@ -37,7 +37,7 @@ export default async function SiteLayout({ children, params }: { children: React
           {ctx.can("org.manage") ? <ConfirmAction action={archiveSiteRecord.bind(null, id)} label="Close site" title="Close this site?" description="It stops appearing in pickers and rotas. Timesheets, vouchers and documents are kept." confirmLabel="Close site" /> : null}
         </>}
       />
-      <SiteTabs base={base} counts={counts} />
+      <SiteTabs base={base} counts={counts} canTrade={ctx.can("trading.read")} />
       {children}
     </>
   );

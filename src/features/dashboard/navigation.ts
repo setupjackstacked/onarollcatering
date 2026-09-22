@@ -15,8 +15,9 @@ export type NavSection = { label?: string; items: NavItem[] };
 export const DASHBOARD_NAV: NavSection[] = [
   { items: [
     { label: "Overview", href: "/dashboard", icon: "home" },
-    { label: "Sites", href: "/dashboard/sites", icon: "sites", permission: "projects.read" },
-    { label: "Vouchers", href: "/dashboard/vouchers", icon: "vouchers", permission: "projects.read" },
+    { label: "Sites", href: "/dashboard/sites", icon: "sites", permission: "sites.read" },
+    { label: "Vouchers", href: "/dashboard/vouchers", icon: "vouchers", permission: "sites.read" },
+    { label: "Daily sales", href: "/dashboard/sales", icon: "payments", permission: "trading.read" },
     { label: "Messages", href: "/dashboard/messages", icon: "messages" },
   ] },
   {
@@ -72,7 +73,8 @@ export const DASHBOARD_NAV: NavSection[] = [
 /** Mobile bottom bar (spec §76). */
 export const MOBILE_NAV: { label: string; href: string; icon: NavItem["icon"]; permission?: Permission; phase?: number }[] = [
   { label: "Home", href: "/dashboard", icon: "home" },
-  { label: "Projects", href: "/dashboard/projects", icon: "projects", permission: "projects.read" },
-  { label: "Sales", href: "/dashboard/leads", icon: "leads", permission: "sales.read" },
+  { label: "Sites", href: "/dashboard/sites", icon: "sites", permission: "sites.read" },
+  { label: "Sales", href: "/dashboard/sales", icon: "payments", permission: "trading.read" },
   { label: "Staff", href: "/dashboard/employees", icon: "employees", permission: "workforce.read" },
+  { label: "Rota", href: "/dashboard/rota", icon: "rota", permission: "workforce.read" },
 ];

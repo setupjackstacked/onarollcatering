@@ -388,6 +388,89 @@ export type Database = {
           },
         ];
       };
+      daily_sales: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          site_id: string;
+          sale_date: string;
+          cash: string;
+          card: string;
+          account: string;
+          total: string | null;
+          transactions: number | null;
+          notes: string | null;
+          recorded_by: string | null;
+          confirmed_by: string | null;
+          confirmed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          site_id: string;
+          sale_date: string;
+          cash?: string;
+          card?: string;
+          account?: string;
+          total?: string | null;
+          transactions?: number | null;
+          notes?: string | null;
+          recorded_by?: string | null;
+          confirmed_by?: string | null;
+          confirmed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          site_id?: string;
+          sale_date?: string;
+          cash?: string;
+          card?: string;
+          account?: string;
+          total?: string | null;
+          transactions?: number | null;
+          notes?: string | null;
+          recorded_by?: string | null;
+          confirmed_by?: string | null;
+          confirmed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "daily_sales_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "daily_sales_site_id_fkey";
+            columns: ["site_id"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "daily_sales_recorded_by_fkey";
+            columns: ["recorded_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "daily_sales_confirmed_by_fkey";
+            columns: ["confirmed_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       document_categories: {
         Row: {
           id: string;
@@ -907,6 +990,7 @@ export type Database = {
           archived_at: string | null;
           created_at: string;
           updated_at: string;
+          site_id: string | null;
         };
         Insert: {
           id?: string;
@@ -931,6 +1015,7 @@ export type Database = {
           archived_at?: string | null;
           created_at?: string;
           updated_at?: string;
+          site_id?: string | null;
         };
         Update: {
           id?: string;
@@ -955,6 +1040,7 @@ export type Database = {
           archived_at?: string | null;
           created_at?: string;
           updated_at?: string;
+          site_id?: string | null;
         };
         Relationships: [
           {
@@ -997,6 +1083,13 @@ export type Database = {
             columns: ["supplier_id"];
             isOneToOne: false;
             referencedRelation: "suppliers";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "expenses_site_id_fkey";
+            columns: ["site_id"];
+            isOneToOne: false;
+            referencedRelation: "sites";
             referencedColumns: ["id"];
           },
         ];
@@ -2974,6 +3067,79 @@ export type Database = {
           },
         ];
       };
+      site_budgets: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          site_id: string;
+          month: string;
+          food_budget: string;
+          labour_budget: string;
+          other_budget: string;
+          revenue_target: string;
+          total_budget: string | null;
+          approved_by_client: boolean;
+          notes: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          site_id: string;
+          month: string;
+          food_budget?: string;
+          labour_budget?: string;
+          other_budget?: string;
+          revenue_target?: string;
+          total_budget?: string | null;
+          approved_by_client?: boolean;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          site_id?: string;
+          month?: string;
+          food_budget?: string;
+          labour_budget?: string;
+          other_budget?: string;
+          revenue_target?: string;
+          total_budget?: string | null;
+          approved_by_client?: boolean;
+          notes?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "site_budgets_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "site_budgets_site_id_fkey";
+            columns: ["site_id"];
+            isOneToOne: false;
+            referencedRelation: "sites";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "site_budgets_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       sites: {
         Row: {
           id: string;
@@ -3861,7 +4027,6 @@ export type Database = {
       };
       report_hours_by_site: { Args: { p_org: string; p_from: unknown; p_to: unknown }; Returns: unknown };
       report_absence: { Args: { p_org: string; p_from: unknown; p_to: unknown }; Returns: unknown };
-      generate_operations_alerts: { Args: { p_org: string }; Returns: number };
       seed_org_job_titles: { Args: { org: string }; Returns: undefined };
       employees_without_access: { Args: { p_org: string }; Returns: unknown };
       link_employee_account: {
@@ -3873,6 +4038,23 @@ export type Database = {
         };
         Returns: undefined;
       };
+      report_site_pl: { Args: { p_org: string; p_from: unknown; p_to: unknown }; Returns: unknown };
+      record_daily_sales: {
+        Args: {
+          p_site_id: string;
+          p_date: unknown;
+          p_cash?: unknown;
+          p_card?: unknown;
+          p_account?: unknown;
+          p_transactions?: unknown;
+          p_notes?: unknown;
+        };
+        Returns: string;
+      };
+      report_daily_sales: { Args: { p_site_id: string; p_from: unknown; p_to: unknown }; Returns: unknown };
+      confirm_daily_sales: { Args: { p_site_id: string; p_date: unknown }; Returns: undefined };
+      sites_missing_sales: { Args: { p_org: string; p_date?: unknown }; Returns: unknown };
+      generate_operations_alerts: { Args: { p_org: string }; Returns: number };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";

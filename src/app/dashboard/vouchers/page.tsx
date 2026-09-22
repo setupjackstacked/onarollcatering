@@ -15,7 +15,7 @@ export const metadata = { title: "Vouchers" };
 
 export default async function VouchersPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const ctx = await requireOrgContext("/dashboard/vouchers");
-  if (!ctx.can("projects.read") && !ctx.can("finance.read")) redirect("/dashboard");
+  if (!ctx.can("sites.read") && !ctx.can("finance.read")) redirect("/dashboard");
   const sp = await searchParams;
   const from = str(sp.from) || isoDateOffset(-30);
   const to = str(sp.to) || isoDateOffset(0);

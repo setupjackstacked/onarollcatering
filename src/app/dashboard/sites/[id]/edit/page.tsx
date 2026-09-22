@@ -9,7 +9,7 @@ import { SiteForm } from "@/components/dashboard/forms/site-form";
 export default async function EditSitePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const ctx = await requireOrgContext(`/dashboard/sites/${id}/edit`);
-  if (!ctx.can("sales.write") && !ctx.can("projects.write")) redirect(`/dashboard/sites/${id}`);
+  if (!ctx.can("sales.write") && !ctx.can("sites.write")) redirect(`/dashboard/sites/${id}`);
   const site = await getSite(ctx, id);
   if (!site) notFound();
   const [contacts, members] = await Promise.all([listContacts(ctx, site.client_id), listMembers(ctx)]);

@@ -7,7 +7,7 @@ export default async function SiteDocumentsPage({ params }: { params: Promise<{ 
   const { id } = await params;
   const ctx = await requireOrgContext();
   const [docs, categories] = await Promise.all([listEntityDocuments(ctx, "site", id), documentCategories(ctx, "site")]);
-  const canWrite = ctx.can("projects.write") || ctx.can("sales.write") || ctx.can("org.manage");
+  const canWrite = ctx.can("sites.write") || ctx.can("sales.write") || ctx.can("org.manage");
   return (
     <Panel title="Site documents">
       <p className="mb-4 text-sm text-muted-light">Contracts, risk assessments, method statements and induction paperwork for this site. Visible to everyone assigned here.</p>

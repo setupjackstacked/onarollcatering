@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireOrgContext } from "@/lib/auth/context";
 import { loadReports } from "@/features/reports/queries";
+import { siteProfitAndLoss } from "@/features/trading/queries";
 import { runAlerts } from "@/features/reports/actions";
 import { categoryLabel } from "@/features/expenses/schema";
 import { PageHeader, Panel, Metric, EmptyState } from "@/components/dashboard/primitives";
@@ -11,6 +12,7 @@ import { RevenueChart, ConversionChart, CategoryBarChart, StackedCostChart } fro
 import { QuoteBadge, StageBadge } from "@/lib/domain/badges";
 
 import { formatMoney, toPence } from "@/lib/money";
+import { isoDateOffset, formatDateUK } from "@/lib/dates";
 import { str } from "@/lib/pagination";
 import { cn } from "@/lib/utils/cn";
 
@@ -31,6 +33,13 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
   const sp = await searchParams;
   const months = Number(str(sp.months)) || 12;
   const days = months * 30;
+
+  // A site manager gets their own kitchens, not the sales pipeline. The finance
+  // panels below would be empty for them anyway — RLS sees to that — but a
+  // screen full of zeroed invoice figures reads as a broken report rather than
+  // as one that was never theirs.
+  if (!ctx.can("finance.read")) return <ManagerReports ctx={ctx} months={months} />;
+
   const data = await loadReports(ctx, { months, days });
 
   const revenue = data.revenue.map((r) => ({ label: monthLabel(r.month), invoiced: toPence(r.invoiced_net), received: toPence(r.received) }));
@@ -246,6 +255,68 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
             ) : <p className="text-sm text-muted-light">No absence recorded in this period.</p>}
           </Panel>
         </div>
+      )}
+    </>
+  );
+}
+
+/** The report a site manager actually needs: how their kitchens are trading. */
+async function ManagerReports({ ctx, months }: { ctx: Awaited<ReturnType<typeof requireOrgContext>>; months: number }) {
+  const from = isoDateOffset(-months * 30);
+  const to = isoDateOffset(0);
+  const pl = await siteProfitAndLoss(ctx, { from, to });
+  const revenue = pl.reduce((n, r) => n + toPence(r.revenue), 0);
+  const profit = pl.reduce((n, r) => n + toPence(r.gross_profit), 0);
+
+  return (
+    <>
+      <PageHeader eyebrow="Insight" title="Reports"
+        description={`How your kitchens have traded, ${formatDateUK(from)} to ${formatDateUK(to)}.`} />
+      <div className="mb-6 flex flex-wrap items-center gap-2 text-sm">
+        <span className="text-muted-light">Period</span>
+        {RANGES.map((r) => (
+          <Link key={r.value} href={`/dashboard/reports?months=${r.value}`}
+            className={cn("rounded-full px-3 py-1", String(months) === r.value ? "bg-obsidian text-ivory" : "border border-graphite/25")}>{r.label}</Link>
+        ))}
+      </div>
+
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3">
+        <Metric label="Food sales" value={formatMoney(revenue, { showPence: false })} />
+        <Metric label="Gross profit" value={formatMoney(profit, { showPence: false })} tone={profit < 0 ? "warning" : "default"} />
+        <Metric label="Margin" value={revenue > 0 ? `${Math.round((profit / revenue) * 1000) / 10}%` : "—"} />
+      </div>
+
+      {pl.length ? (
+        <div className="space-y-6">
+          <Panel title="Your kitchens">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="text-left text-xs uppercase tracking-wider text-muted-light">
+                  <tr><th className="py-2 pr-3 font-medium">Kitchen</th><th className="py-2 pr-3 text-right font-medium">Sales</th><th className="py-2 pr-3 text-right font-medium">Food</th><th className="py-2 pr-3 text-right font-medium">Labour</th><th className="py-2 pr-3 text-right font-medium">Gross profit</th><th className="py-2 text-right font-medium">Margin</th></tr>
+                </thead>
+                <tbody className="divide-y divide-graphite/10">
+                  {pl.map((r) => (
+                    <tr key={r.site_id}>
+                      <td className="py-2 pr-3"><Link href={`/dashboard/sites/${r.site_id}/sales`} className="underline">{r.site_name}</Link></td>
+                      <td className="py-2 pr-3 text-right num-lining">{formatMoney(toPence(r.revenue), { showPence: false })}</td>
+                      <td className="py-2 pr-3 text-right num-lining text-muted-light">{formatMoney(toPence(r.food_cost), { showPence: false })}</td>
+                      <td className="py-2 pr-3 text-right num-lining text-muted-light">{formatMoney(toPence(r.labour_cost), { showPence: false })}</td>
+                      <td className={cn("py-2 pr-3 text-right num-lining", toPence(r.gross_profit) < 0 && "text-status-danger")}>{formatMoney(toPence(r.gross_profit), { showPence: false })}</td>
+                      <td className="py-2 text-right num-lining">{r.margin_pct === null ? "—" : `${r.margin_pct}%`}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Panel>
+          <Panel title="Sales by kitchen">
+            <CategoryBarChart data={pl.map((r) => ({ label: r.site_name, value: toPence(r.revenue) }))} valueLabel="Food sales" />
+          </Panel>
+        </div>
+      ) : (
+        <EmptyState title="Nothing to report yet"
+          description="Record a day's takings and this fills in. Labour cost comes from approved timesheets."
+          action={{ label: "Record today's sales", href: "/dashboard/sales" }} />
       )}
     </>
   );
