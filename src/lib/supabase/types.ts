@@ -2372,6 +2372,130 @@ export type Database = {
           },
         ];
       };
+      payroll_recipients: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          name: string;
+          email: string;
+          role_note: string | null;
+          active: boolean;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          name: string;
+          email: string;
+          role_note?: string | null;
+          active?: boolean;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          name?: string;
+          email?: string;
+          role_note?: string | null;
+          active?: boolean;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "payroll_recipients_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payroll_recipients_created_by_fkey";
+            columns: ["created_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      payroll_sends: {
+        Row: {
+          id: string;
+          organisation_id: string;
+          pay_period_id: string;
+          recipients: string[];
+          storage_path: string | null;
+          file_name: string | null;
+          size_bytes: number | null;
+          employee_count: number;
+          total_hours: string;
+          total_gross: string;
+          unapproved_count: number;
+          note: string | null;
+          sent_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          organisation_id: string;
+          pay_period_id: string;
+          recipients: string[];
+          storage_path?: string | null;
+          file_name?: string | null;
+          size_bytes?: number | null;
+          employee_count?: number;
+          total_hours?: string;
+          total_gross?: string;
+          unapproved_count?: number;
+          note?: string | null;
+          sent_by?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          organisation_id?: string;
+          pay_period_id?: string;
+          recipients?: string[];
+          storage_path?: string | null;
+          file_name?: string | null;
+          size_bytes?: number | null;
+          employee_count?: number;
+          total_hours?: string;
+          total_gross?: string;
+          unapproved_count?: number;
+          note?: string | null;
+          sent_by?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "payroll_sends_organisation_id_fkey";
+            columns: ["organisation_id"];
+            isOneToOne: false;
+            referencedRelation: "organisations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payroll_sends_pay_period_id_fkey";
+            columns: ["pay_period_id"];
+            isOneToOne: false;
+            referencedRelation: "pay_periods";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "payroll_sends_sent_by_fkey";
+            columns: ["sent_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       profiles: {
         Row: {
           id: string;
@@ -4055,6 +4179,23 @@ export type Database = {
       confirm_daily_sales: { Args: { p_site_id: string; p_date: unknown }; Returns: undefined };
       sites_missing_sales: { Args: { p_org: string; p_date?: unknown }; Returns: unknown };
       generate_operations_alerts: { Args: { p_org: string }; Returns: number };
+      payroll_unapproved: { Args: { p_period_id: string }; Returns: unknown };
+      payroll_report: { Args: { p_period_id: string }; Returns: unknown };
+      record_payroll_send: {
+        Args: {
+          p_period_id: string;
+          p_recipients: string[];
+          p_storage_path: string;
+          p_file_name: string;
+          p_size_bytes: number;
+          p_employee_count: number;
+          p_total_hours: unknown;
+          p_total_gross: unknown;
+          p_unapproved?: unknown;
+          p_note?: unknown;
+        };
+        Returns: string;
+      };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";

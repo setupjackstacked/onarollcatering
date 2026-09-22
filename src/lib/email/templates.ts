@@ -156,6 +156,61 @@ If you didn't ask for this, ignore it — your password hasn't changed.`;
   return { subject: `Reset your ${site.name} password`, html, text };
 }
 
+/**
+ * The covering email for a payroll period. Written for someone outside the
+ * business: the figures they need are in the message itself, so a bureau can
+ * sanity-check the attachment against it before opening anything.
+ */
+export function payrollReportEmail(args: {
+  organisationName: string;
+  periodName: string;
+  from: string;
+  to: string;
+  payDate: string | null;
+  employees: number;
+  hours: number;
+  gross: number;
+  unapprovedSheets: number;
+  unapprovedHours: number;
+  note: string | null;
+  sentBy: string;
+}) {
+  const money = (n: number) => new Intl.NumberFormat("en-IE", { style: "currency", currency: "EUR" }).format(n);
+  const dates = `${args.from} to ${args.to}`;
+  const excluded = args.unapprovedSheets
+    ? `<p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:${brand.muted};">
+         <strong>${args.unapprovedSheets} timesheet(s)</strong> totalling ${args.unapprovedHours.toFixed(2)} hours fall inside
+         this period but were not approved at the time of sending, so they are not included in the figures above. They
+         will appear in a later period once approved. The same note appears on the report itself.</p>`
+    : "";
+  const note = args.note
+    ? `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;white-space:pre-wrap;">${escape(args.note)}</p>`
+    : "";
+
+  const html = layout(
+    `Payroll — ${args.periodName}`,
+    `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;">The payroll report for <strong>${escape(dates)}</strong> is attached as a PDF.</p>
+     ${note}
+     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
+       ${row("Period", args.periodName)}${row("Dates", dates)}${row("Pay date", args.payDate ?? "Not set")}
+       ${row("Employees", String(args.employees))}${row("Total hours", args.hours.toFixed(2))}${row("Total gross pay", money(args.gross))}
+     </table>
+     ${excluded}
+     <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:${brand.muted};">
+       Sent from the ${escape(args.organisationName)} dashboard${args.sentBy ? ` by ${escape(args.sentBy)}` : ""}.
+       Figures cover approved hours only. Reply to this email with any queries.</p>`,
+  );
+  const text = `Payroll report — ${args.periodName} (${dates})
+
+Employees: ${args.employees}
+Total hours: ${args.hours.toFixed(2)}
+Total gross pay: ${money(args.gross)}
+Pay date: ${args.payDate ?? "Not set"}
+${args.note ? `\n${args.note}\n` : ""}${args.unapprovedSheets ? `\n${args.unapprovedSheets} timesheet(s) totalling ${args.unapprovedHours.toFixed(2)} hours were not approved at the time of sending and are excluded.\n` : ""}
+The full report is attached as a PDF. Figures cover approved hours only.`;
+  return { subject: `Payroll — ${args.periodName} (${dates})`, html, text };
+}
+
 /** Sent by the email settings screen to prove Resend is wired up. */
 export function emailDiagnostic(args: { sentBy: string; from: string; siteUrl: string }) {
   const html = layout(

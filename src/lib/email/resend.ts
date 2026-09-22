@@ -13,7 +13,15 @@ function getClient() {
   return client;
 }
 
-export type Mail = { to: string | string[]; subject: string; html: string; text: string; replyTo?: string };
+export type MailAttachment = { filename: string; content: Buffer; contentType?: string };
+export type Mail = {
+  to: string | string[];
+  subject: string;
+  html: string;
+  text: string;
+  replyTo?: string;
+  attachments?: MailAttachment[];
+};
 
 /**
  * Sends an email via Resend. When RESEND_API_KEY is absent (local dev) the
@@ -36,6 +44,7 @@ export async function sendMail(mail: Mail): Promise<{ ok: boolean; id?: string }
     // somewhere else, so every message needs a reply-to a human actually
     // watches. A caller can override it; otherwise the account default wins.
     replyTo: mail.replyTo ?? EMAIL_REPLY_TO,
+    attachments: mail.attachments,
   });
   if (error) {
     logger.error("email.failed", { error: error.message, subject: mail.subject });

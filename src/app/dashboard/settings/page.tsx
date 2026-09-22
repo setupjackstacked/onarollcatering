@@ -29,6 +29,7 @@ export default async function SettingsPage() {
             {ctx.can("finance.read") || ctx.role === "administrator" ? <ActionLink href="/dashboard/settings/catalogue">Catalogue &amp; VAT</ActionLink> : null}
             {ctx.can("org.manage") ? <ActionLink href="/dashboard/settings/vouchers">Voucher categories</ActionLink> : null}
             {ctx.can("org.manage") ? <ActionLink href="/dashboard/settings/email">Email</ActionLink> : null}
+            {ctx.can("finance.write") ? <ActionLink href="/dashboard/settings/payroll">Payroll recipients</ActionLink> : null}
           </div>
         </Panel>
         <div className="space-y-6 lg:col-span-2">

@@ -9,6 +9,7 @@ import { Panel, Metric, StatusBadge } from "@/components/dashboard/primitives";
 import { ConfirmAction } from "@/components/dashboard/confirm";
 import { RedirectingAction } from "@/components/dashboard/redirecting-action";
 import { AdjustmentForm, PayPeriodForm } from "@/components/dashboard/forms/payroll-forms";
+import { SendPayrollForm } from "@/components/dashboard/forms/payroll-send-forms";
 import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
 
@@ -20,7 +21,15 @@ export default async function PayPeriodPage({ params }: { params: Promise<{ id: 
   if (!ctx.can("finance.read")) redirect("/dashboard");
   const period = await getPayPeriod(ctx, id);
   if (!period) notFound();
-  const [entries, totals, unbuilt, emap] = await Promise.all([listPayrollEntries(ctx, id), payPeriodTotals(ctx, id), unbuiltTimesheetCount(ctx, period), employeeMap(ctx)]);
+  const [entries, totals, unbuilt, emap, { data: unapprovedRows }, { data: recipients }, { data: sends }] = await Promise.all([
+    listPayrollEntries(ctx, id), payPeriodTotals(ctx, id), unbuiltTimesheetCount(ctx, period), employeeMap(ctx),
+    ctx.supabase.rpc("payroll_unapproved", { p_period_id: id }),
+    ctx.supabase.from("payroll_recipients").select("id, name, email, role_note").eq("organisation_id", ctx.organisation.id).eq("active", true).order("name"),
+    ctx.supabase.from("payroll_sends").select("id, recipients, created_at, employee_count, total_hours, total_gross, unapproved_count, note").eq("pay_period_id", id).order("created_at", { ascending: false }),
+  ]);
+  const unapproved = (unapprovedRows ?? []) as unknown as { employee_name: string; sheets: number; hours: string }[];
+  const unapprovedSheets = unapproved.reduce((a, u) => a + Number(u.sheets), 0);
+  const unapprovedHours = unapproved.reduce((a, u) => a + Number(u.hours), 0);
   const canWrite = ctx.can("finance.write");
   const locked = period.status === "finalised" || period.status === "exported";
   return (
@@ -93,13 +102,59 @@ export default async function PayPeriodPage({ params }: { params: Promise<{ id: 
           )}
         </Panel>
 
-        {period.status === "finalised" && canWrite ? (
-          <Panel title="Export">
-            <p className="mb-3 text-sm text-muted-light">Download the CSV and upload it to your payroll provider, then mark the period exported so it’s clear it has been sent.</p>
-            <div className="flex flex-wrap gap-2">
-              <ActionLink href={`/dashboard/payroll/${id}/export`} variant="copper">Download CSV</ActionLink>
-              <ConfirmAction action={markExported.bind(null, id)} label="Mark exported" title="Mark this period as exported?" variant="outline" confirmLabel="Mark exported" />
+        {entries.length && canWrite ? (
+          <Panel title="Send to payroll">
+            <p className="mb-4 text-sm text-muted-light">
+              A PDF of every employee&rsquo;s hours, rates and gross pay, grouped by site. Check it first — what you
+              download here is byte-for-byte what the recipient receives.
+            </p>
+            <div className="mb-5 flex flex-wrap gap-2">
+              <ActionLink href={`/dashboard/payroll/${id}/report`} variant="copper">Download PDF</ActionLink>
+              <ActionLink href={`/dashboard/payroll/${id}/export`}>Download CSV</ActionLink>
+              {period.status === "finalised" ? (
+                <ConfirmAction action={markExported.bind(null, id)} label="Mark exported" title="Mark this period as exported?" description="Use this if you sent it by some other route. Emailing it from here marks it automatically." variant="outline" confirmLabel="Mark exported" />
+              ) : null}
             </div>
+            <SendPayrollForm
+              periodId={id}
+              recipients={(recipients ?? []).map((r) => ({ id: r.id, name: r.name, email: r.email, role_note: r.role_note }))}
+              unapprovedSheets={unapprovedSheets}
+              unapprovedHours={unapprovedHours}
+            />
+          </Panel>
+        ) : null}
+
+        {unapproved.length && canWrite ? (
+          <Panel title={`Not included — ${unapprovedSheets} unapproved timesheet${unapprovedSheets === 1 ? "" : "s"}`}>
+            <p className="mb-3 text-sm text-muted-light">
+              These hours fall inside the period but nobody has approved them, so they are in no figure on this page.
+              Approve them and rebuild, or send without them — the report states the exclusion either way.
+            </p>
+            <ul className="divide-y divide-graphite/10 text-sm">
+              {unapproved.map((u, i) => (
+                <li key={i} className="flex items-center justify-between py-2">
+                  <span>{u.employee_name}</span>
+                  <span className="num-lining text-muted-light">{Number(u.hours).toFixed(2)} hrs · {u.sheets} sheet(s)</span>
+                </li>
+              ))}
+            </ul>
+          </Panel>
+        ) : null}
+
+        {sends?.length ? (
+          <Panel title="Already sent">
+            <ul className="divide-y divide-graphite/10 text-sm">
+              {sends.map((sd) => (
+                <li key={sd.id} className="py-3 first:pt-0 last:pb-0">
+                  <span className="block">{formatDateUK(sd.created_at, true)} — {sd.recipients.join(", ")}</span>
+                  <span className="block text-xs text-muted-light num-lining">
+                    {sd.employee_count} employees · {Number(sd.total_hours).toFixed(2)} hrs · {formatMoney(toPence(sd.total_gross))} gross
+                    {sd.unapproved_count ? ` · ${sd.unapproved_count} unapproved excluded` : ""}
+                  </span>
+                  {sd.note ? <span className="block text-xs text-muted-light">&ldquo;{sd.note}&rdquo;</span> : null}
+                </li>
+              ))}
+            </ul>
           </Panel>
         ) : null}
 
