@@ -12,6 +12,16 @@ export const listEmployeeRoles = cache(async (ctx: OrgContext) => {
   return data ?? [];
 });
 
+/** Who still can't log in, and why — no email address yet, or invited and not accepted. */
+export async function employeesWithoutAccess(ctx: OrgContext) {
+  const { data } = await ctx.supabase.rpc("employees_without_access", { p_org: ctx.organisation.id });
+  return (data ?? []) as unknown as {
+    employee_id: string; employee_number: string; full_name: string; role_key: string;
+    site_name: string | null; email: string | null; invited_at: string | null; invite_count: number;
+    state: "no_email" | "ready" | "invited" | "active";
+  }[];
+}
+
 /** Directory: safe for schedulers — no pay, address or notes. */
 export const listEmployeeOptions = cache(async (ctx: OrgContext) => {
   const { data } = await ctx.supabase.from("employee_directory").select("id, full_name, role_key, status").eq("organisation_id", ctx.organisation.id).is("archived_at", null).order("full_name").limit(500);

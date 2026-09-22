@@ -42,3 +42,29 @@ export const SECONDARY_ROLES: OrganisationRole[] = ["finance", "read_only"];
 
 export const roleLabel = (role: string) => ROLE_LABEL[role as OrganisationRole] ?? role;
 export const roleGroup = (role: string): RoleGroup => ROLE_GROUP[role as OrganisationRole] ?? "other";
+
+/**
+ * What system role a job title probably needs. This only pre-selects the
+ * dropdown when inviting someone — whoever sends the invitation decides, and
+ * anything not listed here defaults to Staff, which is the safe answer.
+ */
+const JOB_ROLE_SUGGESTION: Record<string, OrganisationRole> = {
+  "managing-director": "administrator",
+  "hr-finance-bp": "administrator",
+  administrator: "administrator",
+  "accounts-coordinator": "finance",
+  "foh-manager": "project_manager",
+  "foh-supervisor": "project_manager",
+  "catering-manager": "project_manager",
+  "catering-supervisor": "project_manager",
+  "project-manager": "project_manager",
+};
+
+export function suggestedRoleForJob(roleKey: string | null | undefined): OrganisationRole {
+  return (roleKey && JOB_ROLE_SUGGESTION[roleKey]) || "staff";
+}
+
+/** A site roster entry is either manager or staff; admins and managers manage. */
+export function siteRoleFor(role: OrganisationRole): "manager" | "staff" {
+  return role === "owner" || role === "administrator" || role === "project_manager" ? "manager" : "staff";
+}

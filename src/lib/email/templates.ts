@@ -95,6 +95,68 @@ export function enquiryCustomerConfirmation(e: Enquiry) {
   return { subject: `Your enquiry — ${e.projectName}`, html, text };
 }
 
+/**
+ * The welcome email an employee gets when an admin adds their address. The
+ * link is a one-time Supabase invite link: following it signs them in once and
+ * drops them on the "choose a password" screen.
+ */
+export function employeeWelcome(args: {
+  firstName: string;
+  actionLink: string;
+  roleLabel: string;
+  siteName?: string | null;
+  isStaff: boolean;
+  expiresHours?: number;
+}) {
+  const where = args.isStaff
+    ? `the staff portal on your phone — your shifts, your hours, holiday and sick leave, and the daily voucher count`
+    : `the On A Roll dashboard`;
+  const atSite = args.siteName ? ` at ${args.siteName}` : "";
+  const html = layout(
+    `Your ${site.name} login`,
+    `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;">Hello ${escape(args.firstName)},</p>
+     <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">An account has been set up for you on the On A Roll system. You'll use it for ${escape(where)}${escape(atSite)}.</p>
+     <p style="margin:0 0 24px;font-size:15px;line-height:1.6;">Choose a password to get started. The link below works once and expires in ${args.expiresHours ?? 24} hours.</p>
+     <p style="margin:0 0 24px;"><a href="${args.actionLink}" style="display:inline-block;background:${brand.copper};color:#ffffff;text-decoration:none;padding:14px 28px;font-size:15px;font-weight:600;">Set your password</a></p>
+     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
+       ${row("Your access level", args.roleLabel)}${row("Site", args.siteName ?? undefined)}
+     </table>
+     <p style="margin:24px 0 0;font-size:13px;line-height:1.6;color:${brand.muted};">If the button doesn't work, copy this address into your browser:<br /><span style="word-break:break-all;">${escape(args.actionLink)}</span></p>
+     <p style="margin:16px 0 0;font-size:13px;line-height:1.6;color:${brand.muted};">If you weren't expecting this, you can ignore it — nothing happens until you set a password.</p>`,
+  );
+  const text = `Hello ${args.firstName},
+
+An account has been set up for you on the On A Roll system. You'll use it for ${where}${atSite}.
+
+Set your password (the link works once and expires in ${args.expiresHours ?? 24} hours):
+${args.actionLink}
+
+Access level: ${args.roleLabel}${args.siteName ? `\nSite: ${args.siteName}` : ""}
+
+If you weren't expecting this, ignore it — nothing happens until you set a password.`;
+  return { subject: `Set up your ${site.name} login`, html, text };
+}
+
+/** Sent by the email settings screen to prove Resend is wired up. */
+export function emailDiagnostic(args: { sentBy: string; from: string; siteUrl: string }) {
+  const html = layout(
+    "Email is working",
+    `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;">This is a test message from the On A Roll dashboard. If you're reading it, Resend is configured correctly and the system can send welcome emails, invoices and alerts.</p>
+     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;">
+       ${row("Sent by", args.sentBy)}${row("From address", args.from)}${row("Application", args.siteUrl)}${row("Sent at", new Date().toISOString())}
+     </table>
+     <p style="margin:24px 0 0;font-size:13px;color:${brand.muted};">Check that this landed in the inbox rather than spam. If it went to spam, the sending domain still needs its DNS records verified.</p>`,
+  );
+  const text = `Email is working.
+
+This is a test message from the On A Roll dashboard. Resend is configured correctly.
+Sent by: ${args.sentBy}
+From: ${args.from}
+Application: ${args.siteUrl}
+Sent at: ${new Date().toISOString()}`;
+  return { subject: "On A Roll — email test", html, text };
+}
+
 export function contactInternalAlert(m: ContactMessage) {
   const html = layout(
     `Website message — ${m.name}`,

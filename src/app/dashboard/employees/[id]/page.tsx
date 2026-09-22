@@ -5,6 +5,8 @@ import { listMembers } from "@/features/shared/members";
 import { Panel, Metric } from "@/components/dashboard/primitives";
 import { DescriptionList } from "@/components/dashboard/entity";
 import { LinkAccountForm } from "@/components/dashboard/forms/workforce-forms";
+import { EmployeeInviteForm, ResendInviteForm } from "@/components/dashboard/forms/invite-forms";
+import { suggestedRoleForJob } from "@/lib/auth/roles";
 import { EMPLOYMENT_TYPES } from "@/features/workforce/schema";
 import { formatMoney, toPence } from "@/lib/money";
 import { formatDateUK } from "@/lib/dates";
@@ -43,10 +45,39 @@ export default async function EmployeeOverviewPage({ params }: { params: Promise
           </Panel>
           {employee.notes ? <Panel title="Notes"><p className="whitespace-pre-wrap text-sm">{employee.notes}</p></Panel> : null}
         </div>
-        <Panel title="Staff portal access">
-          <p className="mb-4 text-sm text-muted-light">Link this employee to a team member account so they can see their shifts and submit timesheets at /staff. Invite them from Settings first if they have no login.</p>
-          <LinkAccountForm id={id} current={employee.user_id} members={members.map((m) => ({ value: m.user_id, label: m.full_name ?? m.email ?? m.user_id }))} />
-        </Panel>
+        <div className="space-y-6">
+          <Panel title="Login and access">
+            {employee.user_id ? (
+              <>
+                <p className="mb-4 text-sm text-muted-light">
+                  {employee.first_name} has a login{employee.email ? ` (${employee.email})` : ""}
+                  {employee.invited_at ? `. Last emailed ${formatDateUK(employee.invited_at)}` : ""}.
+                </p>
+                <ResendInviteForm employeeId={id} />
+              </>
+            ) : (
+              <>
+                <p className="mb-4 text-sm text-muted-light">
+                  {employee.first_name} has no login yet. Add an email address and they&rsquo;ll be sent a welcome
+                  message with a link to set their own password — you never see or set it.
+                  {employee.invited_at ? ` Last emailed ${formatDateUK(employee.invited_at)}, not yet accepted.` : ""}
+                </p>
+                <EmployeeInviteForm
+                  employeeId={id}
+                  suggestedRole={suggestedRoleForJob(employee.role_key)}
+                  defaultEmail={employee.email}
+                  canGrantOwner={ctx.role === "owner"}
+                />
+              </>
+            )}
+          </Panel>
+          <Panel title="Link to an existing account">
+            <p className="mb-4 text-sm text-muted-light">
+              Only needed when someone was invited from Settings before their employee record existed.
+            </p>
+            <LinkAccountForm id={id} current={employee.user_id} members={members.map((m) => ({ value: m.user_id, label: m.full_name ?? m.email ?? m.user_id }))} />
+          </Panel>
+        </div>
       </div>
     </div>
   );

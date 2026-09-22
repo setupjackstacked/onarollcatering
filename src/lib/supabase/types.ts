@@ -596,6 +596,9 @@ export type Database = {
           created_at: string;
           updated_at: string;
           primary_site_id: string | null;
+          invited_at: string | null;
+          invited_by: string | null;
+          invite_count: number;
         };
         Insert: {
           id?: string;
@@ -621,6 +624,9 @@ export type Database = {
           created_at?: string;
           updated_at?: string;
           primary_site_id?: string | null;
+          invited_at?: string | null;
+          invited_by?: string | null;
+          invite_count?: number;
         };
         Update: {
           id?: string;
@@ -646,6 +652,9 @@ export type Database = {
           created_at?: string;
           updated_at?: string;
           primary_site_id?: string | null;
+          invited_at?: string | null;
+          invited_by?: string | null;
+          invite_count?: number;
         };
         Relationships: [
           {
@@ -674,6 +683,13 @@ export type Database = {
             columns: ["primary_site_id"];
             isOneToOne: false;
             referencedRelation: "sites";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "employees_invited_by_fkey";
+            columns: ["invited_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
             referencedColumns: ["id"];
           },
         ];
@@ -3779,6 +3795,7 @@ export type Database = {
         };
         Returns: number;
       };
+      record_employee_invite: { Args: { p_employee_id: string; p_email: string }; Returns: undefined };
       expire_documents: { Args: { p_org: string }; Returns: number };
       generate_alerts: { Args: { p_org: string }; Returns: number };
       finalise_payroll_period: { Args: { p_period_id: string }; Returns: undefined };
@@ -3845,6 +3862,17 @@ export type Database = {
       report_hours_by_site: { Args: { p_org: string; p_from: unknown; p_to: unknown }; Returns: unknown };
       report_absence: { Args: { p_org: string; p_from: unknown; p_to: unknown }; Returns: unknown };
       generate_operations_alerts: { Args: { p_org: string }; Returns: number };
+      seed_org_job_titles: { Args: { org: string }; Returns: undefined };
+      employees_without_access: { Args: { p_org: string }; Returns: unknown };
+      link_employee_account: {
+        Args: {
+          p_employee_id: string;
+          p_user_id: string;
+          p_role?: Database["public"]["Enums"]["organisation_role"];
+          p_site_role?: Database["public"]["Enums"]["site_role"];
+        };
+        Returns: undefined;
+      };
     };
     Enums: {
       organisation_role: "owner" | "administrator" | "finance" | "project_manager" | "staff" | "read_only";
