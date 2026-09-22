@@ -137,6 +137,25 @@ If you weren't expecting this, ignore it — nothing happens until you set a pas
   return { subject: `Set up your ${site.name} login`, html, text };
 }
 
+/** Someone asked to reset their own password from the login screen. */
+export function passwordReset(args: { actionLink: string; email: string; expiresHours?: number }) {
+  const html = layout(
+    "Reset your password",
+    `<p style="margin:0 0 16px;font-size:15px;line-height:1.6;">A password reset was requested for <strong>${escape(args.email)}</strong>.</p>
+     <p style="margin:0 0 24px;font-size:15px;line-height:1.6;">Choose a new one below. The link works once and expires in ${args.expiresHours ?? 1} hour${(args.expiresHours ?? 1) === 1 ? "" : "s"}.</p>
+     <p style="margin:0 0 24px;"><a href="${args.actionLink}" style="display:inline-block;background:${brand.copper};color:#ffffff;text-decoration:none;padding:14px 28px;font-size:15px;font-weight:600;">Choose a new password</a></p>
+     <p style="margin:0 0 0;font-size:13px;line-height:1.6;color:${brand.muted};">If the button doesn't work, copy this address into your browser:<br /><span style="word-break:break-all;">${escape(args.actionLink)}</span></p>
+     <p style="margin:16px 0 0;font-size:13px;line-height:1.6;color:${brand.muted};">If you didn't ask for this, ignore it — your password hasn't changed and nobody has been given access.</p>`,
+  );
+  const text = `A password reset was requested for ${args.email}.
+
+Choose a new password (the link works once and expires shortly):
+${args.actionLink}
+
+If you didn't ask for this, ignore it — your password hasn't changed.`;
+  return { subject: `Reset your ${site.name} password`, html, text };
+}
+
 /** Sent by the email settings screen to prove Resend is wired up. */
 export function emailDiagnostic(args: { sentBy: string; from: string; siteUrl: string }) {
   const html = layout(

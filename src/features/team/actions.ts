@@ -5,7 +5,11 @@ import { z } from "zod";
 import { requirePermission } from "@/lib/auth/context";
 import { parseForm, type FormState } from "@/lib/forms";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { publicEnv } from "@/lib/env";
+import { mintAuthLink } from "@/lib/auth/links";
+import { sendMail } from "@/lib/email/resend";
+import { employeeWelcome } from "@/lib/email/templates";
+import { roleLabel } from "@/lib/auth/roles";
+import { serverEnv } from "@/lib/env";
 import { logger } from "@/lib/logger";
 
 const ROLES = ["owner", "administrator", "finance", "project_manager", "staff", "read_only"] as const;
@@ -27,27 +31,36 @@ export async function inviteMember(_: FormState, formData: FormData): Promise<Fo
   if (!p.ok) return p.state;
   if (p.data.role === "owner" && ctx.role !== "owner") return { error: "Only an owner can add another owner." };
 
-  const admin = createSupabaseAdminClient();
-  let userId: string | null = null;
-
-  const invite = await admin.auth.admin.inviteUserByEmail(p.data.email, {
-    data: { full_name: p.data.full_name || undefined },
-    redirectTo: `${publicEnv.NEXT_PUBLIC_SITE_URL}/dashboard/auth/callback?next=/dashboard/reset-password`,
-  });
-  if (invite.data.user) {
-    userId = invite.data.user.id;
-  } else if (invite.error && /already|exists|registered/i.test(invite.error.message)) {
-    // Existing account — look it up and just add the membership.
-    const { data: list } = await admin.auth.admin.listUsers({ perPage: 1000 });
-    userId = list?.users.find((u) => u.email?.toLowerCase() === p.data.email.toLowerCase())?.id ?? null;
-    if (!userId) return { error: "That email already has an account but couldn’t be found. Try again." };
-  } else {
-    logger.error("team.invite_failed", { reason: invite.error?.message });
-    return { error: "Couldn’t send the invitation. Check the email address and try again." };
+  const { RESEND_API_KEY } = serverEnv();
+  if (!RESEND_API_KEY) {
+    return { error: "Email isn’t configured yet, so the invitation can’t be sent. Set it up in Settings → Email first." };
   }
 
+  // Mint the link ourselves and send our own email. Supabase will happily send
+  // its default "You've been invited" template from a supabase.co address, and
+  // that is not what someone joining this business should receive.
+  let minted = await mintAuthLink("invite", p.data.email);
+  if (!minted) minted = await mintAuthLink("recovery", p.data.email);
+  if (!minted) {
+    logger.error("team.invite_failed", { email: p.data.email });
+    return { error: "Couldn’t create the login. Check the email address and try again." };
+  }
+  const userId: string = minted.userId;
+
+  const mail = employeeWelcome({
+    firstName: (p.data.full_name || p.data.email).split(" ")[0] ?? p.data.email,
+    actionLink: minted.url,
+    roleLabel: roleLabel(p.data.role),
+    isStaff: p.data.role === "staff",
+  });
+  const sent = await sendMail({ to: p.data.email, ...mail });
+  if (!sent.ok) return { error: "The login was created but the email didn’t send. Check Settings → Email." };
+
   // Ensure profile name (trigger creates the row; name may be missing for existing users)
-  if (p.data.full_name) await admin.from("profiles").update({ full_name: p.data.full_name }).eq("id", userId).is("full_name", null);
+  if (p.data.full_name) {
+    const admin = createSupabaseAdminClient();
+    await admin.from("profiles").update({ full_name: p.data.full_name }).eq("id", userId).is("full_name", null);
+  }
 
   const { error } = await ctx.supabase.from("organisation_members").insert({
     organisation_id: ctx.organisation.id,

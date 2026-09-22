@@ -4,7 +4,10 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { loginSchema, forgotPasswordSchema, resetPasswordSchema, safeNext } from "@/lib/validation/auth";
-import { publicEnv, isSupabaseConfigured } from "@/lib/env";
+import { isSupabaseConfigured } from "@/lib/env";
+import { mintAuthLink } from "@/lib/auth/links";
+import { sendMail } from "@/lib/email/resend";
+import { passwordReset } from "@/lib/email/templates";
 import { logger } from "@/lib/logger";
 import { rateLimit } from "@/lib/rate-limit";
 
@@ -58,12 +61,16 @@ export async function requestPasswordReset(_prev: AuthFormState, formData: FormD
   if (!rateLimit(`reset:${await ip()}`, 5, 60 * 60 * 1000)) {
     return { error: "Too many requests. Please try again later." };
   }
-  const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo: `${publicEnv.NEXT_PUBLIC_SITE_URL}/dashboard/auth/callback?next=/dashboard/reset-password`,
-  });
-  if (error) logger.warn("auth.reset_request_failed", { reason: error.message });
-  // Always the same response — never reveal whether an account exists.
+  // Our own email, not Supabase's default template: the recipient sees the
+  // business, and every link points at onarollcatering.com. mintAuthLink
+  // returns null for an address with no account, and we say nothing either
+  // way — the response below must never reveal whether an account exists.
+  const minted = await mintAuthLink("recovery", parsed.data.email);
+  if (minted) {
+    const mail = passwordReset({ actionLink: minted.url, email: parsed.data.email });
+    const sent = await sendMail({ to: parsed.data.email, ...mail });
+    if (!sent.ok) logger.warn("auth.reset_email_failed", { reason: "send failed" });
+  }
   return { success: "If that email has an account, a reset link is on its way." };
 }
 

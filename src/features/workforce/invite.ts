@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requirePermission } from "@/lib/auth/context";
 import { parseForm, type FormState } from "@/lib/forms";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { mintAuthLink } from "@/lib/auth/links";
 import { publicEnv, serverEnv } from "@/lib/env";
 import { sendMail } from "@/lib/email/resend";
 import { employeeWelcome, emailDiagnostic } from "@/lib/email/templates";
@@ -18,8 +18,6 @@ const inviteSchema = z.object({
   email: z.string().trim().toLowerCase().email("Enter a valid email address").max(254),
   role: z.enum(ROLES),
 });
-
-const REDIRECT = `${publicEnv.NEXT_PUBLIC_SITE_URL}/dashboard/auth/callback?next=/dashboard/reset-password`;
 
 /**
  * Give an employee a login and email them a welcome message.
@@ -59,30 +57,16 @@ export async function inviteEmployee(employeeId: string, _: FormState, formData:
     return { error: "Email isn’t configured yet, so the welcome message can’t be sent. Set it up in Settings → Email first." };
   }
 
-  const admin = createSupabaseAdminClient();
-
-  // Mint the account and the one-time link in a single call. generateLink
-  // creates the user for type 'invite' but sends nothing itself.
-  let actionLink: string | null = null;
-  let userId: string | null = null;
-  const invite = await admin.auth.admin.generateLink({ type: "invite", email, options: { redirectTo: REDIRECT } });
-  if (invite.data?.properties?.action_link && invite.data.user) {
-    actionLink = invite.data.properties.action_link;
-    userId = invite.data.user.id;
-  } else if (invite.error && /already|exists|registered/i.test(invite.error.message)) {
-    // They already have an account from somewhere else — send a password link
-    // instead of failing, and link the existing user to this employee record.
-    const recovery = await admin.auth.admin.generateLink({ type: "recovery", email, options: { redirectTo: REDIRECT } });
-    if (!recovery.data?.properties?.action_link || !recovery.data.user) {
-      logger.error("employee.invite_link_failed", { reason: recovery.error?.message });
-      return { error: "That address already has an account, but a password link couldn’t be created. Try again." };
-    }
-    actionLink = recovery.data.properties.action_link;
-    userId = recovery.data.user.id;
-  } else {
-    logger.error("employee.invite_link_failed", { reason: invite.error?.message });
+  // generateLink creates the account for type 'invite' but sends nothing, so
+  // the email below is ours. If the address already has an account from
+  // somewhere else, send a password link instead of failing.
+  let minted = await mintAuthLink("invite", email);
+  if (!minted) minted = await mintAuthLink("recovery", email);
+  if (!minted) {
+    logger.error("employee.invite_link_failed", { employeeId });
     return { error: "Couldn’t create the login. Check the email address and try again." };
   }
+  const { url: actionLink, userId } = minted;
 
   const siteName = (employee.sites as unknown as { name: string } | null)?.name ?? null;
   const mail = employeeWelcome({
@@ -138,17 +122,15 @@ export async function resendEmployeeInvite(employeeId: string): Promise<FormStat
     .maybeSingle();
   const role = (membership?.role ?? "staff") as OrganisationRole;
 
-  const admin = createSupabaseAdminClient();
-  const type = employee.user_id ? "recovery" : "invite";
-  const link = await admin.auth.admin.generateLink({ type, email: employee.email, options: { redirectTo: REDIRECT } });
-  if (!link.data?.properties?.action_link) {
-    logger.error("employee.resend_failed", { reason: link.error?.message });
+  const minted = await mintAuthLink(employee.user_id ? "recovery" : "invite", employee.email);
+  if (!minted) {
+    logger.error("employee.resend_failed", { employeeId });
     return { error: "Couldn’t create a new link. Try again." };
   }
 
   const mail = employeeWelcome({
     firstName: employee.first_name,
-    actionLink: link.data.properties.action_link,
+    actionLink: minted.url,
     roleLabel: roleLabel(role),
     siteName: (employee.sites as unknown as { name: string } | null)?.name ?? null,
     isStaff: role === "staff",
