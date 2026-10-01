@@ -6,10 +6,15 @@ import type { GalleryImage } from "@/content/gallery";
 /**
  * A wall of the company's own work.
  *
- * A plain masonry-ish grid rather than the layered, overlapping treatment used
- * on project pages: these are phone photographs of real service, and clever
- * cropping makes them look like they are hiding something. Shown square and
- * level, they read as evidence.
+ * Every tile is the same square. Mixed tile heights read as a design idea when
+ * the photographs are art-directed and as a mistake when they are not — and
+ * these are phone photographs, shot in portrait, landscape and square. A strict
+ * grid also survives the jump to a phone, where a two-column run of ragged
+ * heights turns into a staircase.
+ *
+ * The cost is cropping: a square centre-crop of a tall photograph loses its top
+ * and bottom. For plated food, counters and kitchen lines the subject sits in
+ * the middle, so the trade is worth it.
  *
  * Every tile is its own reveal, staggered down the grid, and the stagger is
  * capped — by the twelfth tile a visitor is waiting, not being delighted.
@@ -51,25 +56,20 @@ export function WorkGallery({
           </Reveal>
         ) : null}
 
-        <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4 md:gap-5">
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
           {images.map((image, i) => (
             <Reveal
               as="li"
               variant="image"
               key={image.src}
               delay={Math.min(i, 11) * 60}
-              className={cn(
-                "relative overflow-hidden bg-graphite/5",
-                // Every fifth tile runs tall, so the grid has a rhythm without
-                // any single photograph being cropped beyond recognition.
-                i % 5 === 0 ? "aspect-[4/5] md:row-span-2 md:aspect-[4/5]" : "aspect-square",
-              )}
+              className="relative aspect-square overflow-hidden bg-graphite/5"
             >
               <Image
                 src={image.src}
                 alt={image.alt}
                 fill
-                sizes="(min-width: 768px) 25vw, 50vw"
+                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"
                 className="object-cover transition-transform duration-700 hover:scale-[1.04]"
               />
             </Reveal>

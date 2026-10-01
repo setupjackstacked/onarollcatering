@@ -31,7 +31,15 @@ export const workGallery: GalleryImage[] = [
   { src: img("plated-salmon.jpg"), alt: "Salmon fillet with fennel and citrus" },
   { src: img("dessert-tartlets.jpg"), alt: "Dessert tartlets with cream and berries" },
   { src: img("plated-beef-sirloin.jpg"), alt: "Sirloin of beef with seasonal garnish" },
+  { src: img("grazing-platter-seasonal.jpg"), alt: "Seasonal grazing platter with fruit, cheese and cured meats" },
+  { src: img("pork-belly-bowl.jpg"), alt: "Pork belly with noodles, beansprouts and egg" },
+  { src: img("cakes-and-tarts.jpg"), alt: "Cakes and fruit tarts prepared for the counter" },
+  { src: img("dessert-sharing-box.jpg"), alt: "Dessert sharing box with chocolate roulade and pastries" },
 ];
 
-/** A shorter set for the homepage, where the gallery is a taste rather than the point. */
-export const homeGallery: GalleryImage[] = workGallery.slice(0, 8);
+/**
+ * A shorter set for the homepage, where the gallery is a taste rather than the
+ * point. Both counts divide by 2, 3 and 4 so the grid never ends on a ragged
+ * half-row at any breakpoint.
+ */
+export const homeGallery: GalleryImage[] = workGallery.slice(0, 12);
