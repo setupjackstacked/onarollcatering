@@ -1,28 +1,59 @@
 /**
- * Placeholder photography — Unsplash (Unsplash License: free for commercial use,
- * no attribution required, hotlinked via images.unsplash.com and optimised by next/image).
- * These are stand-ins so the client can review the site with real-looking imagery.
- * Replace with the company's own photography before launch (docs/CONTENT-TODO.md).
+ * On A Roll Catering's own photography.
+ *
+ * These are the business's real kitchens, servery counters and food — not stock.
+ * Files live in `public/images/` and are served through next/image, so changing
+ * a photograph means replacing the file or re-pointing a key here; no component
+ * changes are needed.
+ *
+ * The export is still called `stock` so that every page importing it kept
+ * working when the placeholders were replaced. The name is a leftover, not a
+ * description.
+ *
+ * Replacing one: drop the new file in `public/images/`, point the key at it.
+ * Keep images under about 2000px on the long edge and run them through an
+ * optimiser first — next/image resizes but does not re-compress the original.
  */
-const u = (id: string, w = 2000) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
+const img = (file: string) => `/images/${file}`;
 
 export const stock = {
-  hero: u("photo-1589109807644-924edf14ee09", 2400), // clean stainless commercial kitchen, bright
-  capability: u("photo-1769955821416-9273532bb148"), // chef at pass, dramatic light
-  commercialCatering: u("photo-1788230548191-9e1ba2942569"), // stainless serving line
-  kitchenDesign: u("photo-1708915965975-2a950db0e215"), // commercial range + prep
-  modularKitchens: u("photo-1583939425168-adc7e05386a4"), // site cabin on construction site
-  kitchenFitOut: u("photo-1785306589604-1c6ebaee741f"), // ductwork / extraction
-  cateringStaffing: u("photo-1666479258732-5ea17469b610"), // chef working in stainless kitchen
-  bespokeProjects: u("photo-1696324535687-6bb987f50e96"), // shipping container
-  projectConstruction: u("photo-1589624613207-a967e5c76bc6"), // site cabins on compound
-  projectCorporate: u("photo-1627931085762-4017812f1773"), // stainless kitchen with extraction
-  projectIndustrial: u("photo-1520209268518-aec60b8bb5ca"), // canteen in use
-  about: u("photo-1604414499020-f9ac575bc5ec"), // stainless pots, chrome
-  galleryServing: u("photo-1623475173140-ad2f0369ca92"), // chafing dishes
-  galleryWarehouse: u("photo-1772305336606-989a457ffbae"), // industrial warehouse interior
-  galleryFridge: u("photo-1782750161991-23529c9462bb"), // commercial refrigerator
-  galleryConstruction: u("photo-1694521787162-5373b598945c"), // construction site from above
-  team: u("photo-1666479258732-5ea17469b610"), // catering team at work — PLACEHOLDER
-  og: u("photo-1589109807644-924edf14ee09", 1200),
+  /** Wide shot of a finished dining room and branded servery. Carries the brand and the scale. */
+  hero: img("dining-and-servery.jpg"),
+  /** Chefs working a live service — people, not empty rooms. */
+  capability: img("kitchen-in-service.jpg"),
+
+  // Services
+  commercialCatering: img("servery-counter-daylight.jpg"),
+  kitchenDesign: img("kitchen-ranges-complete.jpg"),
+  modularKitchens: img("modular-kitchen-exterior.jpg"),
+  kitchenFitOut: img("combi-oven-bank.jpg"),
+  cateringStaffing: img("kitchen-team-at-work.jpg"),
+  bespokeProjects: img("modular-kitchen-interior.jpg"),
+
+  // Project / case-study covers
+  projectConstruction: img("fit-out-structure.jpg"),
+  projectCorporate: img("servery-counter-branded.jpg"),
+  projectIndustrial: img("servery-in-service.jpg"),
+
+  about: img("chef-at-the-pass.jpg"),
+
+  // Gallery
+  galleryServing: img("sharing-platter.jpg"),
+  galleryWarehouse: img("kitchen-line-extraction.jpg"),
+  galleryFridge: img("cold-room.jpg"),
+  galleryConstruction: img("fit-out-in-progress.jpg"),
+
+  team: img("kitchen-team-at-work.jpg"),
+  og: img("dining-and-servery.jpg"),
+} as const;
+
+/**
+ * Photographs supplied but not yet placed. Kept because they are the strongest
+ * material for real case studies once those are written — a finished plate and
+ * a servery being installed say more about the business than another empty room.
+ */
+export const unplaced = {
+  platedTerrine: img("plated-terrine.jpg"),
+  stainlessStorage: img("stainless-storage.jpg"),
+  serveryInstallation: img("servery-installation.jpg"),
 } as const;
