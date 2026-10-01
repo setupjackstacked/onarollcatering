@@ -7,9 +7,11 @@ import { ProjectFeature } from "@/components/marketing/project-feature";
 import { StatStrip } from "@/components/marketing/stat-strip";
 import { LogoStrip } from "@/components/marketing/logo-strip";
 import { QuoteCTA } from "@/components/marketing/quote-cta";
+import { WorkGallery } from "@/components/marketing/work-gallery";
 import { SectionIntro } from "@/components/marketing/section-intro";
 import { LinkButton } from "@/components/ui/button";
 import { capability, closingCta } from "@/content/homepage";
+import { homeGallery } from "@/content/gallery";
 import { projects } from "@/content/projects";
 import { site } from "@/content/site";
 
@@ -35,6 +37,13 @@ export default function HomePage() {
         tone="light"
       />
       <ServiceShowcase />
+      <WorkGallery
+        images={homeGallery}
+        eyebrow="On the ground"
+        heading="What we actually serve"
+        lead="Photographs from the kitchens we run — the food, the counters and the facilities behind them. Nothing here is a stock image."
+        tone="stone"
+      />
       <ProcessTimeline />
       <StatStrip />
       <section className="surface-stone">

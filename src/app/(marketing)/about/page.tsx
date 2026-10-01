@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { PageHero } from "@/components/marketing/page-hero";
 import { QuoteCTA } from "@/components/marketing/quote-cta";
+import { WorkGallery } from "@/components/marketing/work-gallery";
 import { SectionIntro } from "@/components/marketing/section-intro";
 import { Reveal } from "@/components/motion/reveal";
 import { about } from "@/content/about";
+import { workGallery } from "@/content/gallery";
 
 export const metadata: Metadata = {
   title: "About",
@@ -104,6 +106,13 @@ export default function AboutPage() {
         </section>
       ) : null}
 
+      <WorkGallery
+        images={workGallery}
+        eyebrow="Our work"
+        heading="Kitchens, counters and what comes out of them"
+        lead="Every photograph here is our own, taken in the facilities we built and the services we run."
+        tone="light"
+      />
       <QuoteCTA heading="Talk to us about your next facility" body="Whether it's a site kitchen for next month or a long-term contract, start with a conversation." cta={{ label: "Discuss Your Project", href: "/quote" }} secondary={{ label: "Contact", href: "/contact" }} />
     </>
   );

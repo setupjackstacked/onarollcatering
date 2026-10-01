@@ -53,6 +53,22 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB" className={`${display.variable} ${sans.variable}`}>
+      <head>
+        {/*
+          Scroll reveals hide their content until JavaScript says otherwise. If
+          that script never runs — no JS, a hydration failure, an observer that
+          misses — the content stays invisible and the page reads as acres of
+          empty space. So the hidden state is applied here, synchronously,
+          before paint, and only when we know we can undo it. No script, no
+          hiding: the page simply renders.
+        */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(typeof IntersectionObserver==='function'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('motion-ready')}}catch(e){}",
+          }}
+        />
+      </head>
       <body className="min-h-dvh antialiased">{children}</body>
     </html>
   );
