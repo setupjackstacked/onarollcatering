@@ -28,7 +28,6 @@ export default async function LogHoursPage({ searchParams }: { searchParams: Pro
           work_date: shift?.shift_date ?? isoDateOffset(0),
           start: shift ? hhmm(shift.start_time) : undefined,
           end: shift ? hhmm(shift.end_time) : undefined,
-          breakMinutes: shift?.break_minutes,
           project_id: shift?.project_id ?? undefined,
           site_id: shift?.site_id ?? undefined,
           shift_id: shift?.id,

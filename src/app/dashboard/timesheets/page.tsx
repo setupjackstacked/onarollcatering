@@ -34,8 +34,8 @@ export default async function TimesheetsPage({ searchParams }: { searchParams: P
           { key: "d", header: "Date", render: (r) => formatDateUK(r.work_date) },
           { key: "e", header: "Employee", render: (r) => emap.get(r.employee_id)?.full_name ?? "—" },
           { key: "p", header: "Project", render: (r) => (r.projects as unknown as { name: string } | null)?.name ?? <span className="text-muted-light">—</span> },
-          { key: "t", header: "Times", render: (r) => <span className="num-lining">{hhmm(r.start_time)}–{hhmm(r.end_time)}{r.break_minutes ? <span className="text-muted-light"> · {r.break_minutes}m break</span> : null}</span> },
-          { key: "h", header: "Hours", align: "right", render: (r) => <span className="num-lining">{Number(r.hours).toFixed(2)}{Number(r.overtime_hours) > 0 ? <span className="text-copper-dark"> +{Number(r.overtime_hours).toFixed(2)} OT</span> : null}</span> },
+          { key: "t", header: "Times", render: (r) => <span className="num-lining">{hhmm(r.start_time)}–{hhmm(r.end_time)}</span> },
+          { key: "h", header: "Hours", align: "right", render: (r) => <span className="num-lining">{Number(r.hours).toFixed(2)}</span> },
           { key: "c", header: "Cost", align: "right", render: (r) => (ctx.can("finance.read") && r.hourly_rate ? formatMoney(Math.round((Number(r.hours) + Number(r.overtime_hours)) * toPence(r.hourly_rate))) : "—") },
           { key: "s", header: "Status", render: (r) => <TimesheetBadge status={r.status} /> },
         ]}

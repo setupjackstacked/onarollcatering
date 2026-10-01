@@ -77,7 +77,7 @@ export async function saveShift(id: string | null, _: FormState, formData: FormD
   const p = parseForm(shiftSchema, formData);
   if (!p.ok) return p.state;
   const d = p.data;
-  const row = { employee_id: d.employee_id, project_id: nullable(d.project_id), site_id: nullable(d.site_id), shift_date: d.shift_date, start_time: d.start_time, end_time: d.end_time, break_minutes: d.break_minutes, role_key: nullable(d.role_key), status: d.status, notes: nullable(d.notes) };
+  const row = { employee_id: d.employee_id, project_id: nullable(d.project_id), site_id: nullable(d.site_id), shift_date: d.shift_date, start_time: d.start_time, end_time: d.end_time, role_key: nullable(d.role_key), status: d.status, notes: nullable(d.notes) };
   const r = id
     ? await ctx.supabase.from("shifts").update(row).eq("id", id)
     : await ctx.supabase.from("shifts").insert({ ...row, organisation_id: ctx.organisation.id, created_by: ctx.user.id });
@@ -114,7 +114,7 @@ export async function saveTimesheet(id: string | null, _: FormState, formData: F
   const p = parseForm(timesheetSchema, formData);
   if (!p.ok) return p.state;
   const d = p.data;
-  const row = { employee_id: d.employee_id, project_id: nullable(d.project_id), site_id: nullable(d.site_id), work_date: d.work_date, start_time: d.start_time, end_time: d.end_time, break_minutes: d.break_minutes, overtime_hours: d.overtime_hours.toFixed(2), notes: nullable(d.notes) };
+  const row = { employee_id: d.employee_id, project_id: nullable(d.project_id), site_id: nullable(d.site_id), work_date: d.work_date, start_time: d.start_time, end_time: d.end_time, notes: nullable(d.notes) };
   const r = id
     ? await ctx.supabase.from("timesheets").update(row).eq("id", id)
     : await ctx.supabase.from("timesheets").insert({ ...row, organisation_id: ctx.organisation.id, created_by: ctx.user.id });

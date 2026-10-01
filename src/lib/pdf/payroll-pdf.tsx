@@ -145,7 +145,7 @@ export async function renderPayrollReport(args: {
           </View>
           <View>
             <Text style={s.bandLabel}>Total hours</Text>
-            <Text style={s.bandValue}>{(totals.standard + totals.overtime).toFixed(2)}</Text>
+            <Text style={s.bandValue}>{totals.standard.toFixed(2)}</Text>
           </View>
           <View>
             <Text style={s.bandLabel}>Gross pay</Text>
@@ -181,12 +181,9 @@ export async function renderPayrollReport(args: {
                 <Text style={[s.thText, s.cName]}>Employee</Text>
                 <Text style={[s.thText, s.cNum]}>Number</Text>
                 <Text style={[s.thText, s.cRight]}>Sheets</Text>
-                <Text style={[s.thText, s.cRight]}>Std hrs</Text>
-                <Text style={[s.thText, s.cRight]}>OT hrs</Text>
+                <Text style={[s.thText, s.cRight]}>Hours</Text>
                 <Text style={[s.thText, s.cRight]}>Rate</Text>
-                <Text style={[s.thText, s.cRight]}>OT rate</Text>
                 <Text style={[s.thText, s.cRightWide]}>Base pay</Text>
-                <Text style={[s.thText, s.cRightWide]}>OT pay</Text>
                 <Text style={[s.thText, s.cRightWide]}>Adjust.</Text>
                 <Text style={[s.thText, s.cRightWide]}>Gross</Text>
                 <Text style={[s.thText, s.cRightWide]}>Expenses</Text>
@@ -197,11 +194,8 @@ export async function renderPayrollReport(args: {
                   <Text style={[s.cNum, s.muted]}>{r.employee_number}</Text>
                   <Text style={s.cRight}>{r.timesheet_count}</Text>
                   <Text style={s.cRight}>{hrs(r.standard_hours)}</Text>
-                  <Text style={s.cRight}>{hrs(r.overtime_hours)}</Text>
                   <Text style={s.cRight}>{eur(r.hourly_rate)}</Text>
-                  <Text style={s.cRight}>{eur(r.overtime_rate)}</Text>
                   <Text style={s.cRightWide}>{eur(r.base_pay)}</Text>
-                  <Text style={s.cRightWide}>{eur(r.overtime_pay)}</Text>
                   <Text style={s.cRightWide}>{n(r.adjustments) ? eur(r.adjustments) : "—"}</Text>
                   <Text style={s.cRightWide}>{eur(r.gross_pay)}</Text>
                   <Text style={s.cRightWide}>{n(r.expenses) ? eur(r.expenses) : "—"}</Text>
@@ -212,11 +206,8 @@ export async function renderPayrollReport(args: {
                 <Text style={s.cNum} />
                 <Text style={s.cRight} />
                 <Text style={s.cRight}>{t.standard.toFixed(2)}</Text>
-                <Text style={s.cRight}>{t.overtime.toFixed(2)}</Text>
-                <Text style={s.cRight} />
                 <Text style={s.cRight} />
                 <Text style={s.cRightWide}>{eur(t.base)}</Text>
-                <Text style={s.cRightWide}>{eur(t.ot)}</Text>
                 <Text style={s.cRightWide}>{eur(t.adj)}</Text>
                 <Text style={s.cRightWide}>{eur(t.gross)}</Text>
                 <Text style={s.cRightWide}>{eur(t.expenses)}</Text>
@@ -231,12 +222,9 @@ export async function renderPayrollReport(args: {
             <Text style={[s.thText, s.cName]}>All sites</Text>
             <Text style={[s.thText, s.cNum]}>{rows.length} employees</Text>
             <Text style={[s.thText, s.cRight]} />
-            <Text style={[s.thText, s.cRight]}>Std hrs</Text>
-            <Text style={[s.thText, s.cRight]}>OT hrs</Text>
-            <Text style={[s.thText, s.cRight]} />
+            <Text style={[s.thText, s.cRight]}>Hours</Text>
             <Text style={[s.thText, s.cRight]} />
             <Text style={[s.thText, s.cRightWide]}>Base pay</Text>
-            <Text style={[s.thText, s.cRightWide]}>OT pay</Text>
             <Text style={[s.thText, s.cRightWide]}>Adjust.</Text>
             <Text style={[s.thText, s.cRightWide]}>Gross</Text>
             <Text style={[s.thText, s.cRightWide]}>Expenses</Text>
@@ -246,18 +234,16 @@ export async function renderPayrollReport(args: {
             <Text style={s.cNum} />
             <Text style={s.cRight} />
             <Text style={s.cRight}>{totals.standard.toFixed(2)}</Text>
-            <Text style={s.cRight}>{totals.overtime.toFixed(2)}</Text>
-            <Text style={s.cRight} />
             <Text style={s.cRight} />
             <Text style={s.cRightWide}>{eur(totals.base)}</Text>
-            <Text style={s.cRightWide}>{eur(totals.ot)}</Text>
             <Text style={s.cRightWide}>{eur(totals.adj)}</Text>
             <Text style={s.cRightWide}>{eur(totals.gross)}</Text>
             <Text style={s.cRightWide}>{eur(totals.expenses)}</Text>
           </View>
           <Text style={[s.muted, { marginTop: 8 }]}>
-            Gross pay is base plus overtime plus adjustments. Expenses are reimbursements and are shown separately
-            because they are not taxable pay. Figures include approved hours only.
+            Gross pay is base pay plus adjustments. Expenses are reimbursements and are shown separately
+            because they are not taxable pay. Hours run from start to finish with no break deducted, and the
+            figures include approved hours only.
           </Text>
         </View>
 

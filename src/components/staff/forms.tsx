@@ -7,12 +7,11 @@ import { LEAVE_TYPES, shiftHours } from "@/features/workforce/schema";
 
 type Opt = { value: string; label: string };
 
-export function LogHoursForm({ projects, sites, defaults }: { projects: Opt[]; sites: Opt[]; defaults?: { work_date?: string; start?: string; end?: string; breakMinutes?: number; project_id?: string; site_id?: string; shift_id?: string } }) {
+export function LogHoursForm({ projects, sites, defaults }: { projects: Opt[]; sites: Opt[]; defaults?: { work_date?: string; start?: string; end?: string; project_id?: string; site_id?: string; shift_id?: string } }) {
   const [start, setStart] = useState(defaults?.start ?? "08:00");
   const [end, setEnd] = useState(defaults?.end ?? "16:00");
-  const [breakMins, setBreakMins] = useState(String(defaults?.breakMinutes ?? 30));
   const [submitNow, setSubmitNow] = useState(true);
-  const hours = shiftHours(start, end, Number(breakMins) || 0);
+  const hours = shiftHours(start, end, 0);
   return (
     <Form action={submitMyHours}>
       {defaults?.shift_id ? <Hidden name="shift_id" value={defaults.shift_id} /> : null}
@@ -21,10 +20,6 @@ export function LogHoursForm({ projects, sites, defaults }: { projects: Opt[]; s
       <FormRow>
         <TextField name="start_time" label="Start" type="time" value={start} onChange={(e) => setStart(e.target.value)} required />
         <TextField name="end_time" label="Finish" type="time" value={end} onChange={(e) => setEnd(e.target.value)} required />
-      </FormRow>
-      <FormRow>
-        <TextField name="break_minutes" label="Break (minutes)" type="number" min={0} max={599} value={breakMins} onChange={(e) => setBreakMins(e.target.value)} />
-        <TextField name="overtime_hours" label="Overtime hours" type="number" min={0} max={24} step="0.25" defaultValue="0" />
       </FormRow>
       <p className="rounded-md bg-copper/10 px-4 py-3 text-sm">You worked <span className="num-lining font-medium">{hours.toFixed(2)}</span> hours.</p>
       <SelectField name="project_id" label="Project" optional options={projects} placeholder="Not on a project" defaultValue={defaults?.project_id ?? ""} />

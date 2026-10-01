@@ -21,13 +21,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   if (!period) return new NextResponse("Not found", { status: 404 });
   const [entries, emap] = await Promise.all([listPayrollEntries(ctx, id), employeeMap(ctx)]);
 
-  const header = ["Employee number", "First name", "Last name", "Standard hours", "Hourly rate", "Base pay", "Overtime hours", "Overtime rate", "Overtime pay", "Adjustments", "Gross pay", "Expenses (non-taxable)", "Timesheets", "Period start", "Period end", "Pay date"];
+  const header = ["Employee number", "First name", "Last name", "Hours", "Hourly rate", "Base pay", "Adjustments", "Gross pay", "Expenses (non-taxable)", "Timesheets", "Period start", "Period end", "Pay date"];
   const lines = [header.map(csvCell).join(",")];
   for (const e of entries) {
     const emp = emap.get(e.employee_id);
     lines.push([
       emp?.employee_number ?? "", emp?.full_name?.split(" ")[0] ?? "", emp?.full_name?.split(" ").slice(1).join(" ") ?? "",
-      e.standard_hours, e.hourly_rate, e.base_pay, e.overtime_hours, e.overtime_rate, e.overtime_pay,
+      e.standard_hours, e.hourly_rate, e.base_pay,
       e.adjustments, e.gross_pay, e.expenses, e.timesheet_count, period.start_date, period.end_date, period.pay_date ?? "",
     ].map(csvCell).join(","));
   }

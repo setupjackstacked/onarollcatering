@@ -32,15 +32,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ repo
     case "hours-by-employee": {
       const { data } = await ctx.supabase.rpc("report_employee_hours", { p_org: org, p_days: daysBetween(from, to) });
       return csvResponse(`employee-hours_${stamp}.csv`, toCsv(
-        ["Employee number", "Employee", "Hours", "Overtime", "Labour cost"],
-        rows(data).map((r) => [r.employee_number, r.full_name, r.hours, r.overtime, r.labour_cost]),
+        ["Employee number", "Employee", "Hours", "Labour cost"],
+        rows(data).map((r) => [r.employee_number, r.full_name, r.hours, r.labour_cost]),
       ));
     }
     case "hours-by-site": {
       const { data } = await ctx.supabase.rpc("report_hours_by_site", { p_org: org, p_from: from, p_to: to });
       return csvResponse(`hours-by-site_${stamp}.csv`, toCsv(
-        ["Site", "People", "Hours", "Overtime", "Labour cost"],
-        rows(data).map((r) => [r.site_name, r.employees, r.hours, r.overtime, r.labour_cost]),
+        ["Site", "People", "Hours", "Labour cost"],
+        rows(data).map((r) => [r.site_name, r.employees, r.hours, r.labour_cost]),
       ));
     }
     case "absence": {

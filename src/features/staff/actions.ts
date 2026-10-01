@@ -17,8 +17,7 @@ export async function submitMyHours(_: FormState, formData: FormData): Promise<F
   const { data, error } = await ctx.supabase.from("timesheets").insert({
     organisation_id: ctx.organisation.id, employee_id: employee.id, shift_id: shiftId,
     project_id: nullable(d.project_id), site_id: nullable(d.site_id), work_date: d.work_date,
-    start_time: d.start_time, end_time: d.end_time, break_minutes: d.break_minutes,
-    overtime_hours: d.overtime_hours.toFixed(2), notes: nullable(d.notes), created_by: ctx.user.id,
+    start_time: d.start_time, end_time: d.end_time, notes: nullable(d.notes), created_by: ctx.user.id,
   }).select("id").single();
   if (error || !data) {
     if (error?.code === "23505") return { error: "You’ve already logged hours starting at that time on that date." };

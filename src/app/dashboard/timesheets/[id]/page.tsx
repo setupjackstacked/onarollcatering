@@ -39,7 +39,6 @@ export default async function TimesheetPage({ params }: { params: Promise<{ id: 
         </>} />
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Metric label="Hours worked" value={Number(ts.hours).toFixed(2)} />
-        <Metric label="Overtime" value={Number(ts.overtime_hours).toFixed(2)} />
         <Metric label="Total" value={total.toFixed(2)} />
         {ctx.can("finance.read") ? <Metric label="Labour cost" value={ts.hourly_rate ? formatMoney(Math.round(total * toPence(ts.hourly_rate))) : "—"} hint={ts.hourly_rate ? `at ${formatMoney(toPence(ts.hourly_rate))}/hr` : "Rate applied on approval"} /> : null}
       </div>
@@ -51,7 +50,7 @@ export default async function TimesheetPage({ params }: { params: Promise<{ id: 
           ) : (
             <Panel title="Details">
               <DescriptionList cols={2} items={[
-                { label: "Break", value: `${ts.break_minutes} minutes` }, { label: "Submitted", value: ts.submitted_at ? formatDateUK(ts.submitted_at, true) : null },
+                { label: "Submitted", value: ts.submitted_at ? formatDateUK(ts.submitted_at, true) : null },
                 { label: "Approved", value: ts.approved_at ? formatDateUK(ts.approved_at, true) : null }, { label: "Notes", value: ts.notes },
               ]} />
             </Panel>

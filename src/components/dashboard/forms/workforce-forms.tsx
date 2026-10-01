@@ -80,7 +80,6 @@ export function ShiftForm({ shift, employees, projects, sites, roles, returnTo, 
   const [date, setDate] = useState(shift?.shift_date ?? defaults?.shift_date ?? "");
   const [start, setStart] = useState(shift?.start_time?.slice(0, 5) ?? "08:00");
   const [end, setEnd] = useState(shift?.end_time?.slice(0, 5) ?? "16:00");
-  const [breakMins, setBreakMins] = useState(String(shift?.break_minutes ?? 30));
   const [warnings, setWarnings] = useState<{ kind: string; detail: string }[]>([]);
   const [, startTransition] = useTransition();
 
@@ -99,7 +98,7 @@ export function ShiftForm({ shift, employees, projects, sites, roles, returnTo, 
     return () => { cancelled = true; clearTimeout(t); };
   }, [employeeId, date, start, end, shift?.id]);
 
-  const hours = start && end ? shiftHours(start, end, Number(breakMins) || 0) : 0;
+  const hours = start && end ? shiftHours(start, end, 0) : 0;
 
   return (
     <Form action={saveShift.bind(null, shift?.id ?? null)}>
@@ -114,8 +113,7 @@ export function ShiftForm({ shift, employees, projects, sites, roles, returnTo, 
         <TextField name="start_time" label="Start" type="time" value={start} onChange={(e) => setStart(e.target.value)} required />
         <TextField name="end_time" label="Finish" type="time" value={end} onChange={(e) => setEnd(e.target.value)} required hint={end <= start ? "Overnight shift" : undefined} />
       </FormRow>
-      <FormRow cols={3}>
-        <TextField name="break_minutes" label="Break (minutes)" type="number" min={0} max={599} value={breakMins} onChange={(e) => setBreakMins(e.target.value)} />
+      <FormRow cols={2}>
         <SelectField name="role_key" label="Role on shift" optional options={roles} placeholder="Their usual role" defaultValue={shift?.role_key ?? ""} />
         <SelectField name="status" label="Status" options={SHIFT_STATUSES} defaultValue={shift?.status ?? "draft"} hint="Published shifts are visible to staff" />
       </FormRow>
@@ -143,8 +141,7 @@ export function ShiftForm({ shift, employees, projects, sites, roles, returnTo, 
 export function TimesheetForm({ timesheet, employees, projects, sites, returnTo, defaults, lockEmployee }: { timesheet?: Tables<"timesheets"> | null; employees: Opt[]; projects: Opt[]; sites: Opt[]; returnTo?: string; defaults?: { work_date?: string; employee_id?: string; project_id?: string; site_id?: string }; lockEmployee?: boolean }) {
   const [start, setStart] = useState(timesheet?.start_time?.slice(0, 5) ?? "08:00");
   const [end, setEnd] = useState(timesheet?.end_time?.slice(0, 5) ?? "16:00");
-  const [breakMins, setBreakMins] = useState(String(timesheet?.break_minutes ?? 30));
-  const hours = shiftHours(start, end, Number(breakMins) || 0);
+  const hours = shiftHours(start, end, 0);
   const employeeId = timesheet?.employee_id ?? defaults?.employee_id ?? "";
   return (
     <Form action={saveTimesheet.bind(null, timesheet?.id ?? null)}>
@@ -160,11 +157,7 @@ export function TimesheetForm({ timesheet, employees, projects, sites, returnTo,
         <TextField name="start_time" label="Start" type="time" value={start} onChange={(e) => setStart(e.target.value)} required />
         <TextField name="end_time" label="Finish" type="time" value={end} onChange={(e) => setEnd(e.target.value)} required />
       </FormRow>
-      <FormRow cols={3}>
-        <TextField name="break_minutes" label="Break (minutes)" type="number" min={0} max={599} value={breakMins} onChange={(e) => setBreakMins(e.target.value)} />
-        <TextField name="overtime_hours" label="Overtime hours" type="number" min={0} max={24} step="0.25" defaultValue={timesheet?.overtime_hours ?? "0"} />
-        <div className="sm:pt-7 text-sm text-muted-light">Hours worked: <span className="num-lining font-medium text-graphite">{hours.toFixed(2)}</span></div>
-      </FormRow>
+      <p className="text-sm text-muted-light">Hours worked: <span className="num-lining font-medium text-graphite">{hours.toFixed(2)}</span> — start to finish, no break deducted.</p>
       <TextArea name="notes" label="Notes" optional defaultValue={timesheet?.notes ?? ""} rows={2} />
       <FormActions>
         <SubmitButton>{timesheet ? "Save" : "Log hours"}</SubmitButton>

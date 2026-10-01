@@ -53,7 +53,6 @@ export const shiftSchema = z.object({
   shift_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a date"),
   start_time: time,
   end_time: time,
-  break_minutes: z.coerce.number().int().min(0).max(599).default(0),
   role_key: optionalText(60),
   status: z.enum(["draft", "published", "completed", "cancelled"]).default("draft"),
   notes: optionalText(1000),
@@ -66,8 +65,6 @@ export const timesheetSchema = z.object({
   work_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a date"),
   start_time: time,
   end_time: time,
-  break_minutes: z.coerce.number().int().min(0).max(599).default(0),
-  overtime_hours: z.coerce.number().min(0).max(24).default(0),
   notes: optionalText(1000),
 });
 

@@ -3,7 +3,7 @@ import { requireOrgContext } from "@/lib/auth/context";
 import { getPayPeriod, listPayrollEntries, payPeriodTotals, unbuiltTimesheetCount } from "@/features/payroll/queries";
 import { buildPeriod, finalisePeriod, reopenPeriod, deletePayPeriod, deleteAdjustment, markExported } from "@/features/payroll/actions";
 import { employeeMap } from "@/features/workforce/queries";
-import { PAY_PERIOD_STATUSES, ADJUSTMENT_KINDS, DEFAULT_OVERTIME_MULTIPLIER } from "@/features/payroll/schema";
+import { PAY_PERIOD_STATUSES, ADJUSTMENT_KINDS } from "@/features/payroll/schema";
 import { EntityHeader, ActionLink, DescriptionList } from "@/components/dashboard/entity";
 import { Panel, Metric, StatusBadge } from "@/components/dashboard/primitives";
 import { ConfirmAction } from "@/components/dashboard/confirm";
@@ -45,10 +45,9 @@ export default async function PayPeriodPage({ params }: { params: Promise<{ id: 
           {canWrite && !locked ? <ConfirmAction action={deletePayPeriod.bind(null, id)} label="Delete" title="Delete this pay period?" description="Entries and adjustments are deleted. Timesheets are not affected." confirmLabel="Delete" /> : null}
         </>} />
 
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-5">
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
         <Metric label="Employees" value={totals.employees} />
         <Metric label="Standard hours" value={totals.hours.toFixed(2)} />
-        <Metric label="Overtime hours" value={totals.overtime.toFixed(2)} hint={`at ${DEFAULT_OVERTIME_MULTIPLIER}×`} />
         <Metric label="Gross pay" value={formatMoney(totals.gross, { showPence: false })} hint="Before PAYE, NI and pension" />
         <Metric label="Reimbursements" value={formatMoney(totals.expenses, { showPence: false })} hint="Paid separately, not taxable" />
       </div>
@@ -63,7 +62,7 @@ export default async function PayPeriodPage({ params }: { params: Promise<{ id: 
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="text-left text-xs uppercase tracking-wider text-muted-light">
-                  <tr><th className="py-2 pr-3 font-medium">Employee</th><th className="py-2 pr-3 text-right font-medium">Hours</th><th className="py-2 pr-3 text-right font-medium">Rate</th><th className="py-2 pr-3 text-right font-medium">Overtime</th><th className="py-2 pr-3 text-right font-medium">Adjustments</th><th className="py-2 pr-3 text-right font-medium">Gross</th><th className="py-2 text-right font-medium">Expenses</th></tr>
+                  <tr><th className="py-2 pr-3 font-medium">Employee</th><th className="py-2 pr-3 text-right font-medium">Hours</th><th className="py-2 pr-3 text-right font-medium">Rate</th><th className="py-2 pr-3 text-right font-medium">Adjustments</th><th className="py-2 pr-3 text-right font-medium">Gross</th><th className="py-2 text-right font-medium">Expenses</th></tr>
                 </thead>
                 <tbody className="divide-y divide-graphite/10">
                   {entries.map((e) => {
@@ -87,7 +86,6 @@ export default async function PayPeriodPage({ params }: { params: Promise<{ id: 
                         </td>
                         <td className="py-2 pr-3 text-right num-lining">{Number(e.standard_hours).toFixed(2)}</td>
                         <td className="py-2 pr-3 text-right num-lining">{formatMoney(toPence(e.hourly_rate))}</td>
-                        <td className="py-2 pr-3 text-right num-lining">{Number(e.overtime_hours).toFixed(2)}{Number(e.overtime_hours) > 0 ? <span className="block text-xs text-muted-light">{formatMoney(toPence(e.overtime_pay))}</span> : null}</td>
                         <td className="py-2 pr-3 text-right num-lining">{formatMoney(toPence(e.adjustments))}</td>
                         <td className="py-2 pr-3 text-right num-lining font-medium">{formatMoney(toPence(e.gross_pay))}</td>
                         <td className="py-2 text-right num-lining text-muted-light">{formatMoney(toPence(e.expenses))}</td>

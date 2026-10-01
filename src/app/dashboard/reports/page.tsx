@@ -161,13 +161,12 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
             <Panel title="Employee hours" action={<ActionLink href={exportHref("hours-by-employee")} className="h-8 px-3 text-xs">CSV</ActionLink>}>
               {data.employees.length ? (
                 <table className="w-full text-sm">
-                  <thead className="text-left text-xs uppercase tracking-wider text-muted-light"><tr><th className="py-2 pr-3 font-medium">Employee</th><th className="py-2 pr-3 text-right font-medium">Hours</th><th className="py-2 pr-3 text-right font-medium">Overtime</th><th className="py-2 text-right font-medium">Cost</th></tr></thead>
+                  <thead className="text-left text-xs uppercase tracking-wider text-muted-light"><tr><th className="py-2 pr-3 font-medium">Employee</th><th className="py-2 pr-3 text-right font-medium">Hours</th><th className="py-2 text-right font-medium">Cost</th></tr></thead>
                   <tbody className="divide-y divide-graphite/10">
                     {data.employees.map((e) => (
                       <tr key={e.employee_id}>
                         <td className="py-2 pr-3"><Link href={`/dashboard/employees/${e.employee_id}/timesheets`} className="underline">{e.full_name}</Link></td>
                         <td className="py-2 pr-3 text-right num-lining">{Number(e.hours).toFixed(2)}</td>
-                        <td className="py-2 pr-3 text-right num-lining">{Number(e.overtime).toFixed(2)}</td>
                         <td className="py-2 text-right num-lining">{formatMoney(toPence(e.labour_cost), { showPence: false })}</td>
                       </tr>
                     ))}

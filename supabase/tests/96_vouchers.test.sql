@@ -20,9 +20,12 @@ begin
   insert into public.site_assignments (organisation_id, site_id, user_id, employee_id, role, is_primary)
   values (v_org, v_site, v_staff, v_emp, 'staff', true);
 
-  select id into v_vouchers from public.voucher_categories where organisation_id = v_org and key = 'vouchers';
-  select id into v_free     from public.voucher_categories where organisation_id = v_org and key = 'free-meals';
+  -- The business counts meals served, and whether a drink went with it.
+  select id into v_vouchers from public.voucher_categories where organisation_id = v_org and key = 'lunch';
+  select id into v_free     from public.voucher_categories where organisation_id = v_org and key = 'lunch-drink';
   if v_vouchers is null or v_free is null then raise exception 'voucher categories not seeded'; end if;
+  select count(*) into n from public.voucher_categories where organisation_id = v_org and active;
+  if n <> 4 then raise exception 'expected 4 active voucher categories, found %', n; end if;
 
   -- staff at the site log the day
   perform test_as(v_staff);

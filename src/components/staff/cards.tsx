@@ -5,7 +5,7 @@ import { formatAddress, type Address } from "@/lib/domain/address";
 import { cn } from "@/lib/utils/cn";
 
 export type StaffShift = {
-  id: string; shift_date: string; start_time: string; end_time: string; break_minutes: number; hours: string; notes: string | null;
+  id: string; shift_date: string; start_time: string; end_time: string; hours: string; notes: string | null;
   projects?: unknown; sites?: unknown;
 };
 
@@ -18,7 +18,7 @@ export function ShiftCard({ shift, highlight }: { shift: StaffShift; highlight?:
     <article className={cn("rounded-lg border p-4", highlight ? "border-copper/40 bg-copper/[0.06]" : "border-graphite/10 bg-white/50")}>
       <p className="text-xs uppercase tracking-wider text-muted-light">{formatDateUK(shift.shift_date)}</p>
       <p className="font-display num-lining mt-1 text-2xl">{hhmm(shift.start_time)} – {hhmm(shift.end_time)}</p>
-      <p className="mt-1 text-sm text-muted-light">{Number(shift.hours).toFixed(2)} paid hours{shift.break_minutes ? ` · ${shift.break_minutes} min break` : ""}</p>
+      <p className="mt-1 text-sm text-muted-light">{Number(shift.hours).toFixed(2)} paid hours</p>
       {project ? <p className="mt-3 text-sm font-medium">{project.name}</p> : null}
       {site ? (
         <p className="mt-1 flex items-start gap-1.5 text-sm text-muted-light">
