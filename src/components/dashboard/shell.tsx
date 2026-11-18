@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Bell, Search, LogOut, ChevronDown } from "lucide-react";
 import type { Permission } from "@/lib/auth/permissions";
@@ -27,6 +27,28 @@ export function DashboardShell({ orgName, userEmail, roleLabel, permissions, unr
   const [collapsed, setCollapsed] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement | null>(null);
+
+  // Dismiss the account menu on an outside click.
+  //
+  // This used to be a `fixed inset-0` overlay, which cannot work here: the
+  // header applies backdrop-blur, and a backdrop-filter makes the element a
+  // containing block for fixed-position descendants, so the overlay only ever
+  // covered the header strip. Listening on the document has no such ancestor
+  // to be trapped by.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onPointerDown = (e: PointerEvent) => {
+      if (!accountRef.current?.contains(e.target as Node)) setMenuOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
 
   useEffect(() => {
     try {
@@ -70,7 +92,7 @@ export function DashboardShell({ orgName, userEmail, roleLabel, permissions, unr
               ) : null}
             </Link>
 
-            <div className="relative">
+            <div className="relative" ref={accountRef}>
               <button type="button" onClick={() => setMenuOpen((o) => !o)} aria-haspopup="menu" aria-expanded={menuOpen} className="flex h-10 items-center gap-2 rounded-full pl-1 pr-2 hover:bg-graphite/5">
                 <span className="flex size-8 items-center justify-center rounded-full bg-obsidian text-xs font-medium uppercase text-ivory">{userEmail.slice(0, 1)}</span>
                 <span className="hidden max-w-[10rem] truncate text-sm md:block">{userEmail}</span>
@@ -78,7 +100,6 @@ export function DashboardShell({ orgName, userEmail, roleLabel, permissions, unr
               </button>
               {menuOpen ? (
                 <>
-                  <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
                   <div role="menu" className="absolute right-0 z-50 mt-2 w-60 rounded-lg border border-graphite/10 bg-ivory p-1 shadow-lg">
                     <div className="px-3 py-2">
                       <p className="truncate text-sm font-medium">{userEmail}</p>

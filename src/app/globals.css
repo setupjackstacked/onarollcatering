@@ -99,6 +99,14 @@ body {
 @utility display-xl {
   font-size: clamp(2.75rem, 1.2rem + 6.2vw, 7rem);
 }
+/* The banner headline. display-xl tops out at 7rem, which suits a four-word
+   line and swallows the viewport on a nine-word one — the call to action and
+   the service strip end up below the fold on a laptop. This caps lower while
+   keeping almost the same size on a phone, where the long headline already
+   fits. */
+@utility display-hero {
+  font-size: clamp(2.5rem, 1.2rem + 4.6vw, 5.25rem);
+}
 @utility display-lg {
   font-size: clamp(2.25rem, 1rem + 4.2vw, 4.75rem);
 }

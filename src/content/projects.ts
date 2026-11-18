@@ -1,12 +1,12 @@
 import { stock } from "./images";
 
-export type ProjectCategory =
-  | "Commercial Catering"
-  | "Modular Kitchen"
-  | "Kitchen Fit-Out"
-  | "Corporate"
-  | "Construction"
-  | "Industrial";
+/**
+ * The same three categories the rest of the site uses. The old labels
+ * (Kitchen Fit-Out, Modular Kitchen, Construction, Industrial) described the
+ * setting or the task rather than the offer, and gave a visitor six filters
+ * for three kinds of work. A project can sit under more than one.
+ */
+export type ProjectCategory = "Commercial Kitchens" | "Contract Catering" | "Project Delivery";
 
 export type Project = {
   slug: string;
@@ -48,7 +48,7 @@ export const projects: Project[] = [
     title: "Site-wide catering for a major infrastructure compound",
     client: "Sample client — confidential",
     location: "Sample location, UK",
-    categories: ["Commercial Catering", "Construction", "Modular Kitchen"],
+    categories: ["Contract Catering", "Project Delivery"],
     summary:
       "Sample case study: a modular kitchen and canteen deployed and operated for a large construction workforce on a multi-year programme.",
     scope: ["Modular kitchen and dining facility", "Full catering team", "Seven-day food service", "Supply chain and compliance"],
@@ -76,7 +76,7 @@ export const projects: Project[] = [
     title: "Design and fit-out of a corporate production kitchen",
     client: "Sample client — confidential",
     location: "Sample location, UK",
-    categories: ["Kitchen Fit-Out", "Corporate"],
+    categories: ["Commercial Kitchens"],
     summary:
       "Sample case study: full design, equipment specification and installation of a staff-restaurant kitchen in a live office environment.",
     scope: ["Kitchen design", "Equipment specification", "Extraction and refrigeration", "Phased installation", "Commissioning"],
@@ -104,7 +104,7 @@ export const projects: Project[] = [
     title: "Shift-pattern catering for an industrial manufacturing site",
     client: "Sample client — confidential",
     location: "Sample location, UK",
-    categories: ["Commercial Catering", "Industrial"],
+    categories: ["Contract Catering"],
     summary:
       "Sample case study: a 24-hour catering operation serving rotating shifts, with menus and staffing built around production patterns.",
     scope: ["Contract catering", "Extended-hours service", "Team management", "Compliance and audit"],
@@ -128,12 +128,9 @@ export const projects: Project[] = [
 ];
 
 export const projectCategories: ProjectCategory[] = [
-  "Commercial Catering",
-  "Modular Kitchen",
-  "Kitchen Fit-Out",
-  "Corporate",
-  "Construction",
-  "Industrial",
+  "Commercial Kitchens",
+  "Contract Catering",
+  "Project Delivery",
 ];
 
 export function getProject(slug: string) {

@@ -50,32 +50,30 @@ export function Hero() {
               <p className="eyebrow text-copper">{hero.eyebrow}</p>
             </Reveal>
             <Reveal delay={80}>
-              <h1 className="font-display display-xl text-balance mt-5 max-w-[14ch]">{hero.headline}</h1>
+              <h1 className="font-display display-hero text-balance mt-5 max-w-[16ch]">{hero.headline}</h1>
             </Reveal>
             <Reveal delay={160}>
               <p className="mt-8 max-w-xl text-pretty text-lg leading-relaxed text-ivory/75 md:text-xl">{hero.supporting}</p>
+              <p className="mt-4 max-w-2xl text-pretty text-base leading-relaxed text-ivory/60">{hero.supportingDetail}</p>
             </Reveal>
             <Reveal delay={240} className="mt-10 flex flex-wrap gap-3">
               <LinkButton href={hero.primaryCta.href} variant="copper" size="lg" arrow>
                 {hero.primaryCta.label}
               </LinkButton>
-              <LinkButton href={hero.secondaryCta.href} variant="outlineLight" size="lg">
-                {hero.secondaryCta.label}
-              </LinkButton>
             </Reveal>
           </div>
 
           <Reveal delay={320} className="hidden md:col-span-3 md:block lg:col-span-4">
-            <p className="eyebrow text-ivory/45">Established {new Date().getFullYear() - 2023 >= 0 ? "2023" : ""}</p>
+            <p className="eyebrow text-ivory/45">Established 2023</p>
             <p className="mt-3 max-w-[22ch] text-sm leading-relaxed text-ivory/60">
-              Integrated catering infrastructure and operations for sites, workplaces and organisations across the UK.
+              {hero.establishedNote}
             </p>
           </Reveal>
         </div>
 
         {/* Credibility line */}
         <Reveal delay={400} className="mt-14 border-t border-ivory/12 pt-5">
-          <ul className="no-scrollbar -mx-5 flex gap-8 overflow-x-auto px-5 md:mx-0 md:grid md:grid-cols-5 md:gap-4 md:px-0">
+          <ul className="no-scrollbar -mx-5 flex gap-8 overflow-x-auto px-5 md:mx-0 md:grid md:grid-cols-3 md:gap-6 md:px-0">
             {credibilityLine.map((item, i) => (
               <li key={item} className="flex shrink-0 items-baseline gap-3 text-sm text-ivory/70">
                 <span className="font-display text-base text-copper">0{i + 1}</span>

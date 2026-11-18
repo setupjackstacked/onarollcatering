@@ -26,11 +26,15 @@ export const site = {
   vatNumber: null as string | null, // PLACEHOLDER
 } as const;
 
+/**
+ * The three categories the business leads with. Modular facilities and
+ * staffing are still delivered — they sit beneath Project Delivery and
+ * Contract Catering respectively — but they are no longer presented as
+ * core services in their own right.
+ */
 export const credibilityLine = [
   "Commercial Kitchens",
   "Contract Catering",
-  "Modular Facilities",
-  "Staffing",
   "Project Delivery",
 ] as const;
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { navigation, site, credibilityLine } from "@/content/site";
-import { services } from "@/content/services";
+import { pillars, servicesInPillar } from "@/content/services";
 import { Logo } from "./logo";
 import { LinkButton } from "@/components/ui/button";
 
@@ -24,12 +24,23 @@ export function Footer() {
         <div className="grid grid-cols-2 gap-8 md:col-span-7 md:grid-cols-3">
           <div>
             <p className="eyebrow text-ivory/45">Services</p>
-            <ul className="mt-5 space-y-3">
-              {services.map((s) => (
-                <li key={s.slug}>
-                  <Link href={`/services/${s.slug}`} className="text-[0.9375rem] text-ivory/80 transition-colors hover:text-ivory">
-                    {s.title}
+            <ul className="mt-5 space-y-5">
+              {pillars.map((p) => (
+                <li key={p.slug}>
+                  <Link href="/services" className="text-[0.9375rem] text-ivory/80 transition-colors hover:text-ivory">
+                    {p.title}
                   </Link>
+                  {/* The detailed pages stay reachable, just not presented as
+                      core services in their own right. */}
+                  <ul className="mt-2 space-y-2">
+                    {servicesInPillar(p).map((s) => (
+                      <li key={s.slug}>
+                        <Link href={`/services/${s.slug}`} className="text-sm text-ivory/55 transition-colors hover:text-ivory/80">
+                          {s.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
                 </li>
               ))}
             </ul>

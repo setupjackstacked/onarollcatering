@@ -37,23 +37,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Capabilities — dark, large numbered list */}
-      <section className="surface-dark grain relative">
-        <div className="container-x grid grid-cols-1 gap-12 py-20 md:grid-cols-12 md:py-32">
-          <div className="md:col-span-4">
-            <SectionIntro tone="dark" eyebrow="Capabilities" heading="What we deliver" size="md" />
-          </div>
-          <ol className="md:col-span-8">
-            {about.capabilities.map((c, i) => (
-              <Reveal as="li" key={c} delay={i * 50} className="flex items-baseline gap-6 border-t border-ivory/12 py-5 last:border-b">
-                <span className="font-display text-lg text-copper">{String(i + 1).padStart(2, "0")}</span>
-                <span className="font-display text-2xl md:text-3xl">{c}</span>
-              </Reveal>
-            ))}
-          </ol>
-        </div>
-      </section>
-
       {/* Values — asymmetric two-column, no cards */}
       <section className="surface-stone">
         <div className="container-x py-20 md:py-32">

@@ -12,15 +12,6 @@ export const about = {
     heading: "Our approach",
     body: "We treat every engagement as a project with a scope, a programme and an outcome. The kitchen, the team and the food service are planned together, because on a working site they fail together if they aren't.",
   },
-  capabilities: [
-    "Commercial contract and workforce catering",
-    "Construction-site and temporary catering",
-    "Modular and Portacabin kitchen facilities",
-    "Commercial kitchen design and equipment specification",
-    "Kitchen fit-out, installation and commissioning",
-    "Employed and managed catering teams",
-    "Project mobilisation and ongoing operations",
-  ],
   values: [
     { title: "Accountable", body: "One contract, one point of contact, one team responsible for the result." },
     { title: "Practical", body: "Specifications and menus designed for throughput, cost and durability — not for show." },

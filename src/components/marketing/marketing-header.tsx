@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { navigation } from "@/content/site";
-import { services } from "@/content/services";
+import { pillars, servicesInPillar } from "@/content/services";
 import { cn } from "@/lib/utils/cn";
 import { LinkButton } from "@/components/ui/button";
 import { LogoLink } from "./logo";
@@ -100,20 +100,33 @@ export function MarketingHeader() {
               All services
             </Link>
           </div>
-          <ul className="col-span-8 grid grid-cols-2 gap-x-10 gap-y-2">
-            {services.map((s) => (
-              <li key={s.slug}>
+          <ul className="col-span-8 grid grid-cols-3 gap-x-8 gap-y-2">
+            {pillars.map((p) => (
+              <li key={p.slug}>
                 <Link
-                  href={`/services/${s.slug}`}
+                  href="/services"
                   className="group flex gap-4 rounded-md px-3 py-3 transition-colors hover:bg-ivory/5"
                   tabIndex={servicesOpen ? 0 : -1}
                 >
-                  <span className="font-display text-lg text-copper">{s.index}</span>
+                  <span className="font-display text-lg text-copper">{p.index}</span>
                   <span>
-                    <span className="block text-[0.9375rem] font-medium text-ivory">{s.title}</span>
-                    <span className="mt-1 block text-sm leading-snug text-ivory/60 group-hover:text-ivory/80">{s.summary}</span>
+                    <span className="block text-[0.9375rem] font-medium text-ivory">{p.title}</span>
+                    <span className="mt-1 block text-sm leading-snug text-ivory/60 group-hover:text-ivory/80">{p.summary}</span>
                   </span>
                 </Link>
+                <ul className="mb-2 ml-3 space-y-1 border-l border-ivory/10 pl-6">
+                  {servicesInPillar(p).map((s) => (
+                    <li key={s.slug}>
+                      <Link
+                        href={`/services/${s.slug}`}
+                        className="block py-1 text-sm text-ivory/55 transition-colors hover:text-ivory"
+                        tabIndex={servicesOpen ? 0 : -1}
+                      >
+                        {s.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </li>
             ))}
           </ul>

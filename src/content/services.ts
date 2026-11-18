@@ -325,3 +325,73 @@ export const services: Service[] = [
 export function getService(slug: string) {
   return services.find((s) => s.slug === slug);
 }
+
+/**
+ * The three categories the business presents publicly.
+ *
+ * The six detailed service pages above all stay live — they carry the real
+ * copy and the search value — but they are no longer offered as six separate
+ * things to choose between. Each sits beneath one of these pillars, so a
+ * visitor picks from three and then goes deeper if they want to.
+ *
+ * `services` is the detail; this is the shape of the offer.
+ */
+export type Pillar = {
+  slug: string;
+  index: string;
+  title: string;
+  summary: string;
+  /** Plain-language scope line, used where there is room for one. */
+  covers: string[];
+  /** Slugs of the detailed service pages that sit beneath this pillar. */
+  serviceSlugs: string[];
+  image: string;
+  imageAlt: string;
+};
+
+export const pillars: Pillar[] = [
+  {
+    slug: "commercial-kitchens",
+    index: "01",
+    title: "Commercial Kitchens",
+    summary:
+      "Kitchen design, fit-out, equipment specification and commissioning — a facility built around how the operation will actually run, then handed over working.",
+    covers: ["Kitchen design", "Fit-out and installation", "Equipment specification", "Commissioning"],
+    serviceSlugs: ["commercial-kitchen-design", "kitchen-fit-out"],
+    image: stock.kitchenDesign,
+    imageAlt: "Finished commercial kitchen with cooking ranges and extraction",
+  },
+  {
+    slug: "contract-catering",
+    index: "02",
+    title: "Contract Catering",
+    summary:
+      "Commercial, workforce, construction-site and corporate catering, delivered by employed and managed teams under a long-term contract.",
+    covers: ["Commercial catering", "Workforce catering", "Construction-site catering", "Corporate catering"],
+    serviceSlugs: ["commercial-catering", "catering-staffing"],
+    image: stock.commercialCatering,
+    imageAlt: "Servery counter in service at a corporate site",
+  },
+  {
+    slug: "project-delivery",
+    index: "03",
+    title: "Project Delivery",
+    summary:
+      "Modular facilities, bespoke projects and mobilisation — the work of getting a catering operation onto a site and running, including where design, build and service are delivered together.",
+    covers: ["Modular facilities", "Bespoke projects", "Mobilisation", "Combined delivery"],
+    serviceSlugs: ["modular-kitchens", "bespoke-projects"],
+    image: stock.modularKitchens,
+    imageAlt: "Modular kitchen unit with external extraction ducting",
+  },
+];
+
+/** The detailed service pages sitting beneath a pillar, in the order listed. */
+export function servicesInPillar(pillar: Pillar) {
+  return pillar.serviceSlugs
+    .map((slug) => services.find((s) => s.slug === slug))
+    .filter((s): s is Service => Boolean(s));
+}
+
+export function getPillar(slug: string) {
+  return pillars.find((p) => p.slug === slug);
+}

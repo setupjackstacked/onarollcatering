@@ -1,12 +1,17 @@
 import { stock } from "./images";
 
 export const hero = {
-  eyebrow: "Commercial catering & kitchen solutions",
-  headline: "Complete Commercial Catering Solutions",
+  eyebrow: "Corporate Catering & Modular Kitchen Solutions",
+  headline: "Specialised Catering Solutions for Industrial and Corporate Applications",
   supporting:
-    "From commercial kitchen design and fit-out to staffing, food service and ongoing operations, On A Roll delivers complete catering solutions for complex commercial environments.",
+    "On A Roll Catering delivers complete catering solutions for complex commercial environments.",
+  /** Second paragraph of the banner. Kept separate so the opening line can hold
+   *  its own weight at larger type while the detail sits beneath it. */
+  supportingDetail:
+    "We tailor our service to each site. We install and operate industrial kitchen facilities for small to medium-sized construction sites and corporate premises serving approximately 100–250 people. We also design, build and operate large-scale temporary catering facilities for approximately 850–2,000 people.",
+  /** Sits under "Established 2023" in the banner's right-hand column. */
+  establishedNote: "Can Compete in the UK and European Markets",
   primaryCta: { label: "Discuss Your Project", href: "/quote" },
-  secondaryCta: { label: "Explore Our Services", href: "/services" },
   media: {
     /** Swap for a real image or video path. Component supports both. */
     type: "image" as "image" | "video",
@@ -33,33 +38,6 @@ export const capability = {
   ],
   image: stock.capability,
   imageAlt: "Chef working at the pass in a commercial kitchen",
-};
-
-export const process = {
-  eyebrow: "How we work",
-  heading: "One partner, end to end",
-  steps: [
-    {
-      number: "01",
-      title: "Discover",
-      body: "Site survey, headcount, service pattern, utilities and constraints. We establish exactly what the operation needs before proposing anything.",
-    },
-    {
-      number: "02",
-      title: "Design",
-      body: "Kitchen layout, equipment schedule, facility type — built or modular — costed and programmed against the client's timeline.",
-    },
-    {
-      number: "03",
-      title: "Deliver",
-      body: "Fabrication, installation, modular deployment, commissioning and handover, coordinated with the wider project.",
-    },
-    {
-      number: "04",
-      title: "Operate",
-      body: "Staffing, daily service, supply chain and compliance under a managed contract for as long as the site needs it.",
-    },
-  ],
 };
 
 /**

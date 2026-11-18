@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/marketing/hero";
 import { EditorialSplit } from "@/components/marketing/editorial-split";
-import { ServiceShowcase } from "@/components/marketing/service-showcase";
-import { ProcessTimeline } from "@/components/marketing/process-timeline";
 import { ProjectFeature } from "@/components/marketing/project-feature";
 import { StatStrip } from "@/components/marketing/stat-strip";
 import { LogoStrip } from "@/components/marketing/logo-strip";
@@ -36,7 +34,6 @@ export default function HomePage() {
         image={{ src: capability.image, alt: capability.imageAlt }}
         tone="light"
       />
-      <ServiceShowcase />
       <WorkGallery
         images={homeGallery}
         eyebrow="On the ground"
@@ -44,7 +41,6 @@ export default function HomePage() {
         lead="Photographs from the kitchens we run — the food, the counters and the facilities behind them. Nothing here is a stock image."
         tone="stone"
       />
-      <ProcessTimeline />
       <StatStrip />
       <section className="surface-stone">
         <div className="container-x py-20 md:py-32">
